@@ -1,18 +1,23 @@
 package org.fullmetalfalcons.androidscouting;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.res.AssetManager;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.ViewGroup;
+import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.Space;
+import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -22,14 +27,16 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.HashMap;
 
-public class ScoutingActivity extends AppCompatActivity {
+public class ScoutingActivity extends AppCompatActivity implements CompoundButton.OnCheckedChangeListener {
 
     private final ArrayList<Element> ELEMENTS = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Utils.onActivityCreateSetTheme(this);
         setContentView(R.layout.activity_scouting);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -38,13 +45,27 @@ public class ScoutingActivity extends AppCompatActivity {
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
+                if (ScoutingActivity.this.checkFields()){
+                    ScoutingActivity.this.collectResults();
+                }
             }
         });
         LinearLayout l = (LinearLayout) findViewById(R.id.mainLinear);
         l.requestFocus();
+
         createTheApp();
+
+        Switch colorSwitch = (Switch) findViewById(R.id.team_color);
+        System.out.println("Restore");
+        Switch s = (Switch) findViewById(R.id.team_color);
+
+        if (savedInstanceState!=null) {
+            if (savedInstanceState.getBoolean("isRed")) {
+                s.setChecked(true);
+            }
+        }
+        colorSwitch.setOnCheckedChangeListener(this);
+
 
     }
 
@@ -84,7 +105,7 @@ public class ScoutingActivity extends AppCompatActivity {
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
 
         Space s = new Space(this);
-        s.setMinimumHeight(fab.getHeight()+fab.getPaddingBottom()+fab.getPaddingTop());
+        s.setMinimumHeight(fab.getHeight() + fab.getPaddingBottom() + fab.getPaddingTop());
         l.addView(s);
     }
 
@@ -117,5 +138,88 @@ public class ScoutingActivity extends AppCompatActivity {
         } catch (ElementParseException e1) {
             e1.printStackTrace();
         }
+    }
+
+    @Override
+    public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+        Log.d("check_changed", "Checked");
+        if (isChecked){
+            Utils.changeToTheme(this,Utils.THEME_RED);
+
+        } else {
+            Utils.changeToTheme(this, Utils.THEME_BLUE);
+        }
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle bundle) {
+        super.onSaveInstanceState(bundle);
+        Switch s = (Switch) findViewById(R.id.team_color);
+        bundle.putBoolean("isRed",s.isChecked());
+
+        ParcelableArrayList values = new ParcelableArrayList();
+        for (Element e: ELEMENTS){
+            values.add(e.getViewData());
+        }
+        bundle.putParcelable("fieldData",values);
+
+        bundle.putString("match_num", ((EditText) findViewById(R.id.match_num)).getText().toString());
+        bundle.putString("team_num", ((EditText) findViewById(R.id.team_num)).getText().toString());
+    }
+
+    @Override
+    protected void onRestoreInstanceState(Bundle bundle){
+        ParcelableArrayList values = (ParcelableArrayList) bundle.getParcelable("fieldData");
+
+        for (int i = 0; i< ELEMENTS.size();i++){
+            ELEMENTS.get(i).setViewData(values.get(i));
+        }
+
+        ((EditText) findViewById(R.id.match_num)).setText(bundle.getString("match_num"));
+        ((EditText) findViewById(R.id.team_num)).setText(bundle.getString("team_num"));
+
+    }
+
+    private boolean checkFields(){
+        String s = ((EditText) findViewById(R.id.team_num)).getText().toString();
+        if (s.equals("")){
+            sendError("Team Number must not be blank");
+            return false;
+        }
+
+        s = ((EditText) findViewById(R.id.match_num)).getText().toString();
+        if (s.equals("")){
+            sendError("Match Number must not be blank");
+            return false;
+        }
+
+
+
+
+        return true;
+    }
+
+    private void collectResults(){
+        HashMap<String, Object> values = new HashMap<>();
+        for (Element e:ELEMENTS){
+            values.putAll(e.getHash());
+        }
+
+        values.put("team_num",Integer.parseInt(((EditText) findViewById(R.id.team_num)).getText().toString()));
+        values.put("match_num",Integer.parseInt(((EditText) findViewById(R.id.match_num)).getText().toString()));
+        values.put("team_color", ((Switch) findViewById(R.id.team_color)).isChecked() ? "Red" : "Blue");
+    }
+
+    private void sendError(String message){
+        new AlertDialog.Builder(this)
+                .setTitle("Something is wrong")
+                .setMessage(message)
+                .setNeutralButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        // continue with delete
+                    }
+                })
+                .setIcon(android.R.drawable.ic_dialog_alert)
+                .show();
     }
 }

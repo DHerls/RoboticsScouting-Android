@@ -2,6 +2,7 @@ package org.fullmetalfalcons.androidscouting;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.res.Resources;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.text.InputType;
@@ -21,6 +22,8 @@ import android.widget.TextView;
 import org.honorato.multistatetogglebutton.MultiStateToggleButton;
 
 import java.lang.reflect.Type;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -178,9 +181,17 @@ public class Element {
 
                 MultiStateToggleButton mstb = new MultiStateToggleButton(activity);
                 mstb.setElements(arguments);
-                mstb.setColors(Color.BLUE, Color.WHITE);
                 mstb.setLayoutParams(lp);
                 mstb.setButtonState(mstb.getChildAt(0), true);
+
+                TypedValue typedValue = new TypedValue();
+                Resources.Theme theme = activity.getTheme();
+                theme.resolveAttribute(R.attr.colorPrimary, typedValue, true);
+                int color = typedValue.data;
+
+                mstb.setColors(color, Color.WHITE);
+
+
 
                 ll.addView(mstb);
 
@@ -268,20 +279,20 @@ public class Element {
                 }
 
                 tv.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,
-                        LinearLayout.LayoutParams.WRAP_CONTENT));
+                        LinearLayout.LayoutParams.MATCH_PARENT));
 
                 switch (arguments[1]){
                     case "left":
-                        tv.setGravity(Gravity.LEFT);
+                        tv.setGravity(Gravity.START);
                         break;
                     case "right":
-                        tv.setGravity(Gravity.RIGHT);
+                        tv.setGravity(Gravity.END);
                         break;
                     case "center":
                         tv.setGravity(Gravity.CENTER);
                         break;
                     default:
-                        tv.setGravity(Gravity.LEFT);
+                        tv.setGravity(Gravity.START);
                         break;
                 }
 
@@ -350,5 +361,127 @@ public class Element {
                 view = space;
                 break;
         }
+    }
+
+    public Object getViewData(){
+        LinearLayout ll;
+        switch(type){
+
+            case SEGMENTED_CONTROL:
+                ll = (LinearLayout) view;
+                MultiStateToggleButton mstb = (MultiStateToggleButton) ll.getChildAt(1);
+                return mstb.getValue();
+            case TEXTFIELD:
+                ll = (LinearLayout) view;
+                EditText et = (EditText) ll.getChildAt(1);
+                return et.getText().toString();
+            case STEPPER:
+                ll = (LinearLayout) view;
+                NumberPicker np = (NumberPicker) ((LinearLayout) view).getChildAt(1);
+                return np.getValue();
+            case LABEL:
+                return "";
+            case SWITCH:
+                ll = (LinearLayout) view;
+                ArrayList<Boolean> bool = new ArrayList<>();
+                LinearLayout innerLayout;
+                for ( int i = 0; i< ll.getChildCount(); i++){
+                   innerLayout = (LinearLayout) ll.getChildAt(i);
+                    bool.add(((Switch) innerLayout.getChildAt(1)).isChecked());
+                }
+                return bool;
+            case SPACE:
+                return "";
+            case SLIDER:
+                ll = (LinearLayout) view;
+                SeekBarWithValues sbwv = (SeekBarWithValues) ll.getChildAt(1);
+                return sbwv.getSeekBar().getProgress();
+        }
+
+        return null;
+    }
+
+    public void setViewData(Object viewData) {
+        LinearLayout ll;
+        switch(type){
+
+            case SEGMENTED_CONTROL:
+                ll = (LinearLayout) view;
+                MultiStateToggleButton mstb = (MultiStateToggleButton) ll.getChildAt(1);
+                mstb.setValue((int) viewData);
+                break;
+            case TEXTFIELD:
+                ll = (LinearLayout) view;
+                EditText et = (EditText) ll.getChildAt(1);
+                et.setText((String) viewData);
+                break;
+            case STEPPER:
+                ll = (LinearLayout) view;
+                NumberPicker np = (NumberPicker) ((LinearLayout) view).getChildAt(1);
+                np.setValue((int) viewData);
+                break;
+            case LABEL:
+                break;
+            case SWITCH:
+                ll = (LinearLayout) view;
+                ArrayList<Boolean> bool = (ArrayList<Boolean>) viewData;
+                LinearLayout innerLayout;
+                for ( int i = 0; i< ll.getChildCount(); i++){
+                    innerLayout = (LinearLayout) ll.getChildAt(i);
+                    ((Switch) innerLayout.getChildAt(1)).setChecked(bool.get(i));
+                }
+                break;
+            case SPACE:
+                break;
+            case SLIDER:
+                ll = (LinearLayout) view;
+                SeekBarWithValues sbwv = (SeekBarWithValues) ll.getChildAt(1);
+                sbwv.getSeekBar().setProgress((int) viewData);
+                break;
+        }
+
+    }
+
+    public HashMap<String, Object> getHash(){
+        HashMap<String, Object> map = new HashMap<>();
+        LinearLayout ll;
+        switch(type){
+
+            case SEGMENTED_CONTROL:
+                ll = (LinearLayout) view;
+                MultiStateToggleButton mstb = (MultiStateToggleButton) ll.getChildAt(1);
+                map.put(keys[0], arguments[mstb.getValue()]);
+            break;
+            case TEXTFIELD:
+                ll = (LinearLayout) view;
+                EditText et = (EditText) ll.getChildAt(1);
+                map.put(keys[0],et.getText().toString());
+            break;
+            case STEPPER:
+                ll = (LinearLayout) view;
+                NumberPicker np = (NumberPicker) ((LinearLayout) view).getChildAt(1);
+                map.put(keys[0],np.getValue());
+            break;
+            case LABEL:
+                break;
+            case SWITCH:
+                ll = (LinearLayout) view;
+                ArrayList<Boolean> bool = new ArrayList<>();
+                LinearLayout innerLayout;
+                for ( int i = 0; i< ll.getChildCount(); i++){
+                    innerLayout = (LinearLayout) ll.getChildAt(i);
+                    map.put(keys[i],((Switch) innerLayout.getChildAt(1)).isChecked());
+                }
+                break;
+            case SPACE:
+                break;
+            case SLIDER:
+                ll = (LinearLayout) view;
+                SeekBarWithValues sbwv = (SeekBarWithValues) ll.getChildAt(1);
+                map.put(keys[0],sbwv.getSeekBar().getProgress());
+            break;
+        }
+
+        return map;
     }
 }

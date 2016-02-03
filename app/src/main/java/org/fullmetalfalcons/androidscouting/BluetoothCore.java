@@ -41,8 +41,7 @@ public class BluetoothCore {
         firstService.addCharacteristic(firstServiceChar);
         ble.addService(firstService);
 
-        firstService.addCharacteristic(firstServiceChar);
-        ble.addService(firstService);
+        ble.startAdvertise();
     }
 
     private static BluetoothGattServerCallback gattServerCallback = new BluetoothGattServerCallback() {

@@ -66,6 +66,7 @@ public class ScoutingActivity extends AppCompatActivity implements CompoundButto
         }
         colorSwitch.setOnCheckedChangeListener(this);
 
+        BluetoothCore.startBLE(this);
 
     }
 

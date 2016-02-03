@@ -1,7 +1,9 @@
 package org.fullmetalfalcons.androidscouting;
 
 import android.app.AlertDialog;
+import android.bluetooth.BluetoothAdapter;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.res.AssetManager;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
@@ -57,11 +59,10 @@ public class ScoutingActivity extends AppCompatActivity implements CompoundButto
 
         Switch colorSwitch = (Switch) findViewById(R.id.team_color);
         System.out.println("Restore");
-        Switch s = (Switch) findViewById(R.id.team_color);
 
         if (savedInstanceState!=null) {
             if (savedInstanceState.getBoolean("isRed")) {
-                s.setChecked(true);
+                colorSwitch.setChecked(true);
             }
         }
         colorSwitch.setOnCheckedChangeListener(this);
@@ -155,6 +156,7 @@ public class ScoutingActivity extends AppCompatActivity implements CompoundButto
     @Override
     protected void onSaveInstanceState(Bundle bundle) {
         super.onSaveInstanceState(bundle);
+        BluetoothCore.stopBLE();
         Switch s = (Switch) findViewById(R.id.team_color);
         bundle.putBoolean("isRed",s.isChecked());
 
@@ -166,6 +168,7 @@ public class ScoutingActivity extends AppCompatActivity implements CompoundButto
 
         bundle.putString("match_num", ((EditText) findViewById(R.id.match_num)).getText().toString());
         bundle.putString("team_num", ((EditText) findViewById(R.id.team_num)).getText().toString());
+
     }
 
     @Override
@@ -184,13 +187,13 @@ public class ScoutingActivity extends AppCompatActivity implements CompoundButto
     private boolean checkFields(){
         String s = ((EditText) findViewById(R.id.team_num)).getText().toString();
         if (s.equals("")){
-            sendError("Team Number must not be blank");
+            sendError("Team Number must not be blank",false);
             return false;
         }
 
         s = ((EditText) findViewById(R.id.match_num)).getText().toString();
         if (s.equals("")){
-            sendError("Match Number must not be blank");
+            sendError("Match Number must not be blank",false);
             return false;
         }
 
@@ -211,16 +214,28 @@ public class ScoutingActivity extends AppCompatActivity implements CompoundButto
         values.put("team_color", ((Switch) findViewById(R.id.team_color)).isChecked() ? "Red" : "Blue");
     }
 
-    private void sendError(String message){
+    public void sendError(String message,final boolean fatalError){
         new AlertDialog.Builder(this)
                 .setTitle("Something is wrong")
+                .setCancelable(!fatalError)
                 .setMessage(message)
                 .setNeutralButton(android.R.string.ok, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
-                        // continue with delete
+                        if (fatalError) {
+                            System.exit(0);
+                        }
                     }
                 })
                 .setIcon(android.R.drawable.ic_dialog_alert)
                 .show();
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+            //Value of Bluetooth Request Code is 1
+            if ((requestCode == 1) && (resultCode == RESULT_OK)) {
+                BluetoothCore.enable();
+            }
     }
 }

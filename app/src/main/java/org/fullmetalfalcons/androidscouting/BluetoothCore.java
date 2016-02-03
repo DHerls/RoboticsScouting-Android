@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothGatt;
 import android.bluetooth.BluetoothGattCharacteristic;
+import android.bluetooth.BluetoothGattDescriptor;
 import android.bluetooth.BluetoothGattServerCallback;
 import android.bluetooth.BluetoothGattService;
 import android.bluetooth.le.AdvertiseCallback;
@@ -13,47 +14,47 @@ import android.util.Log;
 import java.util.UUID;
 
 /**
+ *
  * Created by djher on 2/2/2016.
  */
 public class BluetoothCore {
-    private static final String DEFAULT_SERVICE_UUID = "333B";
-    private static final String DEFAULT_CHARACTERISTIC_UUID = "200B";
+    private static final String DEFAULT_SERVICE_UUID_BASE = "5888-16F1-43F8-AA84-63F1544F2694";
+    private static String passphrase = "333B";
+    private static final String DEFAULT_CHARACTERISTIC_UUID = "20D0C428-B763-4016-8AC6-4B4B3A6865D9";
     private static final String TAG = "SCOUTING";
-
-    private static BluetoothUtility ble;
-
 
     public static void startBLE(Activity a){
 
-        ble = new BluetoothUtility(a);
 
-        ble.setAdvertiseCallback(advertiseCallback);
-        ble.setGattServerCallback(gattServerCallback);
+        if (BluetoothUtility.setupBluetooth(a)){
+            BluetoothUtility.setAdvertiseCallback(advertiseCallback);
+            BluetoothUtility.setGattServerCallback(gattServerCallback);
 
-        BluetoothGattService firstService = new BluetoothGattService(
-                UUID.fromString(DEFAULT_SERVICE_UUID),
-                BluetoothGattService.SERVICE_TYPE_PRIMARY);
-        // alert level char.
-        BluetoothGattCharacteristic firstServiceChar = new BluetoothGattCharacteristic(
-                UUID.fromString(DEFAULT_CHARACTERISTIC_UUID),
-                BluetoothGattCharacteristic.PROPERTY_NOTIFY,
-                BluetoothGattCharacteristic.PERMISSION_READ);
-        firstService.addCharacteristic(firstServiceChar);
-        ble.addService(firstService);
+            BluetoothUtility.createNotificationService(passphrase + DEFAULT_SERVICE_UUID_BASE, DEFAULT_CHARACTERISTIC_UUID);
 
-        ble.startAdvertise();
+            BluetoothUtility.startAdvertise();
+        }
+
+
+
     }
 
     private static BluetoothGattServerCallback gattServerCallback = new BluetoothGattServerCallback() {
         @Override
         public void onConnectionStateChange(BluetoothDevice device, int status, int newState) {
             super.onConnectionStateChange(device, status, newState);
-            Log.d(TAG, "onConnectionStateChange status=" + status + "->" + newState);
+            if (status ==2 && newState==0){
+                BluetoothUtility.stopAdvertise();
+            } else if (status == 0 && newState==2){
+                BluetoothUtility.stopAdvertise();
+            }
+
         }
 
         @Override
         public void onServiceAdded(int status, BluetoothGattService service) {
             super.onServiceAdded(status, service);
+            Log.d(TAG, "Service added");
         }
 
         @Override
@@ -64,7 +65,7 @@ public class BluetoothCore {
             if (characteristic.getUuid().equals(UUID.fromString(DEFAULT_CHARACTERISTIC_UUID))) {
                 Log.d(TAG, "Changing Characteristic Value");
                 characteristic.setValue("Text:This is a test characteristic");
-                ble.getGattServer().sendResponse(device, requestId, BluetoothGatt.GATT_SUCCESS, offset,
+                BluetoothUtility.getGattServer().sendResponse(device, requestId, BluetoothGatt.GATT_SUCCESS, offset,
                         characteristic.getValue());
             }
 
@@ -81,7 +82,22 @@ public class BluetoothCore {
         @Override
         public void onNotificationSent(BluetoothDevice device, int status) {
             super.onNotificationSent(device, status);
-            Log.d(TAG,"Notification?");
+            Log.d(TAG, "Notification?");
+        }
+
+        @Override
+        public void onMtuChanged(BluetoothDevice device, int mtu) {
+            super.onMtuChanged(device, mtu);
+            Log.d(TAG, mtu + "");
+        }
+
+        @Override
+        public void onDescriptorWriteRequest (BluetoothDevice device, int requestId, BluetoothGattDescriptor descriptor, boolean preparedWrite, boolean responseNeeded, int offset, byte[] value) {
+
+            // now tell the connected device that this was all successfull
+            BluetoothUtility.sendResponse(device, requestId, BluetoothGatt.GATT_SUCCESS, offset, value);
+            BluetoothUtility.sendNotification(device, "Fuck you Demeo");
+
         }
     };
 
@@ -99,8 +115,33 @@ public class BluetoothCore {
             String failMsg = "Advertisement command attempt failed: " + errorCode;
             Log.e(TAG, failMsg);
         }
+
     };
 
 
+    public static void enable() {
+        BluetoothUtility.enable();
 
+        BluetoothUtility.setAdvertiseCallback(advertiseCallback);
+        BluetoothUtility.setGattServerCallback(gattServerCallback);
+
+        BluetoothUtility.createNotificationService(getServiceUUID(), DEFAULT_CHARACTERISTIC_UUID);
+
+        BluetoothUtility.startAdvertise();
+    }
+
+    public static void setPassphrase(String passphrase1){
+        passphrase = passphrase1;
+        BluetoothUtility.stopAll();
+        BluetoothUtility.createNotificationService(getServiceUUID(), DEFAULT_CHARACTERISTIC_UUID);
+        BluetoothUtility.startAdvertise();
+    }
+
+    public static String getServiceUUID() {
+        return passphrase + DEFAULT_SERVICE_UUID_BASE;
+    }
+
+    public static void stopBLE() {
+        BluetoothUtility.stopAll();
+    }
 }

@@ -30,7 +30,7 @@ public class BluetoothUtility {
      * String Constants
      */
     private static final String TAG = "MyActivity";
-    private static final String BLUETOOTH_ADAPTER_NAME = "Adapter_1";
+    private static final String BLUETOOTH_ADAPTER_NAME = "Scouting";
 
     /**
      * Advertising Constants
@@ -44,32 +44,33 @@ public class BluetoothUtility {
     /**
      * Bluetooth Objects
      */
-    private static Activity activity;
+    private static ScoutingActivity activity;
     private static BluetoothManager bluetoothManager;
     private static BluetoothAdapter bluetoothAdapter;
     private static BluetoothLeAdvertiser bluetoothLeAdvertiser;
     private static BluetoothGattServer gattServer;
 
     public static boolean setupBluetooth(Activity a){
-        activity = a;
+        activity = (ScoutingActivity) a;
         bluetoothManager = (BluetoothManager) activity.getApplicationContext().getSystemService(Context.BLUETOOTH_SERVICE);
         bluetoothAdapter = bluetoothManager.getAdapter();
+
         if (bluetoothAdapter == null){
             ((ScoutingActivity) activity).sendError("Bluetooth is not supported on this device, this app is useless",true);
             return false;
         } else {
-            bluetoothAdapter.setName(BLUETOOTH_ADAPTER_NAME);
+            bluetoothAdapter.setName(Utils.getDeviceName() + " " + BLUETOOTH_ADAPTER_NAME);
+            System.out.println();
         }
 
         if(!bluetoothAdapter.isEnabled()) {
+            Log.d(a.getString(R.string.log_tag),"Requesting permission to turn on Bluetooth");
             Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
             activity.startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT);
-
             return false;
 
         } else {
             bluetoothLeAdvertiser = bluetoothAdapter.getBluetoothLeAdvertiser();
-
             return true;
         }
 
@@ -106,7 +107,9 @@ public class BluetoothUtility {
         AdvertiseData.Builder dataBuilder = new AdvertiseData.Builder();
         AdvertiseSettings.Builder settingsBuilder = new AdvertiseSettings.Builder();
 
-        dataBuilder.setIncludeTxPowerLevel(false); //necessity to fit in 31 byte advertisement
+        dataBuilder.setIncludeTxPowerLevel(false);
+        //LITERALLY THE MOST IMPORTANT LINE
+        dataBuilder.addServiceUuid(new ParcelUuid(gattService.getUuid()));
 
         settingsBuilder.setAdvertiseMode(AdvertiseSettings.ADVERTISE_MODE_BALANCED);
         settingsBuilder.setTxPowerLevel(AdvertiseSettings.ADVERTISE_TX_POWER_HIGH);
@@ -114,8 +117,10 @@ public class BluetoothUtility {
 
         bluetoothLeAdvertiser.startAdvertising(settingsBuilder.build(), dataBuilder.build(), advertiseCallback);
         advertising = true;
+        activity.setAdvertising(true);
 
-        Log.d(TAG,"Start Advertising");
+        Log.d(TAG, "Start Advertising");
+
     }
 
     //Stop ble advertising and clean up
@@ -123,6 +128,7 @@ public class BluetoothUtility {
         if(!getAdvertising()) return;
         bluetoothLeAdvertiser.stopAdvertising(advertiseCallback);
         advertising = false;
+        activity.setAdvertising(false);
         Log.d(TAG,"Stop Advertising");
 
     }
@@ -130,6 +136,7 @@ public class BluetoothUtility {
     public void stopGattServer(){
         gattServer.clearServices();
         gattServer.close();
+        activity.setConnected(false);
     }
 
     public static BluetoothGattServer getGattServer() {
@@ -137,14 +144,15 @@ public class BluetoothUtility {
     }
 
     private static void startGattServer() {
+        Log.d(activity.getString(R.string.log_tag),"Starting GATT Server");
         gattServer = bluetoothManager.openGattServer(activity, gattServerCallback);
 
         gattServer.addService(gattService);
+
     }
 
     public static void enable() {
         boolean isEnabling = bluetoothAdapter.enable();
-        bluetoothLeAdvertiser = bluetoothAdapter.getBluetoothLeAdvertiser();
         if (!isEnabling)
         {
             // an immediate error occurred - perhaps the bluetooth is already on?
@@ -152,8 +160,8 @@ public class BluetoothUtility {
         else if (bluetoothAdapter.getState() == BluetoothAdapter.STATE_TURNING_ON)
         {
             ProgressDialog progress = new ProgressDialog(activity);
-            progress.setTitle("Loading");
-            progress.setMessage("Wait while loading...");
+            progress.setTitle("Bluetooth");
+            progress.setMessage("Turning on Bluetooth...");
             progress.setCancelable(false);
             progress.show();
             while (bluetoothAdapter.getState() ==BluetoothAdapter.STATE_TURNING_ON){
@@ -166,6 +174,7 @@ public class BluetoothUtility {
             }
             progress.dismiss();
         }
+        bluetoothLeAdvertiser = bluetoothAdapter.getBluetoothLeAdvertiser();
     }
 
     public static void sendResponse(BluetoothDevice device, int requestId, int gattSuccess, int offset, byte[] value) {

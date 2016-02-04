@@ -22,15 +22,18 @@ public class BluetoothCore {
     private static String passphrase = "333B";
     private static final String DEFAULT_CHARACTERISTIC_UUID = "20D0C428-B763-4016-8AC6-4B4B3A6865D9";
     private static final String TAG = "SCOUTING";
+    private static ScoutingActivity a;
 
     public static void startBLE(Activity a){
-
+        BluetoothCore.a = (ScoutingActivity) a;
+        Log.d(a.getString(R.string.log_tag),"Beginning BLE Setup");
 
         if (BluetoothUtility.setupBluetooth(a)){
+            Log.d(a.getString(R.string.log_tag),"Bluetooth Adapter exists and is turned on");
+            BluetoothUtility.createNotificationService(passphrase + DEFAULT_SERVICE_UUID_BASE, DEFAULT_CHARACTERISTIC_UUID);
+
             BluetoothUtility.setAdvertiseCallback(advertiseCallback);
             BluetoothUtility.setGattServerCallback(gattServerCallback);
-
-            BluetoothUtility.createNotificationService(passphrase + DEFAULT_SERVICE_UUID_BASE, DEFAULT_CHARACTERISTIC_UUID);
 
             BluetoothUtility.startAdvertise();
         }
@@ -43,10 +46,13 @@ public class BluetoothCore {
         @Override
         public void onConnectionStateChange(BluetoothDevice device, int status, int newState) {
             super.onConnectionStateChange(device, status, newState);
-            if (status ==2 && newState==0){
-                BluetoothUtility.stopAdvertise();
+            Log.d(a.getString(R.string.log_tag),"Connection changed: "+status + "-->" + newState);
+            if (status ==0 && newState==0){
+                BluetoothUtility.startAdvertise();
+                a.setConnected(false);
             } else if (status == 0 && newState==2){
                 BluetoothUtility.stopAdvertise();
+                a.setConnected(true);
             }
 
         }
@@ -106,7 +112,7 @@ public class BluetoothCore {
         public void onStartSuccess(AdvertiseSettings settingsInEffect) {
             super.onStartSuccess(settingsInEffect);
             String successMsg = "Advertisement command attempt successful";
-            Log.d(TAG, successMsg);
+            Log.d(a.getString(R.string.log_tag), successMsg);
         }
 
         @Override
@@ -120,12 +126,13 @@ public class BluetoothCore {
 
 
     public static void enable() {
+        Log.d(a.getString(R.string.log_tag), "Enabling Bluetooth");
         BluetoothUtility.enable();
+
+        BluetoothUtility.createNotificationService(getServiceUUID(), DEFAULT_CHARACTERISTIC_UUID);
 
         BluetoothUtility.setAdvertiseCallback(advertiseCallback);
         BluetoothUtility.setGattServerCallback(gattServerCallback);
-
-        BluetoothUtility.createNotificationService(getServiceUUID(), DEFAULT_CHARACTERISTIC_UUID);
 
         BluetoothUtility.startAdvertise();
     }
@@ -142,6 +149,7 @@ public class BluetoothCore {
     }
 
     public static void stopBLE() {
+        Log.d(a.getString(R.string.log_tag),"Stopping BLE");
         BluetoothUtility.stopAll();
     }
 }

@@ -42,6 +42,68 @@
                 android:layout_weight="1" />
 
             <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="horizontal"
+                android:layout_weight="1">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="horizontal"
+                    android:layout_gravity="center"
+                    android:layout_weight="1">
+
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:text="Connection:"
+                        android:textSize="18dp"
+                        android:textColor="@android:color/black"
+                        android:layout_marginLeft="20dp"
+                        />
+
+                    <View android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:background="@drawable/indicator_circle"
+                        android:id="@+id/connection_indicator"
+                        android:layout_marginLeft="10dp"/>
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="horizontal"
+                    android:layout_gravity="center"
+                    android:layout_weight="1">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:text="Advertising:"
+                        android:textSize="18dp"
+                        android:textColor="@android:color/black"
+                        android:layout_marginLeft="20dp"
+                        />
+
+                    <View android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:src="@drawable/indicator_circle"
+                        android:id="@+id/advertising_indicator"
+                        android:layout_marginLeft="10dp"/>
+
+                </LinearLayout>
+
+
+
+
+            </LinearLayout>
+
+
+
+            <LinearLayout
                 android:orientation="horizontal"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
@@ -154,7 +216,7 @@
                         android:inputType="number"
                         android:ems="10"
                         android:id="@+id/editText4"
-                        android:hint="Match Number" />
+                        android:hint="333B" />
                 </LinearLayout>
             </LinearLayout>
 

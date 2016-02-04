@@ -5,6 +5,7 @@ import android.bluetooth.BluetoothAdapter;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.AssetManager;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -237,5 +238,25 @@ public class ScoutingActivity extends AppCompatActivity implements CompoundButto
             if ((requestCode == 1) && (resultCode == RESULT_OK)) {
                 BluetoothCore.enable();
             }
+    }
+
+    public void setConnected(final boolean connected){
+        final View connectionIndicator = findViewById(R.id.connection_indicator);
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                connectionIndicator.setBackgroundColor(connected ? Color.GREEN : Color.RED);
+            }
+        });
+    }
+
+    public void setAdvertising(final boolean advertising){
+        final View advertisingIndicator = findViewById(R.id.advertising_indicator);
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                advertisingIndicator.setBackgroundColor(advertising ? Color.GREEN : Color.RED);
+            }
+        });
     }
 }

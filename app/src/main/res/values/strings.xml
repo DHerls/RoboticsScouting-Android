@@ -1,6 +1,7 @@
 <resources>
     <string name="app_name">Android Scouting</string>
     <string name="action_settings">Settings</string>
+    <string name="log_tag">[SCOUTING]</string>
     <string-array name="planets_array">
         <item>Mer</item>
         <item>Venus</item>

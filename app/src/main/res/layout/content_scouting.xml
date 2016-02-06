@@ -31,19 +31,20 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="0dp"
-                android:textAppearance="?android:attr/textAppearanceLarge"
-                android:text="General:"
+                android:text="General"
                 android:id="@+id/titleGeneral"
                 android:layout_below="@+id/scrollView"
                 android:layout_alignParentStart="true"
                 android:layout_gravity="left"
-                android:layout_marginLeft="30dp"
                 android:layout_marginBottom="10dp"
-                android:layout_weight="1" />
+                android:layout_weight="1"
+                android:textStyle="bold"
+                android:textSize="22dp"
+                android:textColor="#000000" />
 
             <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
+                android:layout_height="25dp"
                 android:orientation="horizontal"
                 android:layout_weight="1">
 
@@ -62,7 +63,7 @@
                         android:textSize="18dp"
                         android:textColor="@android:color/black"
                         android:layout_marginLeft="20dp"
-                        />
+                        android:layout_gravity="center" />
 
                     <View android:layout_width="20dp"
                         android:layout_height="20dp"
@@ -90,7 +91,7 @@
 
                     <View android:layout_width="20dp"
                         android:layout_height="20dp"
-                        android:src="@drawable/indicator_circle"
+                        android:background="@drawable/indicator_circle"
                         android:id="@+id/advertising_indicator"
                         android:layout_marginLeft="10dp"/>
 
@@ -210,13 +211,26 @@
                         android:id="@+id/textView4"
                         android:textColor="#000000" />
 
-                    <EditText
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:inputType="number"
-                        android:ems="10"
-                        android:id="@+id/editText4"
-                        android:hint="333B" />
+                    <LinearLayout
+                        android:orientation="horizontal"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:weightSum="1">
+
+                        <EditText
+                            android:layout_width="51dp"
+                            android:layout_height="wrap_content"
+                            android:inputType="textCapCharacters"
+                            android:ems="10"
+                            android:id="@+id/bluetoothCode"
+                            android:hint="ex. 333B"
+                            android:layout_weight="0.89" />
+
+                        <ImageButton android:id="@+id/detail_refresh_btn"
+                            android:layout_width="48dp"
+                            android:layout_height="48dp"
+                            android:src="@drawable/ic_action_refresh1" />
+                    </LinearLayout>
                 </LinearLayout>
             </LinearLayout>
 

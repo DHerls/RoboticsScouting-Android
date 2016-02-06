@@ -1,40 +1,50 @@
 package org.fullmetalfalcons.androidscouting;
 
 import android.app.AlertDialog;
-import android.bluetooth.BluetoothAdapter;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.AssetManager;
-import android.graphics.Color;
+import android.graphics.drawable.GradientDrawable;
+import android.graphics.drawable.LayerDrawable;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.CompoundButton;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.Space;
 import android.widget.Switch;
-import android.widget.TextView;
 import android.widget.Toast;
 
+import com.dd.plist.NSDictionary;
+
+import org.fullmetalfalcons.androidscouting.element.Element;
+import org.fullmetalfalcons.androidscouting.element.ElementParseException;
+import org.fullmetalfalcons.androidscouting.bluetooth.BluetoothCore;
+
 import java.io.BufferedReader;
-import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class ScoutingActivity extends AppCompatActivity implements CompoundButton.OnCheckedChangeListener {
 
     private final ArrayList<Element> ELEMENTS = new ArrayList<>();
+    private final Pattern bluetoothCodePattern = Pattern.compile("\\d{3}[a-fA-F]");
+    private boolean haveBluetoothPermission = true;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,7 +58,7 @@ public class ScoutingActivity extends AppCompatActivity implements CompoundButto
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (ScoutingActivity.this.checkFields()){
+                if (ScoutingActivity.this.checkFields()) {
                     ScoutingActivity.this.collectResults();
                 }
             }
@@ -56,10 +66,28 @@ public class ScoutingActivity extends AppCompatActivity implements CompoundButto
         LinearLayout l = (LinearLayout) findViewById(R.id.mainLinear);
         l.requestFocus();
 
+        final EditText bluetoothCodeView = (EditText)findViewById(R.id.bluetoothCode);
+
+        final ImageButton refreshBtn=(ImageButton)findViewById(R.id.detail_refresh_btn);
+        final Animation ranim = AnimationUtils.loadAnimation(this, R.anim.rotate);
+        refreshBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Matcher bluetoothCodeMatcher = bluetoothCodePattern.matcher(bluetoothCodeView.getText());
+                if (bluetoothCodeMatcher.matches()){
+                    refreshBtn.startAnimation(ranim);
+                    BluetoothCore.setPassphrase(bluetoothCodeView.getText().toString());
+                } else {
+                    sendError("Bluetooth Code must be in the format ###(A-F)",false);
+                    bluetoothCodeView.setText("");
+                }
+
+            }
+        });
+
         createTheApp();
 
         Switch colorSwitch = (Switch) findViewById(R.id.team_color);
-        System.out.println("Restore");
 
         if (savedInstanceState!=null) {
             if (savedInstanceState.getBoolean("isRed")) {
@@ -67,6 +95,8 @@ public class ScoutingActivity extends AppCompatActivity implements CompoundButto
             }
         }
         colorSwitch.setOnCheckedChangeListener(this);
+
+        EditText bluetoothCode = (EditText) findViewById(R.id.bluetoothCode);
 
         BluetoothCore.startBLE(this);
 
@@ -102,7 +132,8 @@ public class ScoutingActivity extends AppCompatActivity implements CompoundButto
     private void addViews() {
         LinearLayout l = (LinearLayout) findViewById(R.id.mainLinear);
         for (Element e: ELEMENTS){
-            l.addView(e.getView());
+            System.out.println(e.getType());
+            l.addView(e.getView(),e.getView().getLayoutParams());
         }
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
@@ -165,15 +196,17 @@ public class ScoutingActivity extends AppCompatActivity implements CompoundButto
         for (Element e: ELEMENTS){
             values.add(e.getViewData());
         }
-        bundle.putParcelable("fieldData",values);
+        bundle.putParcelable("fieldData", values);
 
         bundle.putString("match_num", ((EditText) findViewById(R.id.match_num)).getText().toString());
         bundle.putString("team_num", ((EditText) findViewById(R.id.team_num)).getText().toString());
+        bundle.putString("bluetooth_code",((EditText) findViewById(R.id.bluetoothCode)).getText().toString());
 
     }
 
     @Override
     protected void onRestoreInstanceState(Bundle bundle){
+
         ParcelableArrayList values = (ParcelableArrayList) bundle.getParcelable("fieldData");
 
         for (int i = 0; i< ELEMENTS.size();i++){
@@ -182,8 +215,21 @@ public class ScoutingActivity extends AppCompatActivity implements CompoundButto
 
         ((EditText) findViewById(R.id.match_num)).setText(bundle.getString("match_num"));
         ((EditText) findViewById(R.id.team_num)).setText(bundle.getString("team_num"));
+        ((EditText) findViewById(R.id.bluetoothCode)).setText(bundle.getString("bluetooth_code"));
+
+        //BluetoothCore.startBLE(this);
+
 
     }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if(haveBluetoothPermission){
+            BluetoothCore.startBLE(this);
+        }
+    }
+
 
     private boolean checkFields(){
         String s = ((EditText) findViewById(R.id.team_num)).getText().toString();
@@ -194,7 +240,7 @@ public class ScoutingActivity extends AppCompatActivity implements CompoundButto
 
         s = ((EditText) findViewById(R.id.match_num)).getText().toString();
         if (s.equals("")){
-            sendError("Match Number must not be blank",false);
+            sendError("Match Number must not be blank", false);
             return false;
         }
 
@@ -205,14 +251,15 @@ public class ScoutingActivity extends AppCompatActivity implements CompoundButto
     }
 
     private void collectResults(){
-        HashMap<String, Object> values = new HashMap<>();
+        NSDictionary values = new NSDictionary();
         for (Element e:ELEMENTS){
             values.putAll(e.getHash());
         }
 
-        values.put("team_num",Integer.parseInt(((EditText) findViewById(R.id.team_num)).getText().toString()));
-        values.put("match_num",Integer.parseInt(((EditText) findViewById(R.id.match_num)).getText().toString()));
+        values.put("team_num", Integer.parseInt(((EditText) findViewById(R.id.team_num)).getText().toString()));
+        values.put("match_num", Integer.parseInt(((EditText) findViewById(R.id.match_num)).getText().toString()));
         values.put("team_color", ((Switch) findViewById(R.id.team_color)).isChecked() ? "Red" : "Blue");
+
     }
 
     public void sendError(String message,final boolean fatalError){
@@ -229,34 +276,69 @@ public class ScoutingActivity extends AppCompatActivity implements CompoundButto
                 })
                 .setIcon(android.R.drawable.ic_dialog_alert)
                 .show();
+        if(fatalError){
+            Log.wtf(getString(R.string.log_tag),message);
+        } else {
+            Log.e(getString(R.string.log_tag),message);
+
+        }
     }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-            //Value of Bluetooth Request Code is 1
-            if ((requestCode == 1) && (resultCode == RESULT_OK)) {
-                BluetoothCore.enable();
-            }
+        //Value of Bluetooth Request Code is 1
+        System.out.println("Activity result");
+        if ((requestCode == 1) && (resultCode == RESULT_OK)) {
+            BluetoothCore.enable();
+            haveBluetoothPermission = true;
+        }
+
+        if ((requestCode == 1) && (resultCode == RESULT_CANCELED)) {
+            sendError("Bluetooth must be enabled for this app to function",true);
+            haveBluetoothPermission = false;
+        }
     }
 
     public void setConnected(final boolean connected){
-        final View connectionIndicator = findViewById(R.id.connection_indicator);
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                connectionIndicator.setBackgroundColor(connected ? Color.GREEN : Color.RED);
+                View v = findViewById(R.id.connection_indicator);
+
+                LayerDrawable bgDrawable = (LayerDrawable) v.getBackground();
+                GradientDrawable shape = (GradientDrawable)   bgDrawable.findDrawableByLayerId(R.id.outerCircle);
+                shape.setColor(ContextCompat.getColor(ScoutingActivity.this, connected ? R.color.colorGreenIndicator : R.color.colorRedIndicator));
+
+                shape = (GradientDrawable) bgDrawable.findDrawableByLayerId(R.id.innerCircle);
+                shape.setColor(ContextCompat.getColor(ScoutingActivity.this,connected ? R.color.colorGreenIndicator : R.color.colorRedIndicator));
+
             }
         });
     }
 
-    public void setAdvertising(final boolean advertising){
-        final View advertisingIndicator = findViewById(R.id.advertising_indicator);
+    public void setAdvertising(final boolean advertising) {
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                advertisingIndicator.setBackgroundColor(advertising ? Color.GREEN : Color.RED);
+                View v = findViewById(R.id.advertising_indicator);
+
+                LayerDrawable bgDrawable = (LayerDrawable) v.getBackground();
+                GradientDrawable shape = (GradientDrawable) bgDrawable.getDrawable(0);
+                shape.setColor(ContextCompat.getColor(ScoutingActivity.this, advertising ? R.color.colorGreenIndicator : R.color.colorRedIndicator));
+
+                shape = (GradientDrawable) bgDrawable.getDrawable(1);
+                shape.setStroke(8, ContextCompat.getColor(ScoutingActivity.this, advertising ? R.color.colorGreenIndicator : R.color.colorRedIndicator));
             }
         });
     }
+
+    public static void log(String message){
+
+    }
+
+    public static void debug(String message){
+
+    }
+
 }

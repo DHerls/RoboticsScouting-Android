@@ -1,4 +1,4 @@
-package org.fullmetalfalcons.androidscouting;
+package org.fullmetalfalcons.androidscouting.bluetooth;
 
 import android.app.Activity;
 import android.bluetooth.BluetoothDevice;
@@ -10,6 +10,9 @@ import android.bluetooth.BluetoothGattService;
 import android.bluetooth.le.AdvertiseCallback;
 import android.bluetooth.le.AdvertiseSettings;
 import android.util.Log;
+
+import org.fullmetalfalcons.androidscouting.R;
+import org.fullmetalfalcons.androidscouting.ScoutingActivity;
 
 import java.util.UUID;
 

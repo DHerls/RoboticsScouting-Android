@@ -54,6 +54,7 @@ public class SeekBarWithValues extends RelativeLayout implements SeekBar.OnSeekB
                 -mMaxText.getPaddingLeft()-mMaxText.getPaddingRight())/mSeek.getMax())*newProgress;
         lp.leftMargin = seekLocation + padding;
         mCurrentText.setLayoutParams(lp);
+        //System.out.println("Width: " + mSeek.getWidth());
     }
 
     public SeekBar getSeekBar() {
@@ -79,5 +80,15 @@ public class SeekBarWithValues extends RelativeLayout implements SeekBar.OnSeekB
     @Override
     public void onStopTrackingTouch(SeekBar seekBar) {
 
+    }
+
+    public void setProgress(final int progress) {
+        mSeek.setProgress(progress);
+        postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                updateCurrentText(progress);
+            }
+        },500);
     }
 }

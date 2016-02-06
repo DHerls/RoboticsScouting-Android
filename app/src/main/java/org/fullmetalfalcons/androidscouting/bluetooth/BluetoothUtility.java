@@ -1,4 +1,4 @@
-package org.fullmetalfalcons.androidscouting;
+package org.fullmetalfalcons.androidscouting.bluetooth;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
@@ -9,6 +9,10 @@ import android.content.Intent;
 import android.os.ParcelUuid;
 import android.util.Log;
 import android.widget.Toast;
+
+import org.fullmetalfalcons.androidscouting.R;
+import org.fullmetalfalcons.androidscouting.ScoutingActivity;
+import org.fullmetalfalcons.androidscouting.Utils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -50,7 +54,7 @@ public class BluetoothUtility {
     private static BluetoothLeAdvertiser bluetoothLeAdvertiser;
     private static BluetoothGattServer gattServer;
 
-    public static boolean setupBluetooth(Activity a){
+    protected static boolean setupBluetooth(Activity a){
         activity = (ScoutingActivity) a;
         bluetoothManager = (BluetoothManager) activity.getApplicationContext().getSystemService(Context.BLUETOOTH_SERVICE);
         bluetoothAdapter = bluetoothManager.getAdapter();
@@ -77,21 +81,21 @@ public class BluetoothUtility {
 
     }
 
-    public static void stopAll() {
+    protected static void stopAll() {
         if(getAdvertising()) stopAdvertise();
         if(gattServer != null) gattServer.close();
     }
 
     /*-------------------------------------------------------------------------------*/
 
-    public static boolean getAdvertising() {
+    protected static boolean getAdvertising() {
         return advertising;
     }
 
-    public static void setAdvertiseCallback(AdvertiseCallback callback) {
+    protected static void setAdvertiseCallback(AdvertiseCallback callback) {
         advertiseCallback = callback;
     }
-    public static void setGattServerCallback(BluetoothGattServerCallback callback) {
+    protected static void setGattServerCallback(BluetoothGattServerCallback callback) {
         gattServerCallback = callback;
     }
 
@@ -99,7 +103,7 @@ public class BluetoothUtility {
      * BLE Advertising
      */
     //Public method to begin advertising services
-    public static void startAdvertise() {
+    protected static void startAdvertise() {
         if(getAdvertising()) return;
 
         startGattServer();
@@ -124,7 +128,7 @@ public class BluetoothUtility {
     }
 
     //Stop ble advertising and clean up
-    public static void stopAdvertise() {
+    protected static void stopAdvertise() {
         if(!getAdvertising()) return;
         bluetoothLeAdvertiser.stopAdvertising(advertiseCallback);
         advertising = false;
@@ -133,13 +137,13 @@ public class BluetoothUtility {
 
     }
 
-    public void stopGattServer(){
+    protected void stopGattServer(){
         gattServer.clearServices();
         gattServer.close();
         activity.setConnected(false);
     }
 
-    public static BluetoothGattServer getGattServer() {
+    protected static BluetoothGattServer getGattServer() {
         return gattServer;
     }
 
@@ -151,7 +155,7 @@ public class BluetoothUtility {
 
     }
 
-    public static void enable() {
+    protected static void enable() {
         boolean isEnabling = bluetoothAdapter.enable();
         if (!isEnabling)
         {
@@ -177,18 +181,18 @@ public class BluetoothUtility {
         bluetoothLeAdvertiser = bluetoothAdapter.getBluetoothLeAdvertiser();
     }
 
-    public static void sendResponse(BluetoothDevice device, int requestId, int gattSuccess, int offset, byte[] value) {
+    protected static void sendResponse(BluetoothDevice device, int requestId, int gattSuccess, int offset, byte[] value) {
         gattServer.sendResponse(device, requestId, gattSuccess, offset, value);
 
     }
 
-    public static void sendNotification(BluetoothDevice device, String value){
+    protected static void sendNotification(BluetoothDevice device, String value){
         gattCharacteristic.setValue(value);
         gattServer.notifyCharacteristicChanged(device, gattCharacteristic, false);
 
     }
 
-    public static void createNotificationService(String serviceUUID, String characteristicUUID) {
+    protected static void createNotificationService(String serviceUUID, String characteristicUUID) {
         gattService = new BluetoothGattService(UUID.fromString(serviceUUID),BluetoothGattService.SERVICE_TYPE_PRIMARY);
         gattCharacteristic = new BluetoothGattCharacteristic(
                 UUID.fromString(characteristicUUID),

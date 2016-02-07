@@ -1,4 +1,4 @@
-package org.fullmetalfalcons.androidscouting.randtestname;
+package org.fullmetalfalcons.androidscouting.elements;
 
 /**
  * This Enum holds the list of types for elements and contains methods that return the appropriate element based on

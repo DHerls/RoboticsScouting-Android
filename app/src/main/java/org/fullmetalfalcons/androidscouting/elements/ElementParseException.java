@@ -1,4 +1,4 @@
-package org.fullmetalfalcons.androidscouting.randtestname;
+package org.fullmetalfalcons.androidscouting.elements;
 
 /**
  * Exception thrown when there is an error in parsing Elements from the config file

@@ -27,8 +27,8 @@ import android.widget.Toast;
 
 import com.dd.plist.NSDictionary;
 
-import org.fullmetalfalcons.androidscouting.Element.Element;
-import org.fullmetalfalcons.androidscouting.Element.ElementParseException;
+import org.fullmetalfalcons.androidscouting.element.Element;
+import org.fullmetalfalcons.androidscouting.element.ElementParseException;
 import org.fullmetalfalcons.androidscouting.bluetooth.BluetoothCore;
 
 import java.io.BufferedReader;

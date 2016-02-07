@@ -1,4 +1,4 @@
-package org.fullmetalfalcons.androidscouting.Element;
+package org.fullmetalfalcons.androidscouting.element;
 
 import android.app.Activity;
 import android.content.res.Resources;

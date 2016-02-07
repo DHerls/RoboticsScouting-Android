@@ -1,4 +1,4 @@
-package org.fullmetalfalcons.androidscouting.Element;
+package org.fullmetalfalcons.androidscouting.element;
 
 /**
  * Exception thrown when there is an error in parsing Elements from the config file

@@ -1,4 +1,4 @@
-package org.fullmetalfalcons.androidscouting.element;
+package org.fullmetalfalcons.androidscouting.randtestname;
 
 import android.app.Activity;
 import android.content.res.Resources;

@@ -27,15 +27,14 @@ import android.widget.Toast;
 
 import com.dd.plist.NSDictionary;
 
-import org.fullmetalfalcons.androidscouting.element.Element;
-import org.fullmetalfalcons.androidscouting.element.ElementParseException;
+import org.fullmetalfalcons.androidscouting.Element.Element;
+import org.fullmetalfalcons.androidscouting.Element.ElementParseException;
 import org.fullmetalfalcons.androidscouting.bluetooth.BluetoothCore;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -44,6 +43,7 @@ public class ScoutingActivity extends AppCompatActivity implements CompoundButto
     private final ArrayList<Element> ELEMENTS = new ArrayList<>();
     private final Pattern bluetoothCodePattern = Pattern.compile("\\d{3}[a-fA-F]");
     private boolean haveBluetoothPermission = true;
+    private static boolean isFirstTime = true;
 
 
     @Override
@@ -225,9 +225,11 @@ public class ScoutingActivity extends AppCompatActivity implements CompoundButto
     @Override
     protected void onResume() {
         super.onResume();
-        if(haveBluetoothPermission){
+        System.out.println("Resumed");
+        if(haveBluetoothPermission &&!isFirstTime){
             BluetoothCore.startBLE(this);
         }
+        isFirstTime = false;
     }
 
 

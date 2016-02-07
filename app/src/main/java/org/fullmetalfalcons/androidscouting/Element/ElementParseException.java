@@ -8,6 +8,7 @@ package org.fullmetalfalcons.androidscouting.Element;
 @SuppressWarnings({"serial"})
 public class ElementParseException extends Exception {
 
+
     public ElementParseException(String message){
         super(message);
     }

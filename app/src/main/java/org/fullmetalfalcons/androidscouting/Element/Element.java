@@ -1,8 +1,6 @@
 package org.fullmetalfalcons.androidscouting.Element;
 
-import android.app.ActionBar;
 import android.app.Activity;
-import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.Color;
 import android.graphics.Typeface;
@@ -10,26 +8,20 @@ import android.text.InputType;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.View;
-import android.view.ViewGroup;
-import android.widget.ActionMenuView;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.NumberPicker;
-import android.widget.RadioGroup;
-import android.widget.SeekBar;
 import android.widget.Space;
 import android.widget.Switch;
 import android.widget.TextView;
 
-import org.fullmetalfalcons.androidscouting.ElementParseException;
-import org.fullmetalfalcons.androidscouting.ElementType;
+import com.dd.plist.NSDictionary;
+
 import org.fullmetalfalcons.androidscouting.R;
 import org.fullmetalfalcons.androidscouting.SeekBarWithValues;
 import org.honorato.multistatetogglebutton.MultiStateToggleButton;
 
-import java.lang.reflect.Type;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -476,14 +468,15 @@ public class Element {
             case SLIDER:
                 ll = (LinearLayout) view;
                 SeekBarWithValues sbwv = (SeekBarWithValues) ll.getChildAt(1);
-                sbwv.getSeekBar().setProgress((int) viewData);
+                sbwv.setProgress((int) viewData);
                 break;
+
         }
 
     }
 
-    public HashMap<String, Object> getHash(){
-        HashMap<String, Object> map = new HashMap<>();
+    public NSDictionary getHash(){
+        NSDictionary map = new NSDictionary();
         LinearLayout ll;
         switch(type){
 

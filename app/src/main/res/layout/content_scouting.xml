@@ -133,7 +133,8 @@
                         android:ems="10"
                         android:id="@+id/team_num"
                         android:hint="Team Number"
-                        android:numeric="integer" />
+                        android:numeric="integer"
+                        android:maxLength="4" />
                 </LinearLayout>
 
                 <LinearLayout
@@ -156,7 +157,8 @@
                         android:inputType="number"
                         android:ems="10"
                         android:id="@+id/match_num"
-                        android:hint="Match Number" />
+                        android:hint="Match Number"
+                        android:maxLength="4" />
                 </LinearLayout>
             </LinearLayout>
 
@@ -224,7 +226,8 @@
                             android:ems="10"
                             android:id="@+id/bluetoothCode"
                             android:hint="ex. 333B"
-                            android:layout_weight="0.89" />
+                            android:layout_weight="0.89"
+                            android:maxLength="4" />
 
                         <ImageButton android:id="@+id/detail_refresh_btn"
                             android:layout_width="48dp"

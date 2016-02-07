@@ -71,6 +71,7 @@ public class BluetoothUtility {
             Log.d(a.getString(R.string.log_tag),"Requesting permission to turn on Bluetooth");
             Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
             activity.startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT);
+
             return false;
 
         } else {

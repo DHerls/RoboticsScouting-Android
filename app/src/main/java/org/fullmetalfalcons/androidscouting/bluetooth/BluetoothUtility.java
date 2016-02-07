@@ -85,6 +85,7 @@ public class BluetoothUtility {
     protected static void stopAll() {
         if(getAdvertising()) stopAdvertise();
         if(gattServer != null) gattServer.close();
+
     }
 
     /*-------------------------------------------------------------------------------*/

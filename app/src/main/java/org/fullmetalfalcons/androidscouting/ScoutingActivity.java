@@ -96,8 +96,6 @@ public class ScoutingActivity extends AppCompatActivity implements CompoundButto
         }
         colorSwitch.setOnCheckedChangeListener(this);
 
-        EditText bluetoothCode = (EditText) findViewById(R.id.bluetoothCode);
-
         BluetoothCore.startBLE(this);
 
     }
@@ -116,9 +114,16 @@ public class ScoutingActivity extends AppCompatActivity implements CompoundButto
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
 
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
+        Intent intent;
+        switch(id){
+            case R.id.action_about:
+                intent = new Intent(this,AboutActivity.class);
+                startActivity(intent);
+                break;
+            case R.id.action_settings:
+
+                break;
+            default:
         }
 
         return super.onOptionsItemSelected(item);
@@ -176,7 +181,6 @@ public class ScoutingActivity extends AppCompatActivity implements CompoundButto
 
     @Override
     public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-        Log.d("check_changed", "Checked");
         if (isChecked){
             Utils.changeToTheme(this,Utils.THEME_RED);
 
@@ -200,7 +204,7 @@ public class ScoutingActivity extends AppCompatActivity implements CompoundButto
 
         bundle.putString("match_num", ((EditText) findViewById(R.id.match_num)).getText().toString());
         bundle.putString("team_num", ((EditText) findViewById(R.id.team_num)).getText().toString());
-        bundle.putString("bluetooth_code",((EditText) findViewById(R.id.bluetoothCode)).getText().toString());
+        bundle.putString("bluetooth_code", ((EditText) findViewById(R.id.bluetoothCode)).getText().toString());
 
     }
 
@@ -313,7 +317,7 @@ public class ScoutingActivity extends AppCompatActivity implements CompoundButto
                 shape.setColor(ContextCompat.getColor(ScoutingActivity.this, connected ? R.color.colorGreenIndicator : R.color.colorRedIndicator));
 
                 shape = (GradientDrawable) bgDrawable.findDrawableByLayerId(R.id.innerCircle);
-                shape.setColor(ContextCompat.getColor(ScoutingActivity.this,connected ? R.color.colorGreenIndicator : R.color.colorRedIndicator));
+                shape.setColor(ContextCompat.getColor(ScoutingActivity.this, connected ? R.color.colorGreenIndicator : R.color.colorRedIndicator));
 
             }
         });

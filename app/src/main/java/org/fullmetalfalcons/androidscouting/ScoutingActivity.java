@@ -12,6 +12,7 @@ import android.graphics.drawable.GradientDrawable;
 import android.graphics.drawable.LayerDrawable;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.Snackbar;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -24,6 +25,7 @@ import android.view.animation.AnimationUtils;
 import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.EditText;
+import android.widget.HorizontalScrollView;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.Space;
@@ -40,6 +42,9 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -52,12 +57,12 @@ import java.util.regex.Pattern;
 public class ScoutingActivity extends AppCompatActivity implements CompoundButton.OnCheckedChangeListener {
 
     private final ArrayList<Element> ELEMENTS = new ArrayList<>();
-    private final Pattern bluetoothCodePattern = Pattern.compile("\\d{3}([a-fA-F]|\\d)");
+    private final Pattern bluetoothCodePattern = Pattern.compile("([a-fA-F]|\\d){4}");
     private boolean haveBluetoothPermission = true;
     private static boolean isFirstTime = true;
     private BroadcastReceiver mReceiver;
-    private boolean connected;
-    private boolean advertising;
+    private boolean connected = false;
+    private boolean advertising = false;
 
     /**
      * Called when the activity is created
@@ -76,7 +81,7 @@ public class ScoutingActivity extends AppCompatActivity implements CompoundButto
         setSupportActionBar(toolbar);
 
         //Floating Action Button to send data to base
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+        final FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         //When the button is clicked
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -84,8 +89,18 @@ public class ScoutingActivity extends AppCompatActivity implements CompoundButto
                 //If all the static fields are filled in correctly
                 if (connected){
                     if (ScoutingActivity.this.checkFields()) {
+                        fab.setEnabled(false);
+                        Snackbar.make(view, "Sending...", Snackbar.LENGTH_LONG).setAction("Action", null).show();
                         String results = ScoutingActivity.this.collectResults();
                         BluetoothCore.sendData(results);
+                        final ScheduledExecutorService exec = Executors.newScheduledThreadPool(1);
+
+                        exec.schedule(new Runnable() {
+                            @Override
+                            public void run() {
+                                fab.setEnabled(true);
+                            }
+                        }, 1, TimeUnit.SECONDS);
                     }
                 } else {
                     sendError("Not currently connected to base",false);
@@ -117,7 +132,7 @@ public class ScoutingActivity extends AppCompatActivity implements CompoundButto
                     BluetoothCore.setPassphrase(bluetoothCodeView.getText().toString());
                 } else {
                     //Send error message to user
-                    sendError("Bluetooth Code must be in the format ###(# or (A-F))",false);
+                    sendError("Bluetooth Code must be in the format (# or (A-F))x4",false);
                     //Clear the code box
                     bluetoothCodeView.setText("");
                 }
@@ -307,16 +322,17 @@ public class ScoutingActivity extends AppCompatActivity implements CompoundButto
      * Called when the app is restored from a previous state such as when it was minimized
      * Restores all the fields to the state they were before the app was closed
      *
-     * @param bundle
+     * @param bundle saved data
      */
     @Override
     protected void onRestoreInstanceState(Bundle bundle){
 
         //Get stored values
-        ParcelableArrayList values = (ParcelableArrayList) bundle.getParcelable("fieldData");
+        ParcelableArrayList values = bundle.getParcelable("fieldData");
 
         //Restore all dynamic values
         for (int i = 0; i< ELEMENTS.size();i++){
+            assert values != null;
             ELEMENTS.get(i).setViewData(values.get(i));
         }
 

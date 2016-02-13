@@ -9,6 +9,7 @@ import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.HorizontalScrollView;
 import android.widget.LinearLayout;
 import android.widget.NumberPicker;
 import android.widget.Space;
@@ -17,6 +18,7 @@ import android.widget.TextView;
 
 import com.dd.plist.NSDictionary;
 
+import org.fullmetalfalcons.androidscouting.NumberPickerHorizontal;
 import org.fullmetalfalcons.androidscouting.R;
 import org.fullmetalfalcons.androidscouting.SeekBarWithValues;
 import org.honorato.multistatetogglebutton.MultiStateToggleButton;
@@ -261,11 +263,12 @@ public class Element {
 
                 stLayout.addView(tv, tv.getLayoutParams());
 
-                NumberPicker np = new NumberPicker(activity);
+                NumberPickerHorizontal np = new NumberPickerHorizontal(activity);
                 np.scrollBy(1, 1);
                 np.setMinValue(Integer.parseInt(arguments[0]));
                 np.setMaxValue(Integer.parseInt(arguments[1]));
                 np.setLayoutParams(stLayoutParams);
+                np.setMinimumHeight(200);
 
                 stLayout.addView(np, np.getLayoutParams());
 
@@ -409,7 +412,7 @@ public class Element {
                 return et.getText().toString();
             case STEPPER:
                 ll = (LinearLayout) view;
-                NumberPicker np = (NumberPicker) ((LinearLayout) view).getChildAt(1);
+                NumberPickerHorizontal np = (NumberPickerHorizontal) ((LinearLayout) view).getChildAt(1);
                 return np.getValue();
             case LABEL:
                 return "";
@@ -449,7 +452,7 @@ public class Element {
                 break;
             case STEPPER:
                 ll = (LinearLayout) view;
-                NumberPicker np = (NumberPicker) ((LinearLayout) view).getChildAt(1);
+                NumberPickerHorizontal np = (NumberPickerHorizontal) ((LinearLayout) view).getChildAt(1);
                 np.setValue((int) viewData);
                 break;
             case LABEL:
@@ -492,7 +495,7 @@ public class Element {
             break;
             case STEPPER:
                 ll = (LinearLayout) view;
-                NumberPicker np = (NumberPicker) ((LinearLayout) view).getChildAt(1);
+                NumberPickerHorizontal np = (NumberPickerHorizontal) ((LinearLayout) view).getChildAt(1);
                 map.put(keys[0],np.getValue());
             break;
             case LABEL:

@@ -28,6 +28,7 @@ import android.widget.EditText;
 import android.widget.HorizontalScrollView;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
+import android.widget.NumberPicker;
 import android.widget.Space;
 import android.widget.Switch;
 import android.widget.Toast;
@@ -87,7 +88,7 @@ public class ScoutingActivity extends AppCompatActivity implements CompoundButto
             @Override
             public void onClick(View view) {
                 //If all the static fields are filled in correctly
-                if (connected){
+                if (connected) {
                     if (ScoutingActivity.this.checkFields()) {
                         fab.setEnabled(false);
                         Snackbar.make(view, "Sending...", Snackbar.LENGTH_LONG).setAction("Action", null).show();
@@ -103,7 +104,7 @@ public class ScoutingActivity extends AppCompatActivity implements CompoundButto
                         }, 1, TimeUnit.SECONDS);
                     }
                 } else {
-                    sendError("Not currently connected to base",false);
+                    sendError("Not currently connected to base", false);
                 }
             }
         });
@@ -111,6 +112,11 @@ public class ScoutingActivity extends AppCompatActivity implements CompoundButto
         //Prevents the app from defaulting to focus on the Team Number EditText
         LinearLayout l = (LinearLayout) findViewById(R.id.mainLinear);
         l.requestFocus();
+
+//        NumberPicker np = new NumberPicker(this);
+//        np.setMinValue(0);
+//        np.setMaxValue(100);
+//        l.addView(np);
 
         final EditText bluetoothCodeView = (EditText)findViewById(R.id.bluetoothCode);
 

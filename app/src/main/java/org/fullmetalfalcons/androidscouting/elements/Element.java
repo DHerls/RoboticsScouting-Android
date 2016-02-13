@@ -409,7 +409,23 @@ public class Element {
             case TEXTFIELD:
                 ll = (LinearLayout) view;
                 EditText et = (EditText) ll.getChildAt(1);
+                switch (et.getInputType()){
+                    case InputType.TYPE_CLASS_NUMBER:
+                        if (et.getText().toString().isEmpty()||et.getText().toString().equals("")){
+                            return 0;
+
+                        }
+                        break;
+                    case InputType.TYPE_NUMBER_FLAG_DECIMAL:
+                        if (et.getText().toString().isEmpty()||et.getText().toString().equals("")){
+                            return 0.0;
+
+                        }
+                        break;
+                    default:
+                }
                 return et.getText().toString();
+
             case STEPPER:
                 ll = (LinearLayout) view;
                 NumberPickerHorizontal np = (NumberPickerHorizontal) ((LinearLayout) view).getChildAt(1);

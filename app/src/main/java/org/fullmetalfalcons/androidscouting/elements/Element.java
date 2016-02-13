@@ -503,7 +503,7 @@ public class Element {
                 LinearLayout innerLayout;
                 for ( int i = 0; i< ll.getChildCount(); i++){
                     innerLayout = (LinearLayout) ll.getChildAt(i);
-                    map.put(keys[i],((Switch) innerLayout.getChildAt(1)).isChecked());
+                    map.put(keys[i],((Switch) innerLayout.getChildAt(1)).isChecked() ? "Yes" : "No");
                 }
                 break;
             case SPACE:

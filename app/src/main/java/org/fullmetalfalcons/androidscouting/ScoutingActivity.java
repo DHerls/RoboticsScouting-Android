@@ -1,8 +1,12 @@
 package org.fullmetalfalcons.androidscouting;
 
 import android.app.AlertDialog;
+import android.bluetooth.BluetoothAdapter;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.res.AssetManager;
 import android.graphics.drawable.GradientDrawable;
 import android.graphics.drawable.LayerDrawable;
@@ -17,6 +21,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
+import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.ImageButton;
@@ -47,9 +52,12 @@ import java.util.regex.Pattern;
 public class ScoutingActivity extends AppCompatActivity implements CompoundButton.OnCheckedChangeListener {
 
     private final ArrayList<Element> ELEMENTS = new ArrayList<>();
-    private final Pattern bluetoothCodePattern = Pattern.compile("\\d{3}[a-fA-F]");
+    private final Pattern bluetoothCodePattern = Pattern.compile("\\d{3}([a-fA-F]|\\d)");
     private boolean haveBluetoothPermission = true;
     private static boolean isFirstTime = true;
+    private BroadcastReceiver mReceiver;
+    private boolean connected;
+    private boolean advertising;
 
     /**
      * Called when the activity is created
@@ -74,8 +82,13 @@ public class ScoutingActivity extends AppCompatActivity implements CompoundButto
             @Override
             public void onClick(View view) {
                 //If all the static fields are filled in correctly
-                if (ScoutingActivity.this.checkFields()) {
-                    ScoutingActivity.this.collectResults();
+                if (connected){
+                    if (ScoutingActivity.this.checkFields()) {
+                        String results = ScoutingActivity.this.collectResults();
+                        BluetoothCore.sendData(results);
+                    }
+                } else {
+                    sendError("Not currently connected to base",false);
                 }
             }
         });
@@ -104,7 +117,7 @@ public class ScoutingActivity extends AppCompatActivity implements CompoundButto
                     BluetoothCore.setPassphrase(bluetoothCodeView.getText().toString());
                 } else {
                     //Send error message to user
-                    sendError("Bluetooth Code must be in the format ###(A-F)",false);
+                    sendError("Bluetooth Code must be in the format ###(# or (A-F))",false);
                     //Clear the code box
                     bluetoothCodeView.setText("");
                 }
@@ -131,7 +144,12 @@ public class ScoutingActivity extends AppCompatActivity implements CompoundButto
         //Start advertising
         BluetoothCore.startBLE(this);
 
+        //Register broadcast reciever to detect changes to bluetooth adapter
+        registerBluetoothReceiver();
+
     }
+
+
 
     /**
      * Create a menu
@@ -257,6 +275,7 @@ public class ScoutingActivity extends AppCompatActivity implements CompoundButto
 
     /**
      * When someone leaves the app, or the app is suspended by the phone
+     * Saves data from every field for later restore
      *
      * @param bundle Bundle which contains data to be saved between instance states
      */
@@ -284,28 +303,39 @@ public class ScoutingActivity extends AppCompatActivity implements CompoundButto
 
     }
 
+    /**
+     * Called when the app is restored from a previous state such as when it was minimized
+     * Restores all the fields to the state they were before the app was closed
+     *
+     * @param bundle
+     */
     @Override
     protected void onRestoreInstanceState(Bundle bundle){
 
+        //Get stored values
         ParcelableArrayList values = (ParcelableArrayList) bundle.getParcelable("fieldData");
 
+        //Restore all dynamic values
         for (int i = 0; i< ELEMENTS.size();i++){
             ELEMENTS.get(i).setViewData(values.get(i));
         }
 
+        //Restore static values
         ((EditText) findViewById(R.id.match_num)).setText(bundle.getString("match_num"));
         ((EditText) findViewById(R.id.team_num)).setText(bundle.getString("team_num"));
         ((EditText) findViewById(R.id.bluetoothCode)).setText(bundle.getString("bluetooth_code"));
 
         //BluetoothCore.startBLE(this);
-
+        BluetoothCore.setPassphrase(bundle.getString("bluetooth_code"));
 
     }
 
+    /**
+     * Called when the activity is resumed, only used when Bluetooth permission is requested
+     */
     @Override
     protected void onResume() {
         super.onResume();
-        System.out.println("Resumed");
         if(haveBluetoothPermission &&!isFirstTime){
             BluetoothCore.startBLE(this);
         }
@@ -313,6 +343,13 @@ public class ScoutingActivity extends AppCompatActivity implements CompoundButto
     }
 
 
+    /**
+     * Verifies that the static fields are filled in correctly
+     *
+     * Primarily, checks that the fields are filled in
+     *
+     * @return whether or not all fields are filled correctly
+     */
     private boolean checkFields(){
         String s = ((EditText) findViewById(R.id.team_num)).getText().toString();
         if (s.equals("")){
@@ -332,7 +369,10 @@ public class ScoutingActivity extends AppCompatActivity implements CompoundButto
         return true;
     }
 
-    private void collectResults(){
+    /**
+     * Gathers field values into an NSDictionary in preparation for sending
+     */
+    private String collectResults(){
         NSDictionary values = new NSDictionary();
         for (Element e:ELEMENTS){
             values.putAll(e.getHash());
@@ -342,15 +382,25 @@ public class ScoutingActivity extends AppCompatActivity implements CompoundButto
         values.put("match_num", Integer.parseInt(((EditText) findViewById(R.id.match_num)).getText().toString()));
         values.put("team_color", ((Switch) findViewById(R.id.team_color)).isChecked() ? "Red" : "Blue");
 
+        return values.toXMLPropertyList();
     }
 
+    /**
+     * Sends a popup message to the user with a custom message.
+     * Also closes the app if the error is fatal
+     *
+     * @param message message to send to the user
+     * @param fatalError whether or not the app should close after user acknowledges
+     */
     public void sendError(String message,final boolean fatalError){
         new AlertDialog.Builder(this)
                 .setTitle("Something is wrong")
+                //Can ignore if not fatal
                 .setCancelable(!fatalError)
                 .setMessage(message)
                 .setNeutralButton(android.R.string.ok, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
+                        //Close the app
                         if (fatalError) {
                             System.exit(0);
                         }
@@ -366,11 +416,17 @@ public class ScoutingActivity extends AppCompatActivity implements CompoundButto
         }
     }
 
+    /**
+     * Called when request for bluetooth permissions returns
+     *
+     * @param requestCode Number of activity request
+     * @param resultCode Result of the activity
+     * @param data data passed by the activity
+     */
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         //Value of Bluetooth Request Code is 1
-        System.out.println("Activity result");
         if ((requestCode == 1) && (resultCode == RESULT_OK)) {
             BluetoothCore.enable();
             haveBluetoothPermission = true;
@@ -382,37 +438,63 @@ public class ScoutingActivity extends AppCompatActivity implements CompoundButto
         }
     }
 
+    /**
+     * Changes the color of connected notification icon based on connection state
+     *
+     * @param connected whether or not a bluetooth device is connected
+     */
     public void setConnected(final boolean connected){
+        //Updates to UI must be run on the UI thread
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
+                //Get connection indicator
                 View v = findViewById(R.id.connection_indicator);
 
+                //Get the shape itself
                 LayerDrawable bgDrawable = (LayerDrawable) v.getBackground();
-                GradientDrawable shape = (GradientDrawable)   bgDrawable.findDrawableByLayerId(R.id.outerCircle);
+                //Set inner circle color
+                GradientDrawable shape = (GradientDrawable) bgDrawable.getDrawable(0);
                 shape.setColor(ContextCompat.getColor(ScoutingActivity.this, connected ? R.color.colorGreenIndicator : R.color.colorRedIndicator));
 
-                shape = (GradientDrawable) bgDrawable.findDrawableByLayerId(R.id.innerCircle);
-                shape.setColor(ContextCompat.getColor(ScoutingActivity.this, connected ? R.color.colorGreenIndicator : R.color.colorRedIndicator));
+                //Set outer circle color
+                shape = (GradientDrawable) bgDrawable.getDrawable(1);
+                shape.setStroke(8, ContextCompat.getColor(ScoutingActivity.this, connected ? R.color.colorGreenIndicator : R.color.colorRedIndicator));
 
             }
         });
+        this.connected = connected;
+        final ImageButton refreshBtn=(ImageButton)findViewById(R.id.detail_refresh_btn);
+        refreshBtn.setEnabled(!connected);
+
     }
 
+    /**
+     * Changes the color of connected notification icon based on connection state
+     *
+     * @param advertising whether or not a bluetooth device is connected
+     */
     public void setAdvertising(final boolean advertising) {
+        //Updates to UI must be run on the UI thread
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
+                //Get connection indicator
                 View v = findViewById(R.id.advertising_indicator);
 
+                //Get the shape itself
                 LayerDrawable bgDrawable = (LayerDrawable) v.getBackground();
+                //Set inner circle color
                 GradientDrawable shape = (GradientDrawable) bgDrawable.getDrawable(0);
                 shape.setColor(ContextCompat.getColor(ScoutingActivity.this, advertising ? R.color.colorGreenIndicator : R.color.colorRedIndicator));
 
+                //Set outer circle color
                 shape = (GradientDrawable) bgDrawable.getDrawable(1);
                 shape.setStroke(8, ContextCompat.getColor(ScoutingActivity.this, advertising ? R.color.colorGreenIndicator : R.color.colorRedIndicator));
             }
         });
+
+        this.advertising = advertising;
     }
 
     public static void log(String message){
@@ -423,4 +505,40 @@ public class ScoutingActivity extends AppCompatActivity implements CompoundButto
 
     }
 
+    /**
+     * Creates and registers a BroadcastReceiver to track changes to BluetoothAdapter
+     */
+    private void registerBluetoothReceiver() {
+         mReceiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                final String action = intent.getAction();
+
+                if (action.equals(BluetoothAdapter.ACTION_STATE_CHANGED)) {
+                    final int state = intent.getIntExtra(BluetoothAdapter.EXTRA_STATE,
+                            BluetoothAdapter.ERROR);
+                    switch (state) {
+                        case BluetoothAdapter.STATE_OFF:
+                            sendError("Bluetooth is required for this app, don't turn it off",true);
+                            break;
+                        case BluetoothAdapter.STATE_TURNING_OFF:
+                            break;
+                        case BluetoothAdapter.STATE_ON:
+                            break;
+                        case BluetoothAdapter.STATE_TURNING_ON:
+                            break;
+                    }
+                }
+            }
+        };
+
+        IntentFilter filter = new IntentFilter(BluetoothAdapter.ACTION_STATE_CHANGED);
+        registerReceiver(mReceiver, filter);
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        unregisterReceiver(mReceiver);
+    }
 }

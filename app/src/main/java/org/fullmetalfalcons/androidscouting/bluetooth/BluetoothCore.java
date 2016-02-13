@@ -26,6 +26,8 @@ public class BluetoothCore {
     private static final String DEFAULT_CHARACTERISTIC_UUID = "20D0C428-B763-4016-8AC6-4B4B3A6865D9";
     private static final String TAG = "SCOUTING";
     private static ScoutingActivity a;
+    private static int mtu = 75;
+    private static BluetoothDevice BleDevice;
 
     public static void startBLE(Activity a){
         BluetoothCore.a = (ScoutingActivity) a;
@@ -91,21 +93,21 @@ public class BluetoothCore {
         @Override
         public void onNotificationSent(BluetoothDevice device, int status) {
             super.onNotificationSent(device, status);
-            Log.d(TAG, "Notification?");
         }
 
         @Override
         public void onMtuChanged(BluetoothDevice device, int mtu) {
             super.onMtuChanged(device, mtu);
-            Log.d(TAG, mtu + "");
+            //BluetoothCore.mtu = mtu;
+
         }
 
         @Override
         public void onDescriptorWriteRequest (BluetoothDevice device, int requestId, BluetoothGattDescriptor descriptor, boolean preparedWrite, boolean responseNeeded, int offset, byte[] value) {
 
-            // now tell the connected device that this was all successfull
+            // now tell the connected device that this was all successful
             BluetoothUtility.sendResponse(device, requestId, BluetoothGatt.GATT_SUCCESS, offset, value);
-            BluetoothUtility.sendNotification(device, "Fuck you Demeo");
+            BleDevice = device;
 
         }
     };
@@ -157,5 +159,16 @@ public class BluetoothCore {
     public static void stopBLE() {
         Log.d(a.getString(R.string.log_tag),"Stopping BLE");
         BluetoothUtility.stopAll();
+    }
+
+    public static void sendData(String results) {
+        int numPackets = (int) Math.ceil(results.length()/mtu);
+        System.out.println(results);
+        for (int i = 0; i<numPackets;i++){
+            String toSend = results.substring(i * mtu, (i + 1) * mtu);
+            BluetoothUtility.sendNotification(BleDevice, toSend);
+        }
+        BluetoothUtility.sendNotification(BleDevice, results.substring(numPackets*mtu,results.length()));
+        BluetoothUtility.sendNotification(BleDevice,"EOM");
     }
 }

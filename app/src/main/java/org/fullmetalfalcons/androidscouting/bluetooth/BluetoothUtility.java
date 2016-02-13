@@ -54,6 +54,7 @@ public class BluetoothUtility {
     private static BluetoothLeAdvertiser bluetoothLeAdvertiser;
     private static BluetoothGattServer gattServer;
 
+
     protected static boolean setupBluetooth(Activity a){
         activity = (ScoutingActivity) a;
         bluetoothManager = (BluetoothManager) activity.getApplicationContext().getSystemService(Context.BLUETOOTH_SERVICE);

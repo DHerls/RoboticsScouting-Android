@@ -141,10 +141,13 @@ public class BluetoothCore {
     }
 
     public static void setPassphrase(String passphrase1){
-        passphrase = passphrase1;
-        BluetoothUtility.stopAll();
-        BluetoothUtility.createNotificationService(getServiceUUID(), DEFAULT_CHARACTERISTIC_UUID);
-        BluetoothUtility.startAdvertise();
+        if (!passphrase1.equalsIgnoreCase(passphrase)){
+            passphrase = passphrase1;
+            BluetoothUtility.stopAll();
+            BluetoothUtility.createNotificationService(getServiceUUID(), DEFAULT_CHARACTERISTIC_UUID);
+            BluetoothUtility.startAdvertise();
+        }
+
     }
 
     public static String getServiceUUID() {

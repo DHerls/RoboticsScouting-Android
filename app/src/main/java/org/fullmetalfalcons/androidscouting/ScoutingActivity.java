@@ -38,6 +38,12 @@ import java.util.ArrayList;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+/**
+ * Main Activity for the app
+ *
+ * Collects and sends data about robots to a base
+ *
+ */
 public class ScoutingActivity extends AppCompatActivity implements CompoundButton.OnCheckedChangeListener {
 
     private final ArrayList<Element> ELEMENTS = new ArrayList<>();
@@ -45,61 +51,94 @@ public class ScoutingActivity extends AppCompatActivity implements CompoundButto
     private boolean haveBluetoothPermission = true;
     private static boolean isFirstTime = true;
 
-
+    /**
+     * Called when the activity is created
+     *
+     * Creates a UI based on activity_scouting.xml and dynamically builds from config.txt
+     *
+     * @param savedInstanceState if the app had previously stored data, it would be in this bundle
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        //This method in the Utils class allows the theme to switch between blue and red
         Utils.onActivityCreateSetTheme(this);
         setContentView(R.layout.activity_scouting);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
+        //Floating Action Button to send data to base
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+        //When the button is clicked
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                //If all the static fields are filled in correctly
                 if (ScoutingActivity.this.checkFields()) {
                     ScoutingActivity.this.collectResults();
                 }
             }
         });
+
+        //Prevents the app from defaulting to focus on the Team Number EditText
         LinearLayout l = (LinearLayout) findViewById(R.id.mainLinear);
         l.requestFocus();
 
         final EditText bluetoothCodeView = (EditText)findViewById(R.id.bluetoothCode);
 
+        //Refresh button next to the bluetooth code EditText
         final ImageButton refreshBtn=(ImageButton)findViewById(R.id.detail_refresh_btn);
+        //The animation to make the button spin
         final Animation ranim = AnimationUtils.loadAnimation(this, R.anim.rotate);
+        //When the refresh button is pressed
         refreshBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                //Create a matcher based on the pattern above and the text in the code EditText
                 Matcher bluetoothCodeMatcher = bluetoothCodePattern.matcher(bluetoothCodeView.getText());
+                //If the text matches the pattern
                 if (bluetoothCodeMatcher.matches()){
+                    //Animate the refresh button
                     refreshBtn.startAnimation(ranim);
+                    //Set a new passphrase
                     BluetoothCore.setPassphrase(bluetoothCodeView.getText().toString());
                 } else {
+                    //Send error message to user
                     sendError("Bluetooth Code must be in the format ###(A-F)",false);
+                    //Clear the code box
                     bluetoothCodeView.setText("");
                 }
 
             }
         });
 
+        //Dynamically generate the UI based on config.txt
         createTheApp();
 
+        //Get the Team Color Switch
         Switch colorSwitch = (Switch) findViewById(R.id.team_color);
 
+        //This isn't the first time
         if (savedInstanceState!=null) {
+            //If the theme should be red
             if (savedInstanceState.getBoolean("isRed")) {
+                //Check the switch
                 colorSwitch.setChecked(true);
             }
         }
         colorSwitch.setOnCheckedChangeListener(this);
 
+        //Start advertising
         BluetoothCore.startBLE(this);
 
     }
 
+    /**
+     * Create a menu
+     *
+     * @param menu the menu being created
+     * @return Whether the creation of the menu was successful
+     */
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
@@ -129,30 +168,44 @@ public class ScoutingActivity extends AppCompatActivity implements CompoundButto
         return super.onOptionsItemSelected(item);
     }
 
+    /**
+     * Calls two methods to create the UI dynamically from config.txt
+     */
     private void createTheApp(){
         loadConfig();
         addViews();
     }
 
+    /**
+     * After all the Elements are generated from the config file, they are added in order to the screen
+     */
     private void addViews() {
+        //Get the main layout of the app
         LinearLayout l = (LinearLayout) findViewById(R.id.mainLinear);
+        //For each element created
         for (Element e: ELEMENTS){
-            System.out.println(e.getType());
+            //Add the Element's view to the app
             l.addView(e.getView(),e.getView().getLayoutParams());
         }
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
 
+        //Add padding at the bottom of the page
         Space s = new Space(this);
         s.setMinimumHeight(fab.getHeight() + fab.getPaddingBottom() + fab.getPaddingTop());
         l.addView(s);
     }
 
+    /**
+     * Load Element data from the Config file
+     */
     private void loadConfig(){
+        //Located in the assets folder
         AssetManager am = getAssets();
         try {
             BufferedReader config = new BufferedReader(new InputStreamReader(am.open("config.txt")));
             String line;
+            //While there are still lines to read
             while ((line=config.readLine())!=null) {
                 line = line.trim();
                 if (line.length() < 2) {
@@ -165,13 +218,20 @@ public class ScoutingActivity extends AppCompatActivity implements CompoundButto
                 }
             }
         } catch (IOException e) {
-            Toast.makeText(this,"fuck",Toast.LENGTH_LONG).show();
+            //This exception signifies the entire app is useless
+            sendError("fuck",true);
             e.printStackTrace();
         }
     }
 
+    /**
+     * Adds a new element from a string to the main array
+     *
+     * @param line line from config file
+     */
     private void addElement(String line){
         try {
+            //Element will throw an exception if it is improperly formed
             Element e = new Element(line,this);
             ELEMENTS.add(e);
         } catch (ElementParseException e1) {
@@ -179,6 +239,12 @@ public class ScoutingActivity extends AppCompatActivity implements CompoundButto
         }
     }
 
+    /**
+     * Called when the TeamColor switch is flipped
+     *
+     * @param buttonView the switch which is flipped
+     * @param isChecked Whether or not it is checked
+     */
     @Override
     public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
         if (isChecked){
@@ -189,19 +255,29 @@ public class ScoutingActivity extends AppCompatActivity implements CompoundButto
         }
     }
 
+    /**
+     * When someone leaves the app, or the app is suspended by the phone
+     *
+     * @param bundle Bundle which contains data to be saved between instance states
+     */
     @Override
     protected void onSaveInstanceState(Bundle bundle) {
         super.onSaveInstanceState(bundle);
+        //Stop advertising
         BluetoothCore.stopBLE();
+
+        //Set whether or not the theme should be red
         Switch s = (Switch) findViewById(R.id.team_color);
         bundle.putBoolean("isRed",s.isChecked());
 
+        //Put all the values from the views into an arraylist then put it into the bundle
         ParcelableArrayList values = new ParcelableArrayList();
         for (Element e: ELEMENTS){
             values.add(e.getViewData());
         }
         bundle.putParcelable("fieldData", values);
 
+        //Put all the static fields into the bundle
         bundle.putString("match_num", ((EditText) findViewById(R.id.match_num)).getText().toString());
         bundle.putString("team_num", ((EditText) findViewById(R.id.team_num)).getText().toString());
         bundle.putString("bluetooth_code", ((EditText) findViewById(R.id.bluetoothCode)).getText().toString());

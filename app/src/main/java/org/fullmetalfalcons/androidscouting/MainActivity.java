@@ -28,6 +28,7 @@ public class MainActivity extends AppCompatActivity {
 
     private final Pattern bluetoothCodePattern = Pattern.compile("([a-fA-F]|\\d){4}");
     private BroadcastReceiver mReceiver;
+    private static Bundle viewData;
 
 
     @Override
@@ -223,5 +224,18 @@ public class MainActivity extends AppCompatActivity {
     protected void onDestroy() {
         super.onDestroy();
         unregisterReceiver(mReceiver);
+    }
+
+
+    public static void saveData(Bundle bundle) {
+        MainActivity.viewData = bundle;
+    }
+
+    public static Bundle getData(){
+        return viewData;
+    }
+
+    public static void clearData() {
+        viewData.clear();
     }
 }

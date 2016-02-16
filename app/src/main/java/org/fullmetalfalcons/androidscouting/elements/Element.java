@@ -507,12 +507,12 @@ public class Element {
             case TEXTFIELD:
                 ll = (LinearLayout) view;
                 EditText et = (EditText) ll.getChildAt(1);
-                map.put(keys[0],et.getText().toString());
+                map.put(keys[0], et.getText().toString());
             break;
             case STEPPER:
                 ll = (LinearLayout) view;
                 NumberPickerHorizontal np = (NumberPickerHorizontal) ((LinearLayout) view).getChildAt(1);
-                map.put(keys[0],np.getValue());
+                map.put(keys[0], np.getValue());
             break;
             case LABEL:
                 break;
@@ -522,7 +522,7 @@ public class Element {
                 LinearLayout innerLayout;
                 for ( int i = 0; i< ll.getChildCount(); i++){
                     innerLayout = (LinearLayout) ll.getChildAt(i);
-                    map.put(keys[i],((Switch) innerLayout.getChildAt(1)).isChecked() ? "Yes" : "No");
+                    map.put(keys[i], ((Switch) innerLayout.getChildAt(1)).isChecked() ? "Yes" : "No");
                 }
                 break;
             case SPACE:
@@ -530,10 +530,49 @@ public class Element {
             case SLIDER:
                 ll = (LinearLayout) view;
                 SeekBarWithValues sbwv = (SeekBarWithValues) ll.getChildAt(1);
-                map.put(keys[0],sbwv.getSeekBar().getProgress());
+                map.put(keys[0], sbwv.getSeekBar().getProgress());
             break;
         }
 
         return map;
+    }
+
+    public void clearViewData() {
+        LinearLayout ll;
+        switch(type){
+
+            case SEGMENTED_CONTROL:
+                ll = (LinearLayout) view;
+                MultiStateToggleButton mstb = (MultiStateToggleButton) ll.getChildAt(1);
+                mstb.setValue(0);
+                break;
+            case TEXTFIELD:
+                ll = (LinearLayout) view;
+                EditText et = (EditText) ll.getChildAt(1);
+                et.getText().clear();
+                break;
+            case STEPPER:
+                ll = (LinearLayout) view;
+                NumberPickerHorizontal np = (NumberPickerHorizontal) ((LinearLayout) view).getChildAt(1);
+                np.setValue(np.getMinValue());
+                break;
+            case LABEL:
+                break;
+            case SWITCH:
+                ll = (LinearLayout) view;
+                LinearLayout innerLayout;
+                for ( int i = 0; i< ll.getChildCount(); i++){
+                    innerLayout = (LinearLayout) ll.getChildAt(i);
+                    ((Switch) innerLayout.getChildAt(1)).setChecked(false);
+                }
+                break;
+            case SPACE:
+                break;
+            case SLIDER:
+                ll = (LinearLayout) view;
+                SeekBarWithValues sbwv = (SeekBarWithValues) ll.getChildAt(1);
+                sbwv.setProgress(0);
+                break;
+        }
     }
 }

@@ -76,6 +76,7 @@ public class ScoutingActivity extends AppCompatActivity implements CompoundButto
         setContentView(R.layout.activity_scouting);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+        //noinspection ConstantConditions
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         //Floating Action Button to send data to base
@@ -123,18 +124,32 @@ public class ScoutingActivity extends AppCompatActivity implements CompoundButto
         Switch colorSwitch = (Switch) findViewById(R.id.team_color);
 
         //This isn't the first time
-        if (savedInstanceState!=null) {
+        if (MainActivity.getData()!=null&&!MainActivity.getData().isEmpty()) {
             //If the theme should be red
-            if (savedInstanceState.getBoolean("isRed")) {
+            if (MainActivity.getData().getBoolean("isRed")) {
                 //Check the switch
                 colorSwitch.setChecked(true);
             }
+            restoreData();
         }
         colorSwitch.setOnCheckedChangeListener(this);
 
-
     }
 
+    private void restoreData() {
+        Bundle bundle = MainActivity.getData();
+        ParcelableArrayList values = bundle.getParcelable("fieldData");
+
+        //Restore all dynamic values
+        for (int i = 0; i< ELEMENTS.size();i++){
+            assert values != null;
+            ELEMENTS.get(i).setViewData(values.get(i));
+        }
+
+        //Restore static values
+        ((EditText) findViewById(R.id.match_num)).setText(bundle.getString("match_num"));
+        ((EditText) findViewById(R.id.team_num)).setText(bundle.getString("team_num"));
+    }
 
 
     /**
@@ -176,7 +191,9 @@ public class ScoutingActivity extends AppCompatActivity implements CompoundButto
      * Calls two methods to create the UI dynamically from config.txt
      */
     private void createTheApp(){
-        loadConfig();
+        if (ELEMENTS.isEmpty()){
+            loadConfig();
+        }
         addViews();
     }
 
@@ -403,6 +420,23 @@ public class ScoutingActivity extends AppCompatActivity implements CompoundButto
         }
     }
 
+    public void clearAll(View v){
+
+        for (int i = 0; i< ELEMENTS.size();i++){
+            ELEMENTS.get(i).clearViewData();
+        }
+
+        //Restore static values
+        ((EditText) findViewById(R.id.match_num)).setText("");
+        ((EditText) findViewById(R.id.team_num)).setText("");
+
+
+        MainActivity.clearData();
+
+        ((Switch) findViewById(R.id.team_color)).setChecked(false);
+        Utils.changeToTheme(this, Utils.THEME_BLUE);
+    }
+
     public static void log(String message){
 
     }
@@ -411,4 +445,26 @@ public class ScoutingActivity extends AppCompatActivity implements CompoundButto
 
     }
 
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        Bundle bundle = new Bundle();
+        //Set whether or not the theme should be red
+        Switch s = (Switch) findViewById(R.id.team_color);
+        bundle.putBoolean("isRed",s.isChecked());
+
+        //Put all the values from the views into an arraylist then put it into the bundle
+        ParcelableArrayList values = new ParcelableArrayList();
+        for (Element e: ELEMENTS){
+            values.add(e.getViewData());
+        }
+        bundle.putParcelable("fieldData", values);
+
+        //Put all the static fields into the bundle
+        bundle.putString("match_num", ((EditText) findViewById(R.id.match_num)).getText().toString());
+        bundle.putString("team_num", ((EditText) findViewById(R.id.team_num)).getText().toString());
+        //bundle.putString("bluetooth_code", ((EditText) findViewById(R.id.bluetoothCode)).getText().toString());
+
+        MainActivity.saveData(bundle);
+    }
 }

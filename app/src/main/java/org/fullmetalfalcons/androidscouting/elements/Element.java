@@ -464,7 +464,7 @@ public class Element {
             case TEXTFIELD:
                 ll = (LinearLayout) view;
                 EditText et = (EditText) ll.getChildAt(1);
-                et.setText((String) viewData);
+                et.setText(""+ viewData);
                 break;
             case STEPPER:
                 ll = (LinearLayout) view;

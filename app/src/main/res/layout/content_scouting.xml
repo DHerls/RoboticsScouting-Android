@@ -42,67 +42,6 @@
                 android:textSize="22dp"
                 android:textColor="#000000" />
 
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="25dp"
-                android:orientation="horizontal"
-                android:layout_weight="1">
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:orientation="horizontal"
-                    android:layout_gravity="center"
-                    android:layout_weight="1">
-
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="match_parent"
-                        android:text="Connection:"
-                        android:textSize="18dp"
-                        android:textColor="@android:color/black"
-                        android:layout_marginLeft="20dp"
-                        android:layout_gravity="center" />
-
-                    <View android:layout_width="20dp"
-                        android:layout_height="20dp"
-                        android:background="@drawable/indicator_circle"
-                        android:id="@+id/connection_indicator"
-                        android:layout_marginLeft="10dp"/>
-
-                </LinearLayout>
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:orientation="horizontal"
-                    android:layout_gravity="center"
-                    android:layout_weight="1">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="match_parent"
-                        android:text="Advertising:"
-                        android:textSize="18dp"
-                        android:textColor="@android:color/black"
-                        android:layout_marginLeft="20dp"
-                        />
-
-                    <View android:layout_width="20dp"
-                        android:layout_height="20dp"
-                        android:background="@drawable/indicator_circle"
-                        android:id="@+id/advertising_indicator"
-                        android:layout_marginLeft="10dp"/>
-
-                </LinearLayout>
-
-
-
-
-            </LinearLayout>
-
-
 
             <LinearLayout
                 android:orientation="horizontal"
@@ -199,42 +138,6 @@
 
                 </LinearLayout>
 
-                <LinearLayout
-                    android:orientation="vertical"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:layout_weight="1" >
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:textAppearance="?android:attr/textAppearanceSmall"
-                        android:text="Bluetooth Code"
-                        android:id="@+id/textView4"
-                        android:textColor="#000000" />
-
-                    <LinearLayout
-                        android:orientation="horizontal"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:weightSum="1">
-
-                        <EditText
-                            android:layout_width="51dp"
-                            android:layout_height="wrap_content"
-                            android:inputType="textCapCharacters"
-                            android:ems="10"
-                            android:id="@+id/bluetoothCode"
-                            android:hint="ex. 333B"
-                            android:layout_weight="0.89"
-                            android:maxLength="4" />
-
-                        <ImageButton android:id="@+id/detail_refresh_btn"
-                            android:layout_width="48dp"
-                            android:layout_height="48dp"
-                            android:src="@drawable/ic_action_refresh1" />
-                    </LinearLayout>
-                </LinearLayout>
             </LinearLayout>
 
 

@@ -11,8 +11,8 @@ import android.bluetooth.le.AdvertiseCallback;
 import android.bluetooth.le.AdvertiseSettings;
 import android.util.Log;
 
+import org.fullmetalfalcons.androidscouting.MainActivity;
 import org.fullmetalfalcons.androidscouting.R;
-import org.fullmetalfalcons.androidscouting.ScoutingActivity;
 
 import java.util.UUID;
 
@@ -25,12 +25,14 @@ public class BluetoothCore {
     private static String passphrase = "333B";
     private static final String DEFAULT_CHARACTERISTIC_UUID = "20D0C428-B763-4016-8AC6-4B4B3A6865D9";
     private static final String TAG = "SCOUTING";
-    private static ScoutingActivity a;
+    private static MainActivity activity;
     private static int mtu = 75;
     private static BluetoothDevice BleDevice;
+    private static boolean connected = false;
+    private static boolean advertising = false;
 
     public static void startBLE(Activity a){
-        BluetoothCore.a = (ScoutingActivity) a;
+        BluetoothCore.activity = (MainActivity) a;
         Log.d(a.getString(R.string.log_tag),"Beginning BLE Setup");
 
         if (BluetoothUtility.setupBluetooth(a)){
@@ -41,9 +43,10 @@ public class BluetoothCore {
             BluetoothUtility.setGattServerCallback(gattServerCallback);
 
             BluetoothUtility.startAdvertise();
+
+            advertising = true;
+            activity.setAdvertising(true);
         }
-
-
 
     }
 
@@ -51,13 +54,19 @@ public class BluetoothCore {
         @Override
         public void onConnectionStateChange(BluetoothDevice device, int status, int newState) {
             super.onConnectionStateChange(device, status, newState);
-            Log.d(a.getString(R.string.log_tag),"Connection changed: "+status + "-->" + newState);
+            Log.d(activity.getString(R.string.log_tag),"Connection changed: "+status + "-->" + newState);
             if (status ==0 && newState==0){
                 BluetoothUtility.startAdvertise();
-                a.setConnected(false);
+                activity.setConnected(false);
+                connected = false;
+                activity.setAdvertising(true);
+                advertising = true;
             } else if (status == 0 && newState==2){
                 BluetoothUtility.stopAdvertise();
-                a.setConnected(true);
+                activity.setAdvertising(false);
+                advertising = false;
+                activity.setConnected(true);
+                connected = true;
             }
 
         }
@@ -117,7 +126,8 @@ public class BluetoothCore {
         public void onStartSuccess(AdvertiseSettings settingsInEffect) {
             super.onStartSuccess(settingsInEffect);
             String successMsg = "Advertisement command attempt successful";
-            Log.d(a.getString(R.string.log_tag), successMsg);
+            Log.d(activity.getString(R.string.log_tag), successMsg);
+            activity.setAdvertising(true);
         }
 
         @Override
@@ -125,13 +135,14 @@ public class BluetoothCore {
             super.onStartFailure(errorCode);
             String failMsg = "Advertisement command attempt failed: " + errorCode;
             Log.e(TAG, failMsg);
+            activity.setAdvertising(false);
         }
 
     };
 
 
     public static void enable() {
-        Log.d(a.getString(R.string.log_tag), "Enabling Bluetooth");
+        Log.d(activity.getString(R.string.log_tag), "Enabling Bluetooth");
         BluetoothUtility.enable();
 
         BluetoothUtility.createNotificationService(getServiceUUID(), DEFAULT_CHARACTERISTIC_UUID);
@@ -157,7 +168,7 @@ public class BluetoothCore {
     }
 
     public static void stopBLE() {
-        Log.d(a.getString(R.string.log_tag),"Stopping BLE");
+        Log.d(activity.getString(R.string.log_tag),"Stopping BLE");
         BluetoothUtility.stopAll();
     }
 
@@ -170,5 +181,14 @@ public class BluetoothCore {
         }
         BluetoothUtility.sendNotification(BleDevice, results.substring(numPackets*mtu,results.length()));
         BluetoothUtility.sendNotification(BleDevice,"EOM");
+    }
+
+
+    public static boolean isConnected() {
+        return connected;
+    }
+
+    public  static boolean isAdvertising() {
+        return advertising;
     }
 }

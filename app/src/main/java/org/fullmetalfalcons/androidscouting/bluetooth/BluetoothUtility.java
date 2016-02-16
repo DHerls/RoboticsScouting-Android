@@ -10,6 +10,7 @@ import android.os.ParcelUuid;
 import android.util.Log;
 import android.widget.Toast;
 
+import org.fullmetalfalcons.androidscouting.MainActivity;
 import org.fullmetalfalcons.androidscouting.R;
 import org.fullmetalfalcons.androidscouting.ScoutingActivity;
 import org.fullmetalfalcons.androidscouting.Utils;
@@ -48,7 +49,7 @@ public class BluetoothUtility {
     /**
      * Bluetooth Objects
      */
-    private static ScoutingActivity activity;
+    private static MainActivity activity;
     private static BluetoothManager bluetoothManager;
     private static BluetoothAdapter bluetoothAdapter;
     private static BluetoothLeAdvertiser bluetoothLeAdvertiser;
@@ -56,12 +57,12 @@ public class BluetoothUtility {
 
 
     protected static boolean setupBluetooth(Activity a){
-        activity = (ScoutingActivity) a;
+        activity = (MainActivity) a;
         bluetoothManager = (BluetoothManager) activity.getApplicationContext().getSystemService(Context.BLUETOOTH_SERVICE);
         bluetoothAdapter = bluetoothManager.getAdapter();
 
         if (bluetoothAdapter == null){
-            ((ScoutingActivity) activity).sendError("Bluetooth is not supported on this device, this app is useless",true);
+            activity.sendError("Bluetooth is not supported on this device, this app is useless",true);
             return false;
         } else {
             bluetoothAdapter.setName(Utils.getDeviceName() + " " + BLUETOOTH_ADAPTER_NAME);
@@ -124,8 +125,6 @@ public class BluetoothUtility {
 
         bluetoothLeAdvertiser.startAdvertising(settingsBuilder.build(), dataBuilder.build(), advertiseCallback);
         advertising = true;
-        activity.setAdvertising(true);
-
         Log.d(TAG, "Start Advertising");
 
     }

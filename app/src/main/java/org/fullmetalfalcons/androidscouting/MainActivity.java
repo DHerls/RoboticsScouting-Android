@@ -100,7 +100,7 @@ public class MainActivity extends AppCompatActivity {
         });
         final ImageButton refreshBtn=(ImageButton)findViewById(R.id.detail_refresh_btn);
         refreshBtn.setEnabled(!connected);
-
+        Log.d("MERF", "Set Connected" + connected);
     }
 
     /**
@@ -236,6 +236,13 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public static void clearData() {
-        viewData.clear();
+        if (viewData!=null){
+            viewData.clear();
+        }
+    }
+
+    public void startRetrieveActivity(View view) {
+        Intent intent = new Intent(this,RetrieveDataActivity.class);
+        startActivity(intent);
     }
 }

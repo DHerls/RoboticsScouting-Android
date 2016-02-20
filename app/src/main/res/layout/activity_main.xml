@@ -132,5 +132,6 @@
         android:minWidth="150dp"
         android:background="@color/colorBluePrimary"
         android:layout_below="@+id/button"
-        android:layout_centerHorizontal="true" />
+        android:layout_centerHorizontal="true"
+        android:onClick="startRetrieveActivity"/>
 </RelativeLayout>

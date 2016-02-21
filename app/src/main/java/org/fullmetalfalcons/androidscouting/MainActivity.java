@@ -20,6 +20,7 @@ import android.widget.EditText;
 import android.widget.ImageButton;
 
 import org.fullmetalfalcons.androidscouting.bluetooth.BluetoothCore;
+import org.fullmetalfalcons.androidscouting.fileio.ConfigManager;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -35,6 +36,11 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        if (ConfigManager.getElements().isEmpty()){
+            ConfigManager.loadConfig(this);
+        }
+
 
         final EditText bluetoothCodeView = (EditText) findViewById(R.id.bluetoothCode);
 

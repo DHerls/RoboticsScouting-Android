@@ -37,17 +37,22 @@ import java.util.regex.Pattern;
  */
 public class Element {
 
-    private final Activity activity;
     private ElementType type;
     private String[] descriptions;
     private String[] keys;
     private String[] arguments;
-    private View view = null;
+    private volatile View view = null;
 
     //The below elements are used to capture the data between arrows <Like this>
     private final String argumentRegex = "<(.*?)>";
     private final Pattern argumentPattern = Pattern.compile(argumentRegex);
+    private String[] columnValues;
 
+    private static boolean switchColors = false;
+
+    public static void setSwitchColors(boolean switchColors) {
+        Element.switchColors = switchColors;
+    }
 
     /**
      * Constructor for the Element Class, requires a line from the config file
@@ -55,8 +60,7 @@ public class Element {
      * @param line A line read from the config file
      * @throws ElementParseException If there is a problem with the line/ it does not conform to conventions
      */
-    public Element(String line, Activity activity) throws ElementParseException {
-        this.activity = activity;
+    public Element(String line) throws ElementParseException {
         parseString(line);
 
 
@@ -150,15 +154,23 @@ public class Element {
         return keys;
     }
 
-    public View getView(){
-        if (view==null){
-            generateView();
+    public View getView(Activity a){
+
+        if (switchColors){
+            Object o = getViewData();
+            //System.out.println(o.toString());
+            generateView(a);
+            setViewData(o);
         }
+        if (view==null){
+            generateView(a);
+        }
+
 
         return view;
     }
 
-    private void generateView(){
+    private void generateView(Activity activity){
         //LinearLayout main = (LinearLayout) activity.findViewById(R.id.mainLinear);
 
         //LinearLayout ll = new LinearLayout(activity);
@@ -574,5 +586,57 @@ public class Element {
                 sbwv.setProgress(0);
                 break;
         }
+    }
+
+    public String[] getColumnValues(){
+        if (columnValues!=null){
+            return columnValues;
+        }
+        ArrayList<String> values = new ArrayList<>();
+        switch(type){
+            case SEGMENTED_CONTROL:
+                for (String s: arguments){
+                    values.add(keys[0]+"_"+s.trim());
+                }
+                break;
+            case TEXTFIELD:
+                if (arguments[0].equalsIgnoreCase("number") || arguments[0].equalsIgnoreCase("decimal")){
+                    values.add(keys[0].trim());
+                }
+                break;
+            case STEPPER:
+                values.add(keys[0].trim());
+                break;
+            case LABEL:
+                break;
+            case SWITCH:
+                for (String key: keys){
+                    values.add(key.trim()+"_yes");
+                    values.add(key.trim()+"_no");
+                }
+                break;
+            case SPACE:
+                break;
+            case SLIDER:
+                values.add(keys[0]);
+                break;
+        }
+
+        for (int i = 0; i< values.size();i++){
+            values.set(i, values.get(i)
+                    .replace("\\","_")
+                    .replace("/","_")
+                    .replace(" ","_")
+                    .toLowerCase()
+                    .trim());
+        }
+
+        this.columnValues = values.toArray(new String[values.size()]);
+
+        return this.columnValues;
+    }
+
+    public void destroyView() {
+        view = null;
     }
 }

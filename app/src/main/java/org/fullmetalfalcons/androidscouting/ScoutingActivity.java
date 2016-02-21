@@ -1,53 +1,32 @@
 package org.fullmetalfalcons.androidscouting;
 
 import android.app.AlertDialog;
-import android.bluetooth.BluetoothAdapter;
-import android.content.BroadcastReceiver;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.IntentFilter;
-import android.content.res.AssetManager;
-import android.graphics.drawable.GradientDrawable;
-import android.graphics.drawable.LayerDrawable;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
-import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
-import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.animation.Animation;
-import android.view.animation.AnimationUtils;
-import android.widget.Button;
+import android.view.View;
 import android.widget.CompoundButton;
 import android.widget.EditText;
-import android.widget.HorizontalScrollView;
-import android.widget.ImageButton;
 import android.widget.LinearLayout;
-import android.widget.NumberPicker;
 import android.widget.Space;
 import android.widget.Switch;
-import android.widget.Toast;
 
 import com.dd.plist.NSDictionary;
 
-import org.fullmetalfalcons.androidscouting.elements.Element;
-import org.fullmetalfalcons.androidscouting.elements.ElementParseException;
 import org.fullmetalfalcons.androidscouting.bluetooth.BluetoothCore;
+import org.fullmetalfalcons.androidscouting.elements.Element;
+import org.fullmetalfalcons.androidscouting.fileio.ConfigManager;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.util.ArrayList;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 /**
  * Main Activity for the app
@@ -56,8 +35,7 @@ import java.util.regex.Pattern;
  *
  */
 public class ScoutingActivity extends AppCompatActivity implements CompoundButton.OnCheckedChangeListener {
-
-    private final ArrayList<Element> ELEMENTS = new ArrayList<>();
+    
     private boolean haveBluetoothPermission = true;
     private static boolean isFirstTime = true;
 
@@ -134,18 +112,19 @@ public class ScoutingActivity extends AppCompatActivity implements CompoundButto
         }
         colorSwitch.setOnCheckedChangeListener(this);
 
+        Element.setSwitchColors(false);
     }
 
     private void restoreData() {
         Bundle bundle = MainActivity.getData();
-        ParcelableArrayList values = bundle.getParcelable("fieldData");
-
-        //Restore all dynamic values
-        for (int i = 0; i< ELEMENTS.size();i++){
-            assert values != null;
-            ELEMENTS.get(i).setViewData(values.get(i));
-        }
-
+        //ParcelableArrayList values = bundle.getParcelable("fieldData");
+//
+//        //Restore all dynamic values
+//        for (int i = 0; i< ConfigManager.getElements().size();i++){
+//            assert values != null;
+//            ConfigManager.getElements().get(i).setViewData(values.get(i));
+//        }
+//
         //Restore static values
         ((EditText) findViewById(R.id.match_num)).setText(bundle.getString("match_num"));
         ((EditText) findViewById(R.id.team_num)).setText(bundle.getString("team_num"));
@@ -191,22 +170,20 @@ public class ScoutingActivity extends AppCompatActivity implements CompoundButto
      * Calls two methods to create the UI dynamically from config.txt
      */
     private void createTheApp(){
-        if (ELEMENTS.isEmpty()){
-            loadConfig();
-        }
         addViews();
     }
 
     /**
-     * After all the Elements are generated from the config file, they are added in order to the screen
+     * After all the ConfigManager.getElements() are generated from the config file, they are added in order to the screen
      */
     private void addViews() {
         //Get the main layout of the app
         LinearLayout l = (LinearLayout) findViewById(R.id.mainLinear);
         //For each element created
-        for (Element e: ELEMENTS){
+        for (Element e: ConfigManager.getElements()){
             //Add the Element's view to the app
-            l.addView(e.getView(),e.getView().getLayoutParams());
+            View v = e.getView(this);
+            l.addView(v,v.getLayoutParams());
         }
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
@@ -220,45 +197,10 @@ public class ScoutingActivity extends AppCompatActivity implements CompoundButto
     /**
      * Load Element data from the Config file
      */
-    private void loadConfig(){
-        //Located in the assets folder
-        AssetManager am = getAssets();
-        try {
-            BufferedReader config = new BufferedReader(new InputStreamReader(am.open("config.txt")));
-            String line;
-            //While there are still lines to read
-            while ((line=config.readLine())!=null) {
-                line = line.trim();
-                if (line.length() < 2) {
-                    continue;
-                }
-                //If the line does not start with ##, which indicates a comment, or @ which indicated an equation
-                if (!line.substring(0, 2).equals("##") && line.charAt(0) != '@') {
-                    //Attempt to add an Element to the main array
-                    addElement(line);
-                }
-            }
-        } catch (IOException e) {
-            //This exception signifies the entire app is useless
-            sendError("fuck",true);
-            e.printStackTrace();
-        }
-    }
+    //private void loadConfig(){
+        
 
-    /**
-     * Adds a new element from a string to the main array
-     *
-     * @param line line from config file
-     */
-    private void addElement(String line){
-        try {
-            //Element will throw an exception if it is improperly formed
-            Element e = new Element(line,this);
-            ELEMENTS.add(e);
-        } catch (ElementParseException e1) {
-            e1.printStackTrace();
-        }
-    }
+    
 
     /**
      * Called when the TeamColor switch is flipped
@@ -293,11 +235,11 @@ public class ScoutingActivity extends AppCompatActivity implements CompoundButto
         bundle.putBoolean("isRed",s.isChecked());
 
         //Put all the values from the views into an arraylist then put it into the bundle
-        ParcelableArrayList values = new ParcelableArrayList();
-        for (Element e: ELEMENTS){
-            values.add(e.getViewData());
-        }
-        bundle.putParcelable("fieldData", values);
+//        ParcelableArrayList values = new ParcelableArrayList();
+//        for (Element e: ConfigManager.getElements()){
+//            values.add(e.getViewData());
+//        }
+//        bundle.putParcelable("fieldData", values);
 
         //Put all the static fields into the bundle
         bundle.putString("match_num", ((EditText) findViewById(R.id.match_num)).getText().toString());
@@ -316,13 +258,13 @@ public class ScoutingActivity extends AppCompatActivity implements CompoundButto
     protected void onRestoreInstanceState(Bundle bundle){
 
         //Get stored values
-        ParcelableArrayList values = bundle.getParcelable("fieldData");
+        //ParcelableArrayList values = bundle.getParcelable("fieldData");
 
-        //Restore all dynamic values
-        for (int i = 0; i< ELEMENTS.size();i++){
-            assert values != null;
-            ELEMENTS.get(i).setViewData(values.get(i));
-        }
+//        //Restore all dynamic values
+//        for (int i = 0; i< ConfigManager.getElements().size();i++){
+//            assert values != null;
+//            ConfigManager.getElements().get(i).setViewData(values.get(i));
+//        }
 
         //Restore static values
         ((EditText) findViewById(R.id.match_num)).setText(bundle.getString("match_num"));
@@ -378,7 +320,7 @@ public class ScoutingActivity extends AppCompatActivity implements CompoundButto
      */
     private String collectResults(){
         NSDictionary values = new NSDictionary();
-        for (Element e:ELEMENTS){
+        for (Element e:ConfigManager.getElements()){
             values.putAll(e.getHash());
         }
 
@@ -422,8 +364,8 @@ public class ScoutingActivity extends AppCompatActivity implements CompoundButto
 
     public void clearAll(View v){
 
-        for (int i = 0; i< ELEMENTS.size();i++){
-            ELEMENTS.get(i).clearViewData();
+        for (int i = 0; i< ConfigManager.getElements().size();i++){
+            ConfigManager.getElements().get(i).clearViewData();
         }
 
         //Restore static values
@@ -433,8 +375,12 @@ public class ScoutingActivity extends AppCompatActivity implements CompoundButto
 
         MainActivity.clearData();
 
-        ((Switch) findViewById(R.id.team_color)).setChecked(false);
-        Utils.changeToTheme(this, Utils.THEME_BLUE);
+
+        Switch s = (Switch) findViewById(R.id.team_color);
+        if (s.isChecked()){
+            s.setChecked(false);
+            Utils.changeToTheme(this, Utils.THEME_BLUE);
+        }
     }
 
     public static void log(String message){
@@ -453,18 +399,23 @@ public class ScoutingActivity extends AppCompatActivity implements CompoundButto
         Switch s = (Switch) findViewById(R.id.team_color);
         bundle.putBoolean("isRed",s.isChecked());
 
-        //Put all the values from the views into an arraylist then put it into the bundle
-        ParcelableArrayList values = new ParcelableArrayList();
-        for (Element e: ELEMENTS){
-            values.add(e.getViewData());
-        }
-        bundle.putParcelable("fieldData", values);
-
-        //Put all the static fields into the bundle
+//        //Put all the values from the views into an arraylist then put it into the bundle
+//        ParcelableArrayList values = new ParcelableArrayList();
+//        for (Element e: ConfigManager.getElements()){
+//            values.add(e.getViewData());
+//        }
+//        bundle.putParcelable("fieldData", values);
+//
+//        //Put all the static fields into the bundle
         bundle.putString("match_num", ((EditText) findViewById(R.id.match_num)).getText().toString());
         bundle.putString("team_num", ((EditText) findViewById(R.id.team_num)).getText().toString());
-        //bundle.putString("bluetooth_code", ((EditText) findViewById(R.id.bluetoothCode)).getText().toString());
+//        //bundle.putString("bluetooth_code", ((EditText) findViewById(R.id.bluetoothCode)).getText().toString());
 
         MainActivity.saveData(bundle);
+        LinearLayout l = (LinearLayout) findViewById(R.id.mainLinear);
+        for (Element e: ConfigManager.getElements()){
+            l.removeView(e.getView(this));
+        }
     }
+
 }

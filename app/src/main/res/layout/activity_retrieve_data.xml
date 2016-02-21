@@ -23,6 +23,90 @@
 
         </android.support.design.widget.AppBarLayout>
 
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:text="Team Number"
+            android:id="@+id/textView6"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="80dp" />
+
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="188dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="10dp"
+            android:layout_marginLeft="10dp">
+
+            <EditText
+                android:layout_width="144dp"
+                android:layout_height="wrap_content"
+                android:inputType="number"
+                android:ems="10"
+                android:id="@+id/editText" />
+
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Ok"
+                android:id="@+id/button4"
+                android:layout_weight="1" />
+        </LinearLayout>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:text="Or:"
+            android:id="@+id/textView7"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="30dp" />
+
+        <Spinner
+            android:layout_width="157dp"
+            android:layout_height="40dp"
+            android:id="@+id/spinner"
+            android:spinnerMode="dropdown"
+            android:entries="@array/value_array"
+            android:gravity="center"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="10dp"
+            android:layout_marginBottom="10dp"
+            android:textAlignment="center"
+            android:touchscreenBlocksFocus="false" />
+
+        <Spinner
+            android:layout_width="wrap_content"
+            android:layout_height="40dp"
+            android:id="@+id/column_spinner"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="10dp"
+            android:layout_marginBottom="10dp"
+            android:textAlignment="center" />
+
+        <Spinner
+            android:layout_width="151dp"
+            android:layout_height="40dp"
+            android:id="@+id/spinner3"
+            android:layout_gravity="center_horizontal"
+            android:entries="@array/operator_array"
+            android:gravity="center"
+            android:layout_marginTop="10dp"
+            android:layout_marginBottom="10dp"
+            android:textAlignment="center" />
+
+        <EditText
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:inputType="numberDecimal"
+            android:ems="10"
+            android:id="@+id/editText2"
+            android:layout_gravity="center_horizontal"
+            android:hint="Value"
+            android:textAlignment="center" />
+
 
     </LinearLayout>
 

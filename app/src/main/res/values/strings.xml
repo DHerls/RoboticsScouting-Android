@@ -18,4 +18,15 @@ After installing and opening the Mac app, make sure Bluetooth is enabled on both
 2. After completing the form, press the "DONE" button at the bottom. On the Mac, when ready to get all the data, just press the "Compile to Excel" button.
 3. And that's it! Scout away!"</string>
     <string name="about_credits_text"></string>
+    <string-array name="value_array">
+        <item>Raw Value</item>
+        <item>Percentage</item>
+    </string-array>
+    <string-array name="operator_array">
+        <item>=</item>
+        <item>&gt;</item>
+        <item>&lt;</item>
+        <item>&gt;=</item>
+        <item>&lt;=</item>
+    </string-array>
 </resources>

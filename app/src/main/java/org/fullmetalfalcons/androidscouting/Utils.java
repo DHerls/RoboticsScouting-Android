@@ -7,6 +7,9 @@ import android.app.Activity;
 import android.content.Intent;
 import android.os.Build;
 
+import org.fullmetalfalcons.androidscouting.elements.Element;
+import org.fullmetalfalcons.androidscouting.fileio.ConfigManager;
+
 public class Utils
 {
     private static int sTheme = 2;
@@ -18,8 +21,14 @@ public class Utils
     public static void changeToTheme(Activity activity, int theme)
     {
         sTheme = theme;
+        Element.setSwitchColors(true);
         activity.recreate();
     }
+
+    public static int getTheme(){
+        return sTheme;
+    }
+
     /** Set the theme of the activity, according to the configuration. */
     public static void onActivityCreateSetTheme(Activity activity)
     {

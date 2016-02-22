@@ -21,15 +21,19 @@ import java.util.UUID;
  * Created by djher on 2/2/2016.
  */
 public class BluetoothCore {
-    private static final String DEFAULT_SERVICE_UUID_BASE = "5888-16F1-43F8-AA84-63F1544F2694";
+    private static final String SERVICE_UUID_BASE = "5888-16F1-43F8-AA84-63F1544F2694";
     private static String passphrase = "333B";
-    private static final String DEFAULT_CHARACTERISTIC_UUID = "20D0C428-B763-4016-8AC6-4B4B3A6865D9";
-    private static final String TAG = "SCOUTING";
+    private static final String SEND_CHARACTERISTIC_UUID = "20D0C428-B763-4016-8AC6-4B4B3A6865D9";
+    private static final String RECEIVE_CHARACTERISTIC_UUID = "80A37B7F-0563-409B-B320-8C1768CE6A58";
+
     private static MainActivity activity;
     private static int mtu = 75;
     private static BluetoothDevice BleDevice;
     private static boolean connected = false;
     private static boolean advertising = false;
+
+    private static BluetoothGattCharacteristic sendDataCharacteristic;
+    private static BluetoothGattCharacteristic receiveDataCharacteristic;
 
     public static void startBLE(Activity a){
         BluetoothCore.activity = (MainActivity) a;
@@ -37,15 +41,15 @@ public class BluetoothCore {
 
         if (BluetoothUtility.setupBluetooth(a)){
             Log.d(a.getString(R.string.log_tag),"Bluetooth Adapter exists and is turned on");
-            BluetoothUtility.createNotificationService(passphrase + DEFAULT_SERVICE_UUID_BASE, DEFAULT_CHARACTERISTIC_UUID);
+
+            addCharacteristics();
+
+            BluetoothUtility.setServiceUUID(getServiceUUID());
 
             BluetoothUtility.setAdvertiseCallback(advertiseCallback);
             BluetoothUtility.setGattServerCallback(gattServerCallback);
 
             BluetoothUtility.startAdvertise();
-
-            advertising = true;
-            activity.setAdvertising(true);
         }
 
     }
@@ -74,16 +78,16 @@ public class BluetoothCore {
         @Override
         public void onServiceAdded(int status, BluetoothGattService service) {
             super.onServiceAdded(status, service);
-            Log.d(TAG, "Service added");
+            Log.d(activity.getString(R.string.log_tag), "Service added");
         }
 
         @Override
         public void onCharacteristicReadRequest(BluetoothDevice device, int requestId, int offset, BluetoothGattCharacteristic characteristic) {
             super.onCharacteristicReadRequest(device, requestId, offset, characteristic);
-            Log.d(TAG, "onCharacteristicReadRequest requestId=" + requestId + " offset=" + offset);
+            Log.d(activity.getString(R.string.log_tag), "onCharacteristicReadRequest requestId=" + requestId + " offset=" + offset);
 
-            if (characteristic.getUuid().equals(UUID.fromString(DEFAULT_CHARACTERISTIC_UUID))) {
-                Log.d(TAG, "Changing Characteristic Value");
+            if (characteristic.getUuid().equals(UUID.fromString(SEND_CHARACTERISTIC_UUID))) {
+                Log.d(activity.getString(R.string.log_tag), "Changing Characteristic Value");
                 characteristic.setValue("Text:This is a test characteristic");
                 BluetoothUtility.getGattServer().sendResponse(device, requestId, BluetoothGatt.GATT_SUCCESS, offset,
                         characteristic.getValue());
@@ -94,7 +98,7 @@ public class BluetoothCore {
         @Override
         public void onCharacteristicWriteRequest(BluetoothDevice device, int requestId, BluetoothGattCharacteristic characteristic, boolean preparedWrite, boolean responseNeeded, int offset, byte[] value) {
             super.onCharacteristicWriteRequest(device, requestId, characteristic, preparedWrite, responseNeeded, offset, value);
-            Log.d(TAG, "onCharacteristicWriteRequest requestId=" + requestId + " preparedWrite="
+            Log.d(activity.getString(R.string.log_tag), "onCharacteristicWriteRequest requestId=" + requestId + " preparedWrite="
                     + Boolean.toString(preparedWrite) + " responseNeeded="
                     + Boolean.toString(responseNeeded) + " offset=" + offset);
         }
@@ -128,14 +132,16 @@ public class BluetoothCore {
             String successMsg = "Advertisement command attempt successful";
             Log.d(activity.getString(R.string.log_tag), successMsg);
             activity.setAdvertising(true);
+            advertising = true;
         }
 
         @Override
         public void onStartFailure(int errorCode) {
             super.onStartFailure(errorCode);
             String failMsg = "Advertisement command attempt failed: " + errorCode;
-            Log.e(TAG, failMsg);
+            Log.e(activity.getString(R.string.log_tag), failMsg);
             activity.setAdvertising(false);
+            advertising = false;
         }
 
     };
@@ -145,7 +151,9 @@ public class BluetoothCore {
         Log.d(activity.getString(R.string.log_tag), "Enabling Bluetooth");
         BluetoothUtility.enable();
 
-        BluetoothUtility.createNotificationService(getServiceUUID(), DEFAULT_CHARACTERISTIC_UUID);
+        addCharacteristics();
+
+        BluetoothUtility.setServiceUUID(getServiceUUID());
 
         BluetoothUtility.setAdvertiseCallback(advertiseCallback);
         BluetoothUtility.setGattServerCallback(gattServerCallback);
@@ -153,18 +161,35 @@ public class BluetoothCore {
         BluetoothUtility.startAdvertise();
     }
 
+    private static void addCharacteristics() {
+        sendDataCharacteristic = new BluetoothGattCharacteristic(
+                UUID.fromString(SEND_CHARACTERISTIC_UUID),
+                BluetoothGattCharacteristic.PROPERTY_NOTIFY,
+                BluetoothGattCharacteristic.PERMISSION_READ);
+
+        BluetoothUtility.addCharacteristic(sendDataCharacteristic);
+
+        receiveDataCharacteristic = new BluetoothGattCharacteristic(
+                UUID.fromString(RECEIVE_CHARACTERISTIC_UUID),
+                BluetoothGattCharacteristic.PROPERTY_NOTIFY | BluetoothGattCharacteristic.PROPERTY_WRITE,
+                BluetoothGattCharacteristic.PERMISSION_READ | BluetoothGattCharacteristic.PERMISSION_WRITE);
+
+        BluetoothUtility.addCharacteristic(receiveDataCharacteristic);
+
+    }
+
     public static void setPassphrase(String passphrase1){
         if (!passphrase1.equalsIgnoreCase(passphrase)){
             passphrase = passphrase1;
             BluetoothUtility.stopAll();
-            BluetoothUtility.createNotificationService(getServiceUUID(), DEFAULT_CHARACTERISTIC_UUID);
+            BluetoothUtility.setServiceUUID(getServiceUUID());
             BluetoothUtility.startAdvertise();
         }
 
     }
 
     public static String getServiceUUID() {
-        return passphrase + DEFAULT_SERVICE_UUID_BASE;
+        return passphrase + SERVICE_UUID_BASE;
     }
 
     public static void stopBLE() {
@@ -174,13 +199,12 @@ public class BluetoothCore {
 
     public static void sendData(String results) {
         int numPackets = (int) Math.ceil(results.length()/mtu);
-        System.out.println(results);
         for (int i = 0; i<numPackets;i++){
             String toSend = results.substring(i * mtu, (i + 1) * mtu);
-            BluetoothUtility.sendNotification(BleDevice, toSend);
+            BluetoothUtility.sendNotification(sendDataCharacteristic, BleDevice, toSend);
         }
-        BluetoothUtility.sendNotification(BleDevice, results.substring(numPackets*mtu,results.length()));
-        BluetoothUtility.sendNotification(BleDevice,"EOM");
+        BluetoothUtility.sendNotification(sendDataCharacteristic, BleDevice, results.substring(numPackets*mtu,results.length()));
+        BluetoothUtility.sendNotification(sendDataCharacteristic, BleDevice,"EOM");
     }
 
 

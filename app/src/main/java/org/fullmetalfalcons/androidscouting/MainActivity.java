@@ -103,11 +103,13 @@ public class MainActivity extends AppCompatActivity {
                 shape = (GradientDrawable) bgDrawable.getDrawable(1);
                 shape.setStroke(8, ContextCompat.getColor(MainActivity.this, connected ? R.color.colorGreenIndicator : R.color.colorRedIndicator));
 
+                final ImageButton refreshBtn = (ImageButton) findViewById(R.id.detail_refresh_btn);
+                refreshBtn.setEnabled(!connected);
+                Log.d("MERF", "Set Connected" + connected);
+
             }
         });
-        final ImageButton refreshBtn=(ImageButton)findViewById(R.id.detail_refresh_btn);
-        refreshBtn.setEnabled(!connected);
-        Log.d("MERF", "Set Connected" + connected);
+
     }
 
     /**
@@ -209,7 +211,10 @@ public class MainActivity extends AppCompatActivity {
                             BluetoothAdapter.ERROR);
                     switch (state) {
                         case BluetoothAdapter.STATE_OFF:
-                            sendError("Bluetooth is required for this app, don't turn it off",true);
+                            //sendError("Bluetooth is required for this app, don't turn it off",true);
+                            setConnected(false);
+                            setAdvertising(false);
+                            BluetoothCore.stopBLE();
                             break;
                         case BluetoothAdapter.STATE_TURNING_OFF:
                             break;

@@ -58,7 +58,8 @@
                 android:layout_height="wrap_content"
                 android:inputType="number"
                 android:ems="10"
-                android:id="@+id/retrieve_team_num" />
+                android:id="@+id/retrieve_team_num"
+                android:maxLength="4"/>
 
             <Button
                 android:layout_width="wrap_content"

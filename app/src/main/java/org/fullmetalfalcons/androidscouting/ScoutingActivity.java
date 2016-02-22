@@ -78,9 +78,10 @@ public class ScoutingActivity extends AppCompatActivity implements CompoundButto
                                 fab.setEnabled(true);
                             }
                         }, 1, TimeUnit.SECONDS);
+                        ScoutingActivity.this.clearAll(null);
                     }
                 } else {
-                    sendError("Not currently connected to base", false);
+                    //sendError("Not currently connected to base", false);
                 }
             }
         });

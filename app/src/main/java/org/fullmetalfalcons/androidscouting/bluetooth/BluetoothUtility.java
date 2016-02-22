@@ -8,26 +8,23 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.ParcelUuid;
 import android.util.Log;
-import android.widget.Toast;
 
 import org.fullmetalfalcons.androidscouting.MainActivity;
 import org.fullmetalfalcons.androidscouting.R;
-import org.fullmetalfalcons.androidscouting.ScoutingActivity;
 import org.fullmetalfalcons.androidscouting.Utils;
 
 import java.util.ArrayList;
-import java.util.List;
 import java.util.UUID;
 
 /**
  * Bluetooth LE advertising and scanning utilities.
  *
- * Created by micah on 7/16/14.
+ * Adapted by Dan from the code created by micah on 7/16/14.
  */
 public class BluetoothUtility {
 
     /**
-     * Contants
+     * Constants
      */
     private static final int REQUEST_ENABLE_BT = 1;
 
@@ -44,7 +41,6 @@ public class BluetoothUtility {
     private static AdvertiseCallback advertiseCallback; //Must implement and set
     private static BluetoothGattServerCallback gattServerCallback; //Must implement and set
     private static BluetoothGattService gattService;
-    private static BluetoothGattCharacteristic gattCharacteristic;
 
     /**
      * Bluetooth Objects
@@ -54,6 +50,14 @@ public class BluetoothUtility {
     private static BluetoothAdapter bluetoothAdapter;
     private static BluetoothLeAdvertiser bluetoothLeAdvertiser;
     private static BluetoothGattServer gattServer;
+    private static final ArrayList<BluetoothGattCharacteristic> characteristics = new ArrayList<>();
+
+    /**
+     * All bluetooth characteristics must have this descriptor for Apple iOS and OSX devices to subscribe to the characteristic
+     */
+    private static final BluetoothGattDescriptor STUPID_APPLE_DESCRIPTOR = new BluetoothGattDescriptor(
+            UUID.fromString("00002902-0000-1000-8000-00805F9B34FB"),
+            BluetoothGattDescriptor.PERMISSION_WRITE | BluetoothGattDescriptor.PERMISSION_READ);
 
 
     protected static boolean setupBluetooth(Activity a){
@@ -139,6 +143,13 @@ public class BluetoothUtility {
 
     }
 
+    public static void setServiceUUID(String serviceUUID) {
+        gattService = new BluetoothGattService(UUID.fromString(serviceUUID),BluetoothGattService.SERVICE_TYPE_PRIMARY);
+        for (BluetoothGattCharacteristic c: characteristics){
+            gattService.addCharacteristic(c);
+        }
+    }
+
     protected void stopGattServer(){
         gattServer.clearServices();
         gattServer.close();
@@ -172,7 +183,7 @@ public class BluetoothUtility {
             progress.show();
             while (bluetoothAdapter.getState() ==BluetoothAdapter.STATE_TURNING_ON){
                 try {
-                    Thread.sleep(1);
+                    Thread.sleep(50);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
@@ -188,25 +199,14 @@ public class BluetoothUtility {
 
     }
 
-    protected static void sendNotification(BluetoothDevice device, String value){
-        gattCharacteristic.setValue(value);
-        gattServer.notifyCharacteristicChanged(device, gattCharacteristic, false);
+    protected static void sendNotification(BluetoothGattCharacteristic characteristic, BluetoothDevice device, String value){
+        characteristic.setValue(value);
+        gattServer.notifyCharacteristicChanged(device, characteristic, false);
 
     }
 
-    protected static void createNotificationService(String serviceUUID, String characteristicUUID) {
-        gattService = new BluetoothGattService(UUID.fromString(serviceUUID),BluetoothGattService.SERVICE_TYPE_PRIMARY);
-        gattCharacteristic = new BluetoothGattCharacteristic(
-                UUID.fromString(characteristicUUID),
-                BluetoothGattCharacteristic.PROPERTY_NOTIFY,
-                BluetoothGattCharacteristic.PERMISSION_READ);
-        BluetoothGattDescriptor gD = new BluetoothGattDescriptor(
-                UUID.fromString("00002902-0000-1000-8000-00805F9B34FB"),
-                BluetoothGattDescriptor.PERMISSION_WRITE | BluetoothGattDescriptor.PERMISSION_READ);
-        gattCharacteristic.addDescriptor(gD);
-        gattService.addCharacteristic(gattCharacteristic);
-
-
+    public static void addCharacteristic(BluetoothGattCharacteristic characteristic) {
+        characteristic.addDescriptor(STUPID_APPLE_DESCRIPTOR);
+        characteristics.add(characteristic);
     }
-
 }

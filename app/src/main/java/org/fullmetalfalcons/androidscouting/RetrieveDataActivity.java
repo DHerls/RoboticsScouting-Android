@@ -7,6 +7,7 @@ import android.widget.ArrayAdapter;
 import android.widget.Spinner;
 
 import org.fullmetalfalcons.androidscouting.elements.Element;
+import org.fullmetalfalcons.androidscouting.equations.Equation;
 import org.fullmetalfalcons.androidscouting.fileio.ConfigManager;
 
 import java.util.ArrayList;
@@ -25,6 +26,10 @@ public class RetrieveDataActivity extends AppCompatActivity {
         ArrayList<String> columnList = new ArrayList<>();
         for (Element e: ConfigManager.getElements()){
             columnList.addAll(Arrays.asList(e.getColumnValues()));
+        }
+
+        for (Equation e: ConfigManager.getEquations()){
+            columnList.add(e.getColumnValue());
         }
 
         Spinner s = (Spinner) findViewById(R.id.column_spinner);

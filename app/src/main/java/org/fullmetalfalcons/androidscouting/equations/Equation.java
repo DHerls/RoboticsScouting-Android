@@ -28,7 +28,7 @@ public class Equation {
         try{
             //Line should come in the form EQUATION_NAME=Equation
             String[] splitLine = line.split("=");
-            name = splitLine[0].trim();
+            name = splitLine[0].substring(splitLine[0].indexOf(" ")).trim();
             equation = splitLine[1].trim();
         } catch(ArrayIndexOutOfBoundsException e){
             throw new EquationParseException("Config error, equation missing \"=\"");

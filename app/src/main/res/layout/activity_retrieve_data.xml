@@ -27,10 +27,23 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textAppearance="?android:attr/textAppearanceMedium"
+            android:text="Retrieve a single team or search for teams that meet certain criteria"
+            android:id="@+id/textView8"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="20dp"
+            android:textAlignment="center"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
+            android:textColor="#000000" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceMedium"
             android:text="Team Number"
             android:id="@+id/textView6"
             android:layout_gravity="center_horizontal"
-            android:layout_marginTop="80dp" />
+            android:layout_marginTop="40dp" />
 
         <LinearLayout
             android:orientation="horizontal"
@@ -45,13 +58,13 @@
                 android:layout_height="wrap_content"
                 android:inputType="number"
                 android:ems="10"
-                android:id="@+id/editText" />
+                android:id="@+id/retrieve_team_num" />
 
             <Button
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Ok"
-                android:id="@+id/button4"
+                android:id="@+id/retrieve_team_ok"
                 android:layout_weight="1" />
         </LinearLayout>
 
@@ -65,9 +78,9 @@
             android:layout_marginTop="30dp" />
 
         <Spinner
-            android:layout_width="157dp"
+            android:layout_width="150dp"
             android:layout_height="40dp"
-            android:id="@+id/spinner"
+            android:id="@+id/value_spinner"
             android:spinnerMode="dropdown"
             android:entries="@array/value_array"
             android:gravity="center"
@@ -75,7 +88,8 @@
             android:layout_marginTop="10dp"
             android:layout_marginBottom="10dp"
             android:textAlignment="center"
-            android:touchscreenBlocksFocus="false" />
+            android:touchscreenBlocksFocus="false"
+            style="@android:style/Widget.Holo.Light.Spinner"/>
 
         <Spinner
             android:layout_width="wrap_content"
@@ -84,21 +98,23 @@
             android:layout_gravity="center_horizontal"
             android:layout_marginTop="10dp"
             android:layout_marginBottom="10dp"
-            android:textAlignment="center" />
+            android:textAlignment="center"
+            style="@android:style/Widget.Holo.Light.Spinner"/>
 
         <Spinner
-            android:layout_width="151dp"
+            android:layout_width="150dp"
             android:layout_height="40dp"
-            android:id="@+id/spinner3"
+            android:id="@+id/operator_spinner"
             android:layout_gravity="center_horizontal"
             android:entries="@array/operator_array"
             android:gravity="center"
             android:layout_marginTop="10dp"
             android:layout_marginBottom="10dp"
-            android:textAlignment="center" />
+            android:textAlignment="center"
+            style="@android:style/Widget.Holo.Light.Spinner"/>
 
         <EditText
-            android:layout_width="wrap_content"
+            android:layout_width="100dp"
             android:layout_height="wrap_content"
             android:inputType="numberDecimal"
             android:ems="10"
@@ -106,6 +122,13 @@
             android:layout_gravity="center_horizontal"
             android:hint="Value"
             android:textAlignment="center" />
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Search"
+            android:id="@+id/button4"
+            android:layout_gravity="center_horizontal" />
 
 
     </LinearLayout>

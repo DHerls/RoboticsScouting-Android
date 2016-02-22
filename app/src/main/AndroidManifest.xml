@@ -29,7 +29,8 @@
             android:name=".AboutActivity"
             android:parentActivityName=".ScoutingActivity"/>
         <activity android:name=".RetrieveDataActivity"
-            android:parentActivityName=".MainActivity"/>
+            android:parentActivityName=".MainActivity"
+            android:label="Retrieve Team Data"/>
     </application>
 
 </manifest>

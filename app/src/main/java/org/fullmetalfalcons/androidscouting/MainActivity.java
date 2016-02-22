@@ -41,6 +41,7 @@ public class MainActivity extends AppCompatActivity {
             ConfigManager.loadConfig(this);
         }
 
+        //TODO better background
 
         final EditText bluetoothCodeView = (EditText) findViewById(R.id.bluetoothCode);
 

@@ -1,143 +1,3 @@
-<!--<?xml version="1.0" encoding="utf-8"?>-->
-<!--<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"-->
-    <!--xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"-->
-    <!--xmlns:app="http://schemas.android.com/apk/res-auto"-->
-    <!--android:layout_height="match_parent" android:paddingLeft="@dimen/activity_horizontal_margin"-->
-    <!--android:paddingRight="@dimen/activity_horizontal_margin"-->
-    <!--android:paddingTop="@dimen/activity_vertical_margin"-->
-    <!--android:paddingBottom="@dimen/activity_vertical_margin"-->
-    <!--tools:context="org.fullmetalfalcons.androidscouting.MainActivity">-->
-
-    <!--<LinearLayout-->
-        <!--android:layout_width="match_parent"-->
-        <!--android:layout_height="25dp"-->
-        <!--android:orientation="horizontal"-->
-        <!--android:layout_marginTop="23dp"-->
-        <!--android:layout_alignParentTop="true"-->
-        <!--android:layout_alignParentStart="true"-->
-        <!--android:baselineAligned="false"-->
-        <!--android:id="@+id/linearLayout">-->
-
-        <!--<LinearLayout-->
-            <!--android:layout_width="match_parent"-->
-            <!--android:layout_height="match_parent"-->
-            <!--android:orientation="horizontal"-->
-            <!--android:layout_gravity="center"-->
-            <!--android:layout_weight="1">-->
-
-
-            <!--<TextView-->
-                <!--android:layout_width="wrap_content"-->
-                <!--android:layout_height="match_parent"-->
-                <!--android:text="Connection:"-->
-                <!--android:textSize="18dp"-->
-                <!--android:textColor="@android:color/black"-->
-                <!--android:layout_marginLeft="20dp"-->
-                <!--android:layout_gravity="center" />-->
-
-            <!--<View android:layout_width="20dp"-->
-                <!--android:layout_height="20dp"-->
-                <!--android:background="@drawable/indicator_circle"-->
-                <!--android:id="@+id/connection_indicator"-->
-                <!--android:layout_marginLeft="10dp"/>-->
-
-        <!--</LinearLayout>-->
-
-        <!--<LinearLayout-->
-            <!--android:layout_width="match_parent"-->
-            <!--android:layout_height="match_parent"-->
-            <!--android:orientation="horizontal"-->
-            <!--android:layout_gravity="center"-->
-            <!--android:layout_weight="1">-->
-
-            <!--<TextView-->
-                <!--android:layout_width="wrap_content"-->
-                <!--android:layout_height="match_parent"-->
-                <!--android:text="Advertising:"-->
-                <!--android:textSize="18dp"-->
-                <!--android:textColor="@android:color/black"-->
-                <!--android:layout_marginLeft="20dp"-->
-                <!--/>-->
-
-            <!--<View android:layout_width="20dp"-->
-                <!--android:layout_height="20dp"-->
-                <!--android:background="@drawable/indicator_circle"-->
-                <!--android:id="@+id/advertising_indicator"-->
-                <!--android:layout_marginLeft="10dp"/>-->
-
-        <!--</LinearLayout>-->
-
-    <!--</LinearLayout>-->
-
-    <!--<LinearLayout-->
-        <!--android:orientation="vertical"-->
-        <!--android:layout_width="wrap_content"-->
-        <!--android:layout_height="wrap_content"-->
-        <!--android:layout_below="@+id/linearLayout"-->
-        <!--android:layout_marginTop="15dp"-->
-        <!--android:layout_alignEnd="@+id/button"-->
-        <!--android:layout_alignStart="@+id/button"-->
-        <!--android:id="@+id/linearLayout2">-->
-
-        <!--<TextView-->
-            <!--android:layout_width="wrap_content"-->
-            <!--android:layout_height="wrap_content"-->
-            <!--android:textAppearance="?android:attr/textAppearanceSmall"-->
-            <!--android:text="Bluetooth Code"-->
-            <!--android:id="@+id/textView4"-->
-            <!--android:textColor="#000000"-->
-            <!--android:layout_gravity="center_horizontal" />-->
-
-        <!--<LinearLayout-->
-            <!--android:orientation="horizontal"-->
-            <!--android:layout_width="match_parent"-->
-            <!--android:layout_height="match_parent"-->
-            <!--android:weightSum="1">-->
-
-            <!--<EditText-->
-                <!--android:layout_width="51dp"-->
-                <!--android:layout_height="wrap_content"-->
-                <!--android:inputType="textCapCharacters"-->
-                <!--android:ems="10"-->
-                <!--android:id="@+id/bluetoothCode"-->
-                <!--android:hint="ex. 333B"-->
-                <!--android:layout_weight="0.89"-->
-                <!--android:maxLength="4" />-->
-
-            <!--<ImageButton android:id="@+id/detail_refresh_btn"-->
-                <!--android:layout_width="48dp"-->
-                <!--android:layout_height="48dp"-->
-                <!--android:src="@drawable/ic_action_refresh1" />-->
-        <!--</LinearLayout>-->
-    <!--</LinearLayout>-->
-
-    <!--<Button-->
-        <!--android:layout_width="wrap_content"-->
-        <!--android:layout_height="wrap_content"-->
-        <!--android:text="Scout"-->
-        <!--android:id="@+id/button"-->
-        <!--android:layout_marginTop="150dp"-->
-        <!--android:minHeight="75dp"-->
-        <!--android:minWidth="150dp"-->
-        <!--android:background="@color/colorRedPrimary"-->
-        <!--android:layout_alignParentTop="true"-->
-        <!--android:layout_alignStart="@+id/button2"-->
-        <!--android:onClick="startScoutActivity"/>-->
-
-    <!--<Button-->
-        <!--android:layout_width="wrap_content"-->
-        <!--android:layout_height="wrap_content"-->
-        <!--android:text="Retrieve"-->
-        <!--android:id="@+id/button2"-->
-        <!--android:layout_marginTop="50dp"-->
-        <!--android:minHeight="75dp"-->
-        <!--android:minWidth="150dp"-->
-        <!--android:background="@color/colorBluePrimary"-->
-        <!--android:layout_below="@+id/button"-->
-        <!--android:layout_centerHorizontal="true"-->
-        <!--android:onClick="startRetrieveActivity"/>-->
-
-<!--</RelativeLayout>-->
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
@@ -148,7 +8,7 @@
         android:weightSum="2"
         android:orientation="horizontal">
 
-        <org.fullmetalfalcons.androidscouting.MainButtonView
+        <org.fullmetalfalcons.androidscouting.views.MainButtonView
             android:layout_weight="1"
             android:layout_height="435dp"
             app:backgroundColor="@color/colorRedPrimary"
@@ -159,7 +19,7 @@
             android:onClick="startScoutActivity"
             />
 
-        <org.fullmetalfalcons.androidscouting.MainButtonView
+        <org.fullmetalfalcons.androidscouting.views.MainButtonView
             android:layout_weight="1"
             android:layout_height="435dp"
             app:backgroundColor="@color/colorBluePrimary"
@@ -182,7 +42,7 @@
 
         <TextView
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_height="0dp"
             android:text="Bluetooth Code"
             android:id="@+id/textView9"
             android:layout_gravity="center"

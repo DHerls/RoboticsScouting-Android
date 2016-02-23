@@ -1,10 +1,6 @@
 package org.fullmetalfalcons.androidscouting.equations;
 
 
-import org.fullmetalfalcons.androidscouting.MainActivity;
-import org.fullmetalfalcons.androidscouting.ScoutingActivity;
-import org.fullmetalfalcons.androidscouting.elements.Element;
-
 import java.math.BigDecimal;
 
 /**

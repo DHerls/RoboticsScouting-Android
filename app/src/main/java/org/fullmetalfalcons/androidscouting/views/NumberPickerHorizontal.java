@@ -1,4 +1,4 @@
-package org.fullmetalfalcons.androidscouting;
+package org.fullmetalfalcons.androidscouting.views;
 
 import android.content.Context;
 import android.content.res.ColorStateList;
@@ -37,6 +37,8 @@ import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.Scroller;
 import android.widget.TextView;
+
+import org.fullmetalfalcons.androidscouting.R;
 
 import java.util.ArrayList;
 import java.util.Collections;

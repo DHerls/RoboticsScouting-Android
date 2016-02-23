@@ -1,4 +1,4 @@
-package org.fullmetalfalcons.androidscouting;
+package org.fullmetalfalcons.androidscouting.views;
 
 import android.content.Context;
 import android.util.AttributeSet;
@@ -6,6 +6,8 @@ import android.view.LayoutInflater;
 import android.widget.RelativeLayout;
 import android.widget.SeekBar;
 import android.widget.TextView;
+
+import org.fullmetalfalcons.androidscouting.R;
 
 import java.sql.Struct;
 

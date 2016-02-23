@@ -12,7 +12,7 @@
         android:supportsRtl="true"
         android:theme="@style/BlueTheme">
         <activity
-            android:name=".MainActivity"
+            android:name=".activities.MainActivity"
             android:label="@string/app_name">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -21,15 +21,15 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".ScoutingActivity"
+            android:name=".activities.ScoutingActivity"
             android:label="@string/app_name"
-            android:parentActivityName=".ScoutingActivity"
+            android:parentActivityName=".activities.ScoutingActivity"
             android:theme="@style/BlueTheme"/>
         <activity
-            android:name=".AboutActivity"
-            android:parentActivityName=".ScoutingActivity"/>
-        <activity android:name=".RetrieveDataActivity"
-            android:parentActivityName=".MainActivity"
+            android:name=".activities.AboutActivity"
+            android:parentActivityName=".activities.ScoutingActivity"/>
+        <activity android:name=".activities.RetrieveDataActivity"
+            android:parentActivityName=".activities.MainActivity"
             android:label="Retrieve Team Data"/>
     </application>
 

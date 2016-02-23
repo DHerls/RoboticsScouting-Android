@@ -1,4 +1,4 @@
-package org.fullmetalfalcons.androidscouting;
+package org.fullmetalfalcons.androidscouting.views;
 
 import android.content.Context;
 import android.content.res.TypedArray;
@@ -9,6 +9,8 @@ import android.graphics.Path;
 import android.text.TextPaint;
 import android.util.AttributeSet;
 import android.view.View;
+
+import org.fullmetalfalcons.androidscouting.R;
 
 /**
  * TODO: document your custom view class.
@@ -66,9 +68,6 @@ public class MainButtonView extends View {
 
         accentColor = a.getColor(R.styleable.MainButtonView_accentColor,accentColor);
 
-        colorPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
-        colorPaint.setColor(mBackgroundColor);
-
         position = a.getInt(R.styleable.MainButtonView_orientation,position);
 
         a.recycle();
@@ -97,6 +96,10 @@ public class MainButtonView extends View {
         mTextPaintOutline.setColor(Color.BLACK);
         mTextPaintOutline.setStyle(Paint.Style.STROKE);
         mTextPaintOutline.setStrokeWidth(8);
+
+        colorPaint = new Paint();
+        colorPaint.setAntiAlias(true);
+        colorPaint.setColor(mBackgroundColor);
 
         accentPaint = new Paint();
         accentPaint.setAntiAlias(true);
@@ -156,7 +159,7 @@ public class MainButtonView extends View {
 
             }
         }
-
+        colorPaint.setColor(mBackgroundColor);
         colorPaint.setStyle(Paint.Style.FILL);
         canvas.drawPath(backgroundPath, colorPaint);
 

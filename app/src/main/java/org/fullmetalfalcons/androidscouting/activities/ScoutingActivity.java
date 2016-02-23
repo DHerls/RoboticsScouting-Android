@@ -1,4 +1,4 @@
-package org.fullmetalfalcons.androidscouting;
+package org.fullmetalfalcons.androidscouting.activities;
 
 import android.app.AlertDialog;
 import android.content.DialogInterface;
@@ -20,6 +20,8 @@ import android.widget.Switch;
 
 import com.dd.plist.NSDictionary;
 
+import org.fullmetalfalcons.androidscouting.R;
+import org.fullmetalfalcons.androidscouting.Utils;
 import org.fullmetalfalcons.androidscouting.bluetooth.BluetoothCore;
 import org.fullmetalfalcons.androidscouting.elements.Element;
 import org.fullmetalfalcons.androidscouting.fileio.ConfigManager;

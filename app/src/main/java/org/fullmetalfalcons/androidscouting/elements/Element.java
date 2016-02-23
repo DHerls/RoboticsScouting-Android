@@ -9,18 +9,16 @@ import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.View;
 import android.widget.EditText;
-import android.widget.HorizontalScrollView;
 import android.widget.LinearLayout;
-import android.widget.NumberPicker;
 import android.widget.Space;
 import android.widget.Switch;
 import android.widget.TextView;
 
 import com.dd.plist.NSDictionary;
 
-import org.fullmetalfalcons.androidscouting.NumberPickerHorizontal;
+import org.fullmetalfalcons.androidscouting.views.NumberPickerHorizontal;
 import org.fullmetalfalcons.androidscouting.R;
-import org.fullmetalfalcons.androidscouting.SeekBarWithValues;
+import org.fullmetalfalcons.androidscouting.views.SeekBarWithValues;
 import org.honorato.multistatetogglebutton.MultiStateToggleButton;
 
 import java.util.ArrayList;

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <merge xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <view class="org.fullmetalfalcons.androidscouting.NumberPickerHorizontal$CustomEditText"
+    <view class="org.fullmetalfalcons.androidscouting.views.NumberPickerHorizontal$CustomEditText"
         android:textAppearance="?android:attr/textAppearanceMedium"
         android:id="@+id/numberpicker_input"
         android:layout_width="fill_parent"

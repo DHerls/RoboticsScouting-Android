@@ -11,7 +11,7 @@ import android.bluetooth.le.AdvertiseCallback;
 import android.bluetooth.le.AdvertiseSettings;
 import android.util.Log;
 
-import org.fullmetalfalcons.androidscouting.MainActivity;
+import org.fullmetalfalcons.androidscouting.activities.MainActivity;
 import org.fullmetalfalcons.androidscouting.R;
 
 import java.util.UUID;

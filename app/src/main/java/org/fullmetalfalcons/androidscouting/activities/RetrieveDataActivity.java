@@ -1,4 +1,4 @@
-package org.fullmetalfalcons.androidscouting;
+package org.fullmetalfalcons.androidscouting.activities;
 
 import android.app.AlertDialog;
 import android.content.DialogInterface;
@@ -12,6 +12,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Spinner;
 
+import org.fullmetalfalcons.androidscouting.R;
 import org.fullmetalfalcons.androidscouting.bluetooth.BluetoothCore;
 import org.fullmetalfalcons.androidscouting.elements.Element;
 import org.fullmetalfalcons.androidscouting.equations.Equation;

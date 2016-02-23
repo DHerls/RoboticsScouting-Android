@@ -1,4 +1,4 @@
-package org.fullmetalfalcons.androidscouting;
+package org.fullmetalfalcons.androidscouting.activities;
 
 import android.app.AlertDialog;
 import android.bluetooth.BluetoothAdapter;
@@ -26,6 +26,7 @@ import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
+import org.fullmetalfalcons.androidscouting.R;
 import org.fullmetalfalcons.androidscouting.bluetooth.BluetoothCore;
 import org.fullmetalfalcons.androidscouting.fileio.ConfigManager;
 
@@ -122,7 +123,7 @@ public class MainActivity extends AppCompatActivity {
 
 
         //Start advertising
-        //BluetoothCore.startBLE(this);
+        BluetoothCore.startBLE(this);
 
         //Register broadcast receiver to detect changes to bluetooth adapter
         registerBluetoothReceiver();
@@ -268,6 +269,7 @@ public class MainActivity extends AppCompatActivity {
                         case BluetoothAdapter.STATE_TURNING_OFF:
                             break;
                         case BluetoothAdapter.STATE_ON:
+                            BluetoothCore.startBLE(MainActivity.this);
                             break;
                         case BluetoothAdapter.STATE_TURNING_ON:
                             break;

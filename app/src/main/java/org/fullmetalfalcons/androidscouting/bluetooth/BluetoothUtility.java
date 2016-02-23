@@ -9,7 +9,7 @@ import android.content.Intent;
 import android.os.ParcelUuid;
 import android.util.Log;
 
-import org.fullmetalfalcons.androidscouting.MainActivity;
+import org.fullmetalfalcons.androidscouting.activities.MainActivity;
 import org.fullmetalfalcons.androidscouting.R;
 import org.fullmetalfalcons.androidscouting.Utils;
 

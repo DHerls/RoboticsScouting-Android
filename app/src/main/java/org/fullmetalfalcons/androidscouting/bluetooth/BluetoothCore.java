@@ -179,7 +179,7 @@ public class BluetoothCore {
     }
 
     public static void setPassphrase(String passphrase1){
-        if (!passphrase1.equalsIgnoreCase(passphrase)){
+        if (BluetoothUtility.setupBluetooth(activity) && !passphrase1.equalsIgnoreCase(passphrase)){
             passphrase = passphrase1;
             BluetoothUtility.stopAll();
             BluetoothUtility.setServiceUUID(getServiceUUID());
@@ -197,14 +197,14 @@ public class BluetoothCore {
         BluetoothUtility.stopAll();
     }
 
-    public static void sendData(String results) {
+    public static void sendScoutingData(String results) {
         int numPackets = (int) Math.ceil(results.length()/mtu);
         for (int i = 0; i<numPackets;i++){
             String toSend = results.substring(i * mtu, (i + 1) * mtu);
             BluetoothUtility.sendNotification(sendDataCharacteristic, BleDevice, toSend);
         }
-        BluetoothUtility.sendNotification(sendDataCharacteristic, BleDevice, results.substring(numPackets*mtu,results.length()));
-        BluetoothUtility.sendNotification(sendDataCharacteristic, BleDevice,"EOM");
+        BluetoothUtility.sendNotification(sendDataCharacteristic, BleDevice, results.substring(numPackets * mtu, results.length()));
+        BluetoothUtility.sendNotification(sendDataCharacteristic, BleDevice, "EOM");
     }
 
 
@@ -214,5 +214,9 @@ public class BluetoothCore {
 
     public  static boolean isAdvertising() {
         return advertising;
+    }
+
+    public static void requestTeamNum(String s) {
+        BluetoothUtility.sendNotification(receiveDataCharacteristic, BleDevice, s);
     }
 }

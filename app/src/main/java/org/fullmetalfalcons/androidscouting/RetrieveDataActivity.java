@@ -1,11 +1,18 @@
 package org.fullmetalfalcons.androidscouting;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
+import android.view.View;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.Spinner;
 
+import org.fullmetalfalcons.androidscouting.bluetooth.BluetoothCore;
 import org.fullmetalfalcons.androidscouting.elements.Element;
 import org.fullmetalfalcons.androidscouting.equations.Equation;
 import org.fullmetalfalcons.androidscouting.fileio.ConfigManager;
@@ -102,6 +109,30 @@ public class RetrieveDataActivity extends AppCompatActivity {
         ArrayAdapter<String> spinnerArrayAdapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, valueList);
         spinnerArrayAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         s.setAdapter(spinnerArrayAdapter);
+
+
+        Button teamOkButton = (Button) findViewById(R.id.retrieve_team_ok);
+        Button searchOkButton = (Button) findViewById(R.id.retrieve_team_search_button);
+
+        final EditText teamNumEditText = (EditText) findViewById(R.id.retrieve_team_num);
+
+        teamOkButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (teamNumEditText.getText().toString().isEmpty()){
+                    sendError("Team number cannot be blank",false);
+                } else {
+                    BluetoothCore.requestTeamNum(teamNumEditText.getText().toString());
+                }
+            }
+        });
+
+        searchOkButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+            }
+        });
     }
 
     private static String capitalize(String input){
@@ -127,5 +158,37 @@ public class RetrieveDataActivity extends AppCompatActivity {
         }
 
         return output.toString().trim();
+    }
+
+
+    /**
+     * Sends a popup message to the user with a custom message.
+     * Also closes the app if the error is fatal
+     *
+     * @param message message to send to the user
+     * @param fatalError whether or not the app should close after user acknowledges
+     */
+    public void sendError(String message,final boolean fatalError){
+        new AlertDialog.Builder(this)
+                .setTitle("Something is wrong")
+                        //Can ignore if not fatal
+                .setCancelable(!fatalError)
+                .setMessage(message)
+                .setNeutralButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        //Close the app
+                        if (fatalError) {
+                            System.exit(0);
+                        }
+                    }
+                })
+                .setIcon(android.R.drawable.ic_dialog_alert)
+                .show();
+        if(fatalError){
+            Log.wtf(getString(R.string.log_tag), message);
+        } else {
+            Log.e(getString(R.string.log_tag),message);
+
+        }
     }
 }

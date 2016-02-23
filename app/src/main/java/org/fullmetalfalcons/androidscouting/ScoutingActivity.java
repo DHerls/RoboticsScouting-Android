@@ -69,7 +69,7 @@ public class ScoutingActivity extends AppCompatActivity implements CompoundButto
                         fab.setEnabled(false);
                         Snackbar.make(view, "Sending...", Snackbar.LENGTH_LONG).setAction("Action", null).show();
                         String results = ScoutingActivity.this.collectResults();
-                        BluetoothCore.sendData(results);
+                        BluetoothCore.sendScoutingData(results);
                         final ScheduledExecutorService exec = Executors.newScheduledThreadPool(1);
 
                         exec.schedule(new Runnable() {
@@ -81,7 +81,7 @@ public class ScoutingActivity extends AppCompatActivity implements CompoundButto
                         ScoutingActivity.this.clearAll(null);
                     }
                 } else {
-                    //sendError("Not currently connected to base", false);
+                    sendError("Not currently connected to base", false);
                 }
             }
         });

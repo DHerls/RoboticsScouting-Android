@@ -203,7 +203,9 @@
                 android:id="@+id/bluetoothCode"
                 android:hint="ex. 333B"
                 android:layout_weight="0.89"
-                android:maxLength="4" />
+                android:maxLength="4"
+                android:imeOptions="actionDone"
+                android:singleLine="true"/>
 
             <ImageButton android:id="@+id/detail_refresh_btn"
                 android:layout_width="48dp"

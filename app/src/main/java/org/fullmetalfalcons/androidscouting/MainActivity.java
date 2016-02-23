@@ -14,13 +14,17 @@ import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
+import android.view.inputmethod.EditorInfo;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.TextView;
 
 import org.fullmetalfalcons.androidscouting.bluetooth.BluetoothCore;
 import org.fullmetalfalcons.androidscouting.fileio.ConfigManager;
@@ -83,12 +87,45 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        bluetoothCodeView.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+
+            @Override
+            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+
+                if ((actionId== EditorInfo.IME_ACTION_DONE )   )
+                {
+                    //Toast.makeText(getActivity(), "call",45).show();
+                    // hide virtual keyboard
+                    InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+                    imm.hideSoftInputFromWindow(bluetoothCodeView.getWindowToken(), 0);
+
+                    //Create a matcher based on the pattern above and the text in the code EditText
+                    Matcher bluetoothCodeMatcher = bluetoothCodePattern.matcher(bluetoothCodeView.getText());
+                    //If the text matches the pattern
+                    if (bluetoothCodeMatcher.matches()) {
+                        //Animate the refresh button
+                        refreshBtn.startAnimation(ranim);
+                        //Set a new passphrase
+                        BluetoothCore.setPassphrase(bluetoothCodeView.getText().toString());
+                    } else {
+                        //Send error message to user
+                        sendError("Bluetooth Code must be in the format (# or (A-F))x4", false);
+                        //Clear the code box
+                        bluetoothCodeView.setText("");
+                    }
+                    return true;
+                }
+                return false;
+
+            }
+        });
+
 
         //Start advertising
         //BluetoothCore.startBLE(this);
 
         //Register broadcast receiver to detect changes to bluetooth adapter
-        //registerBluetoothReceiver();
+        registerBluetoothReceiver();
     }
 
     /**

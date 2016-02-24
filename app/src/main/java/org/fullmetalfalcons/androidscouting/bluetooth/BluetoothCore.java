@@ -11,8 +11,9 @@ import android.bluetooth.le.AdvertiseCallback;
 import android.bluetooth.le.AdvertiseSettings;
 import android.util.Log;
 
-import org.fullmetalfalcons.androidscouting.activities.MainActivity;
 import org.fullmetalfalcons.androidscouting.R;
+import org.fullmetalfalcons.androidscouting.activities.MainActivity;
+import org.fullmetalfalcons.androidscouting.activities.RetrieveDataActivity;
 
 import java.util.UUID;
 
@@ -34,6 +35,8 @@ public class BluetoothCore {
 
     private static BluetoothGattCharacteristic sendDataCharacteristic;
     private static BluetoothGattCharacteristic receiveDataCharacteristic;
+
+    private static StringBuilder responseBuilder = new StringBuilder();
 
     public static void startBLE(Activity a){
         BluetoothCore.activity = (MainActivity) a;
@@ -98,9 +101,24 @@ public class BluetoothCore {
         @Override
         public void onCharacteristicWriteRequest(BluetoothDevice device, int requestId, BluetoothGattCharacteristic characteristic, boolean preparedWrite, boolean responseNeeded, int offset, byte[] value) {
             super.onCharacteristicWriteRequest(device, requestId, characteristic, preparedWrite, responseNeeded, offset, value);
-            Log.d(activity.getString(R.string.log_tag), "onCharacteristicWriteRequest requestId=" + requestId + " preparedWrite="
-                    + Boolean.toString(preparedWrite) + " responseNeeded="
-                    + Boolean.toString(responseNeeded) + " offset=" + offset);
+//            Log.d(activity.getString(R.string.log_tag), "onCharacteristicWriteRequest requestId=" + requestId + " preparedWrite="
+//                    + Boolean.toString(preparedWrite) + " responseNeeded="
+//                    + Boolean.toString(responseNeeded) + " offset=" + offset);
+
+            if (characteristic.getUuid().equals(receiveDataCharacteristic.getUuid())){
+                BluetoothUtility.sendResponse(device, requestId, BluetoothGatt.GATT_SUCCESS, offset, value);
+                String write = new String(value);
+                if (write.equals("OEM")){
+                    RetrieveDataActivity.setResponseString(responseBuilder.toString());
+                    responseBuilder = new StringBuilder();
+                } else {
+                    responseBuilder.append(write);
+                }
+            } else {
+                BluetoothUtility.sendResponse(device, requestId, BluetoothGatt.GATT_REQUEST_NOT_SUPPORTED, offset, value);
+            }
+
+
         }
 
         @Override

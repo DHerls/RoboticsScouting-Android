@@ -154,6 +154,7 @@ public class BluetoothUtility {
         gattServer.clearServices();
         gattServer.close();
         activity.setConnected(false);
+
     }
 
     protected static BluetoothGattServer getGattServer() {
@@ -209,4 +210,6 @@ public class BluetoothUtility {
         characteristic.addDescriptor(STUPID_APPLE_DESCRIPTOR);
         characteristics.add(characteristic);
     }
+
+
 }

@@ -121,7 +121,7 @@
             android:layout_height="wrap_content"
             android:inputType="numberDecimal"
             android:ems="10"
-            android:id="@+id/editText2"
+            android:id="@+id/value_edit_text"
             android:layout_gravity="center_horizontal"
             android:hint="Value"
             android:textAlignment="center"

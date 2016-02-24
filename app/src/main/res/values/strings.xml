@@ -20,14 +20,15 @@ After installing and opening the Mac app, make sure Bluetooth is enabled on both
     <string name="about_credits_text"></string>
     <string-array name="value_array">
         <item>Raw Value</item>
-        <item>Percentage</item>
+        <item>Average</item>
     </string-array>
     <string-array name="operator_array">
         <item>=</item>
         <item>&gt;</item>
         <item>&lt;</item>
-        <item>&gt;=</item>
-        <item>&lt;=</item>
+        <item>≥</item>
+        <item>≤</item>
+        <item>≠</item>
     </string-array>
     <string name="key_team_num" tools:ignore="UnusedResources">team_num</string>
     <string name="key_match_num" tools:ignore="UnusedResources">match_num</string>

@@ -105,14 +105,15 @@ public class BluetoothCore {
 //            Log.d(activity.getString(R.string.log_tag), "onCharacteristicWriteRequest requestId=" + requestId + " preparedWrite="
 //                    + Boolean.toString(preparedWrite) + " responseNeeded="
 //                    + Boolean.toString(responseNeeded) + " offset=" + offset);
-
             if (characteristic.getUuid().equals(receiveDataCharacteristic.getUuid())){
                 BluetoothUtility.sendResponse(device, requestId, BluetoothGatt.GATT_SUCCESS, offset, value);
                 String write = new String(value);
-                if (write.equals("OEM")){
+                if (write.equals("EOM")){
                     RetrieveDataActivity.setResponseString(responseBuilder.toString());
                     responseBuilder = new StringBuilder();
-                } else {
+                } else if (write.equalsIgnoreCase("NoReadTable")||write.equalsIgnoreCase("NoReadTeam")){
+                    RetrieveDataActivity.setResponseString(write);
+                }else {
                     responseBuilder.append(write);
                 }
             } else {

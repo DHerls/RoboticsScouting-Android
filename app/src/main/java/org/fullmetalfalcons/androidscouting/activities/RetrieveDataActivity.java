@@ -4,6 +4,7 @@ import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -30,12 +31,16 @@ import java.util.HashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import javax.xml.transform.Result;
+
 public class RetrieveDataActivity extends AppCompatActivity {
 
     private final HashMap<String, String> prettyColumns = new HashMap<>();
-    private static String responseString= null;
-    private RequestType requestType;
+    private static volatile String responseString= null;
+    private static RequestType requestType;
     private final Pattern p = Pattern.compile("\\[(.*?)\\]");
+    private ProgressDialog progress;
+    private boolean timeout = false;
 
 
     @Override
@@ -112,6 +117,7 @@ public class RetrieveDataActivity extends AppCompatActivity {
 
             }
         });
+
     }
 
     private void requestTeamNum(EditText teamNumEditText) {
@@ -262,57 +268,14 @@ public class RetrieveDataActivity extends AppCompatActivity {
     }
 
     public static void setResponseString(String s) {
+        System.out.println("HEY DIPSHIT");
         responseString = s;
     }
 
-    private void waitForResponse(){
-        ProgressDialog progress = new ProgressDialog(this);
-        progress.setTitle("Waiting");
-        progress.setMessage("Waiting for response...");
-        progress.setCancelable(false);
-        progress.show();
-        long millis = System.currentTimeMillis();
-        boolean timeout = false;
-        while (RetrieveDataActivity.responseString==null){
-            try {
-                Thread.sleep(50);
-                if (System.currentTimeMillis()-millis>5000){
-                    timeout = true;
-                    break;
-                }
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
+    private void waitForResponse() {
 
-        }
-        progress.dismiss();
-        if (!timeout){
-            if (requestType==RequestType.TEAM){
-                switch (responseString) {
-                    case "NoReadTable":
-                        sendError("No database has been established yet", false);
-                        break;
-                    case "NoReadTeam":
-                        sendError("The team specified cannot be found", false);
-                        break;
-                    default:
-                        Matcher m = p.matcher(responseString);
-                        HashMap<String, String> teamInfo = new HashMap<>();
-                        while (m.find()) {
-                            String[] value = m.group(1).split(":");
-                            teamInfo.put(value[0], value[1]);
-                            System.out.println(value[0] + "=" + value[1]);
-                        }
-                        break;
-                }
-            } else {
-                //TODO Handle Searches
-            }
-        } else {
-            sendError("Error request timeout",false);
-        }
-
-
+        WaitTask waiting = new WaitTask();
+        waiting.execute();
     }
 
     private enum RequestType {
@@ -331,4 +294,76 @@ public class RetrieveDataActivity extends AppCompatActivity {
         }
         return super.onOptionsItemSelected(item);
     }
+
+
+    class WaitTask extends AsyncTask<Object,Void,Void>{
+        @Override
+        protected void onPreExecute() {
+            progress = new ProgressDialog(RetrieveDataActivity.this);
+            progress.setTitle("Waiting");
+            progress.setMessage("Waiting for response...");
+            progress.setCancelable(false);
+            progress.show();
+
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            super.onPostExecute(aVoid);
+
+            if (progress.isShowing()) {
+                progress.dismiss();
+            }
+
+            if (!timeout) {
+                if (requestType== RetrieveDataActivity.RequestType.TEAM) {
+                    switch (responseString) {
+                        case "NoReadTable":
+                            sendError("No database has been established yet", false);
+                            break;
+                        case "NoReadTeam":
+                            sendError("The team specified cannot be found", false);
+                            break;
+                        default:
+                            Matcher m = p.matcher(responseString);
+                            HashMap<String, String> teamInfo = new HashMap<>();
+                            while (m.find()) {
+                                String[] value = m.group(1).split("=");
+                                teamInfo.put(value[0], value[1]);
+                                System.out.println(value[0] + "=" + value[1]);
+                            }
+                            break;
+                    }
+                    responseString = null;
+
+                } else {
+                    //TODO Handle Searches
+                }
+            } else {
+                sendError("Error request timeout", false);
+            }
+
+        }
+
+        @Override
+        protected Void doInBackground(Object... params) {
+            long millis = System.currentTimeMillis();
+            timeout = false;
+            while (responseString == null) {
+                try {
+                    Thread.sleep(50);
+                    if (System.currentTimeMillis() - millis > 5000) {
+                        timeout = true;
+                        break;
+                    }
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+
+            }
+
+            return null;
+        }
+    }
+
 }

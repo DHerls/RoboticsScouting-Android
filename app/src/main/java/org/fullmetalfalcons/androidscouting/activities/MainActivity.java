@@ -10,6 +10,7 @@ import android.content.IntentFilter;
 import android.graphics.Color;
 import android.graphics.drawable.GradientDrawable;
 import android.graphics.drawable.LayerDrawable;
+import android.os.Build;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -39,7 +40,6 @@ public class MainActivity extends AppCompatActivity {
     private BroadcastReceiver mReceiver;
     private static Bundle viewData;
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -65,25 +65,11 @@ public class MainActivity extends AppCompatActivity {
         //Refresh button next to the bluetooth code EditText
         final ImageButton refreshBtn = (ImageButton) findViewById(R.id.detail_refresh_btn);
         //The animation to make the button spin
-        final Animation ranim = AnimationUtils.loadAnimation(this, R.anim.rotate);
         //When the refresh button is pressed
         refreshBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                //Create a matcher based on the pattern above and the text in the code EditText
-                Matcher bluetoothCodeMatcher = bluetoothCodePattern.matcher(bluetoothCodeView.getText());
-                //If the text matches the pattern
-                if (bluetoothCodeMatcher.matches()) {
-                    //Animate the refresh button
-                    refreshBtn.startAnimation(ranim);
-                    //Set a new passphrase
-                    BluetoothCore.setPassphrase(bluetoothCodeView.getText().toString());
-                } else {
-                    //Send error message to user
-                    sendError("Bluetooth Code must be in the format (# or (A-F))x4", false);
-                    //Clear the code box
-                    bluetoothCodeView.setText("");
-                }
+                setPassphrase(bluetoothCodeView);
 
             }
         });
@@ -95,25 +81,7 @@ public class MainActivity extends AppCompatActivity {
 
                 if ((actionId== EditorInfo.IME_ACTION_DONE )   )
                 {
-                    //Toast.makeText(getActivity(), "call",45).show();
-                    // hide virtual keyboard
-                    InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-                    imm.hideSoftInputFromWindow(bluetoothCodeView.getWindowToken(), 0);
-
-                    //Create a matcher based on the pattern above and the text in the code EditText
-                    Matcher bluetoothCodeMatcher = bluetoothCodePattern.matcher(bluetoothCodeView.getText());
-                    //If the text matches the pattern
-                    if (bluetoothCodeMatcher.matches()) {
-                        //Animate the refresh button
-                        refreshBtn.startAnimation(ranim);
-                        //Set a new passphrase
-                        BluetoothCore.setPassphrase(bluetoothCodeView.getText().toString());
-                    } else {
-                        //Send error message to user
-                        sendError("Bluetooth Code must be in the format (# or (A-F))x4", false);
-                        //Clear the code box
-                        bluetoothCodeView.setText("");
-                    }
+                    setPassphrase(bluetoothCodeView);
                     return true;
                 }
                 return false;
@@ -122,11 +90,41 @@ public class MainActivity extends AppCompatActivity {
         });
 
 
-        //Start advertising
-        BluetoothCore.startBLE(this);
+        if (!isEmulator()) {
+            //Start advertising
+            BluetoothCore.startBLE(this);
 
-        //Register broadcast receiver to detect changes to bluetooth adapter
-        registerBluetoothReceiver();
+            //Register broadcast receiver to detect changes to bluetooth adapter
+            registerBluetoothReceiver();
+        } else {
+            sendError("Device is running in an emulator, bluetooth will be useless",false);
+        }
+    }
+
+    private void setPassphrase(EditText bluetoothCodeView){
+        final Animation ranim = AnimationUtils.loadAnimation(this, R.anim.rotate);
+        final ImageButton refreshBtn = (ImageButton) findViewById(R.id.detail_refresh_btn);
+
+        // hide virtual keyboard
+        InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+        imm.hideSoftInputFromWindow(bluetoothCodeView.getWindowToken(), 0);
+
+        //Create a matcher based on the pattern above and the text in the code EditText
+        Matcher bluetoothCodeMatcher = bluetoothCodePattern.matcher(bluetoothCodeView.getText());
+        //If the text matches the pattern
+        if (bluetoothCodeMatcher.matches()) {
+            //Animate the refresh button
+            refreshBtn.startAnimation(ranim);
+            if (!isEmulator()){
+                //Set a new passphrase
+                BluetoothCore.setPassphrase(bluetoothCodeView.getText().toString());
+            }
+        } else {
+            //Send error message to user
+            sendError("Bluetooth Code must be in the format (# or (A-F))x4", false);
+            //Clear the code box
+            bluetoothCodeView.setText("");
+        }
     }
 
     /**
@@ -310,4 +308,16 @@ public class MainActivity extends AppCompatActivity {
         Intent intent = new Intent(this,RetrieveDataActivity.class);
         startActivity(intent);
     }
+
+    private static boolean isEmulator() {
+        return Build.FINGERPRINT.startsWith("generic")
+                || Build.FINGERPRINT.startsWith("unknown")
+                || Build.MODEL.contains("google_sdk")
+                || Build.MODEL.contains("Emulator")
+                || Build.MODEL.contains("Android SDK built for x86")
+                || Build.MANUFACTURER.contains("Genymotion")
+                || (Build.BRAND.startsWith("generic") && Build.DEVICE.startsWith("generic"))
+                || "google_sdk".equals(Build.PRODUCT);
+    }
+
 }

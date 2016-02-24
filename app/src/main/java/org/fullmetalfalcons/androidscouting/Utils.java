@@ -3,12 +3,11 @@ package org.fullmetalfalcons.androidscouting;
 /**
  * Created by Dan on 2/1/2016.
  */
+
 import android.app.Activity;
-import android.content.Intent;
 import android.os.Build;
 
 import org.fullmetalfalcons.androidscouting.elements.Element;
-import org.fullmetalfalcons.androidscouting.fileio.ConfigManager;
 
 public class Utils
 {

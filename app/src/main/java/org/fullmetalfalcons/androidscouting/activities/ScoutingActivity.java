@@ -129,8 +129,8 @@ public class ScoutingActivity extends AppCompatActivity implements CompoundButto
 //        }
 //
         //Restore static values
-        ((EditText) findViewById(R.id.match_num)).setText(bundle.getString("match_num"));
-        ((EditText) findViewById(R.id.team_num)).setText(bundle.getString("team_num"));
+        ((EditText) findViewById(R.id.match_num)).setText(bundle.getString("@string/key_match_num"));
+        ((EditText) findViewById(R.id.team_num)).setText(bundle.getString("@string/key_team_num"));
     }
 
 
@@ -245,8 +245,8 @@ public class ScoutingActivity extends AppCompatActivity implements CompoundButto
 //        bundle.putParcelable("fieldData", values);
 
         //Put all the static fields into the bundle
-        bundle.putString("match_num", ((EditText) findViewById(R.id.match_num)).getText().toString());
-        bundle.putString("team_num", ((EditText) findViewById(R.id.team_num)).getText().toString());
+        bundle.putString("@string/key_match_num", ((EditText) findViewById(R.id.match_num)).getText().toString());
+        bundle.putString("@string/key_team_num", ((EditText) findViewById(R.id.team_num)).getText().toString());
         //bundle.putString("bluetooth_code", ((EditText) findViewById(R.id.bluetoothCode)).getText().toString());
 
     }
@@ -270,8 +270,8 @@ public class ScoutingActivity extends AppCompatActivity implements CompoundButto
 //        }
 
         //Restore static values
-        ((EditText) findViewById(R.id.match_num)).setText(bundle.getString("match_num"));
-        ((EditText) findViewById(R.id.team_num)).setText(bundle.getString("team_num"));
+        ((EditText) findViewById(R.id.match_num)).setText(bundle.getString("@string/key_match_num"));
+        ((EditText) findViewById(R.id.team_num)).setText(bundle.getString("@string/key_team_num"));
         //((EditText) findViewById(R.id.bluetoothCode)).setText(bundle.getString("bluetooth_code"));
 
         //BluetoothCore.startBLE(this);
@@ -327,9 +327,9 @@ public class ScoutingActivity extends AppCompatActivity implements CompoundButto
             values.putAll(e.getHash());
         }
 
-        values.put("team_num", Integer.parseInt(((EditText) findViewById(R.id.team_num)).getText().toString()));
-        values.put("match_num", Integer.parseInt(((EditText) findViewById(R.id.match_num)).getText().toString()));
-        values.put("team_color", ((Switch) findViewById(R.id.team_color)).isChecked() ? "Red" : "Blue");
+        values.put("@string/key_team_num", Integer.parseInt(((EditText) findViewById(R.id.team_num)).getText().toString()));
+        values.put("@string/key_match_num", Integer.parseInt(((EditText) findViewById(R.id.match_num)).getText().toString()));
+        values.put("@string/key_team_color", ((Switch) findViewById(R.id.team_color)).isChecked() ? "Red" : "Blue");
 
         return values.toXMLPropertyList();
     }
@@ -341,6 +341,7 @@ public class ScoutingActivity extends AppCompatActivity implements CompoundButto
      * @param message message to send to the user
      * @param fatalError whether or not the app should close after user acknowledges
      */
+    @SuppressWarnings("SameParameterValue")
     public void sendError(String message,final boolean fatalError){
         new AlertDialog.Builder(this)
                 .setTitle("Something is wrong")
@@ -365,7 +366,12 @@ public class ScoutingActivity extends AppCompatActivity implements CompoundButto
         }
     }
 
+    @SuppressWarnings({"SameParameterValue", "UnusedParameters"})
     public void clearAll(View v){
+
+        //Prevents the app from defaulting to focus on the Team Number EditText
+        LinearLayout l = (LinearLayout) findViewById(R.id.mainLinear);
+        l.requestFocus();
 
         for (int i = 0; i< ConfigManager.getElements().size();i++){
             ConfigManager.getElements().get(i).clearViewData();
@@ -384,13 +390,7 @@ public class ScoutingActivity extends AppCompatActivity implements CompoundButto
             s.setChecked(false);
             Utils.changeToTheme(this, Utils.THEME_BLUE);
         }
-    }
 
-    public static void log(String message){
-
-    }
-
-    public static void debug(String message){
 
     }
 
@@ -410,8 +410,8 @@ public class ScoutingActivity extends AppCompatActivity implements CompoundButto
 //        bundle.putParcelable("fieldData", values);
 //
 //        //Put all the static fields into the bundle
-        bundle.putString("match_num", ((EditText) findViewById(R.id.match_num)).getText().toString());
-        bundle.putString("team_num", ((EditText) findViewById(R.id.team_num)).getText().toString());
+        bundle.putString("@string/kay_match_num", ((EditText) findViewById(R.id.match_num)).getText().toString());
+        bundle.putString("@string/key_team_num", ((EditText) findViewById(R.id.team_num)).getText().toString());
 //        //bundle.putString("bluetooth_code", ((EditText) findViewById(R.id.bluetoothCode)).getText().toString());
 
         MainActivity.saveData(bundle);

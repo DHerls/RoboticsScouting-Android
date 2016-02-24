@@ -21,7 +21,7 @@ import java.util.UUID;
  *
  * Adapted by Dan from the code created by micah on 7/16/14.
  */
-public class BluetoothUtility {
+class BluetoothUtility {
 
     /**
      * Constants
@@ -60,7 +60,7 @@ public class BluetoothUtility {
             BluetoothGattDescriptor.PERMISSION_WRITE | BluetoothGattDescriptor.PERMISSION_READ);
 
 
-    protected static boolean setupBluetooth(Activity a){
+    static boolean setupBluetooth(Activity a){
         activity = (MainActivity) a;
         bluetoothManager = (BluetoothManager) activity.getApplicationContext().getSystemService(Context.BLUETOOTH_SERVICE);
         bluetoothAdapter = bluetoothManager.getAdapter();
@@ -88,7 +88,7 @@ public class BluetoothUtility {
 
     }
 
-    protected static void stopAll() {
+    static void stopAll() {
         if(getAdvertising()) stopAdvertise();
         if(gattServer != null) gattServer.close();
 
@@ -100,10 +100,10 @@ public class BluetoothUtility {
         return advertising;
     }
 
-    protected static void setAdvertiseCallback(AdvertiseCallback callback) {
+    static void setAdvertiseCallback(AdvertiseCallback callback) {
         advertiseCallback = callback;
     }
-    protected static void setGattServerCallback(BluetoothGattServerCallback callback) {
+    static void setGattServerCallback(BluetoothGattServerCallback callback) {
         gattServerCallback = callback;
     }
 
@@ -111,7 +111,7 @@ public class BluetoothUtility {
      * BLE Advertising
      */
     //Public method to begin advertising services
-    protected static void startAdvertise() {
+    static void startAdvertise() {
         if(getAdvertising()) return;
 
         startGattServer();
@@ -134,7 +134,7 @@ public class BluetoothUtility {
     }
 
     //Stop ble advertising and clean up
-    protected static void stopAdvertise() {
+    static void stopAdvertise() {
         if(!getAdvertising()) return;
         bluetoothLeAdvertiser.stopAdvertising(advertiseCallback);
         advertising = false;
@@ -157,7 +157,7 @@ public class BluetoothUtility {
 
     }
 
-    protected static BluetoothGattServer getGattServer() {
+    static BluetoothGattServer getGattServer() {
         return gattServer;
     }
 
@@ -169,8 +169,9 @@ public class BluetoothUtility {
 
     }
 
-    protected static void enable() {
+    static void enable() {
         boolean isEnabling = bluetoothAdapter.enable();
+        //noinspection StatementWithEmptyBody
         if (!isEnabling)
         {
             // an immediate error occurred - perhaps the bluetooth is already on?
@@ -195,12 +196,12 @@ public class BluetoothUtility {
         bluetoothLeAdvertiser = bluetoothAdapter.getBluetoothLeAdvertiser();
     }
 
-    protected static void sendResponse(BluetoothDevice device, int requestId, int gattSuccess, int offset, byte[] value) {
+    static void sendResponse(BluetoothDevice device, int requestId, int gattSuccess, int offset, byte[] value) {
         gattServer.sendResponse(device, requestId, gattSuccess, offset, value);
 
     }
 
-    protected static void sendNotification(BluetoothGattCharacteristic characteristic, BluetoothDevice device, String value){
+    static void sendNotification(BluetoothGattCharacteristic characteristic, BluetoothDevice device, String value){
         characteristic.setValue(value);
         gattServer.notifyCharacteristicChanged(device, characteristic, false);
 

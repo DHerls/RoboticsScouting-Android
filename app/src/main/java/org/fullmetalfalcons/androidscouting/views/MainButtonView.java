@@ -25,9 +25,6 @@ public class MainButtonView extends View {
     private float mTextWidth;
     private float mTextHeight;
 
-    private int width;
-    private int height;
-
     private int position = 0;
 
     private float x;
@@ -125,8 +122,8 @@ public class MainButtonView extends View {
             int paddingRight = getPaddingRight();
             int paddingBottom = getPaddingBottom();
 
-            width = getWidth() - paddingLeft - paddingRight;
-            height = getHeight()  - paddingBottom;
+            int width = getWidth() - paddingLeft - paddingRight;
+            int height = getHeight() - paddingBottom;
 
             x = paddingLeft + (width - mTextWidth) / 2;
             y = (height + mTextHeight) / 3;

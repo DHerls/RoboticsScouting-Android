@@ -2,11 +2,10 @@ package org.fullmetalfalcons.androidscouting.activities;
 
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
-import android.bluetooth.BluetoothAdapter;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.KeyEvent;
@@ -33,10 +32,10 @@ import java.util.regex.Pattern;
 
 public class RetrieveDataActivity extends AppCompatActivity {
 
-    private HashMap<String, String> prettyColumns = new HashMap<>();
+    private final HashMap<String, String> prettyColumns = new HashMap<>();
     private static String responseString= null;
     private RequestType requestType;
-    private Pattern p = Pattern.compile("\\[(.*?)\\]");
+    private final Pattern p = Pattern.compile("\\[(.*?)\\]");
 
 
     @Override
@@ -45,12 +44,13 @@ public class RetrieveDataActivity extends AppCompatActivity {
         setContentView(R.layout.activity_retrieve_data);
         Toolbar toolbar = (Toolbar) findViewById(R.id.retrieve_toolbar);
         setSupportActionBar(toolbar);
+        //noinspection ConstantConditions
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-        Spinner s = (Spinner) findViewById(R.id.column_spinner);
+        Spinner columnSpinner = (Spinner) findViewById(R.id.column_spinner);
         ArrayAdapter<String> spinnerArrayAdapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, getColumnValues());
         spinnerArrayAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        s.setAdapter(spinnerArrayAdapter);
+        columnSpinner.setAdapter(spinnerArrayAdapter);
 
 
         Button teamOkButton = (Button) findViewById(R.id.retrieve_team_ok);
@@ -85,7 +85,6 @@ public class RetrieveDataActivity extends AppCompatActivity {
 
         Button searchOkButton = (Button) findViewById(R.id.retrieve_team_search_button);
         Spinner typeSpinner = (Spinner) findViewById(R.id.value_spinner);
-        Spinner columnSpinner = (Spinner) findViewById(R.id.column_spinner);
         Spinner operatorSpinner = (Spinner) findViewById(R.id.operator_spinner);
         final EditText valueText = (EditText) findViewById(R.id.value_edit_text);
 
@@ -162,6 +161,7 @@ public class RetrieveDataActivity extends AppCompatActivity {
      * @param message message to send to the user
      * @param fatalError whether or not the app should close after user acknowledges
      */
+    @SuppressWarnings("SameParameterValue")
     public void sendError(String message,final boolean fatalError){
         new AlertDialog.Builder(this)
                 .setTitle("Something is wrong")
@@ -288,18 +288,22 @@ public class RetrieveDataActivity extends AppCompatActivity {
         progress.dismiss();
         if (!timeout){
             if (requestType==RequestType.TEAM){
-                if (responseString.equals("NoReadTable")){
-                    sendError("No database has been established yet",false);
-                } else if (responseString.equals("NoReadTeam")){
-                    sendError("The team specified cannot be found",false);
-                } else {
-                    Matcher m = p.matcher(responseString);
-                    HashMap<String,String> teamInfo = new HashMap<>();
-                    while (m.find()){
-                        String[] value = m.group(1).split(":");
-                        teamInfo.put(value[0],value[1]);
-                        System.out.println(value[0] + "=" + value[1]);
-                    }
+                switch (responseString) {
+                    case "NoReadTable":
+                        sendError("No database has been established yet", false);
+                        break;
+                    case "NoReadTeam":
+                        sendError("The team specified cannot be found", false);
+                        break;
+                    default:
+                        Matcher m = p.matcher(responseString);
+                        HashMap<String, String> teamInfo = new HashMap<>();
+                        while (m.find()) {
+                            String[] value = m.group(1).split(":");
+                            teamInfo.put(value[0], value[1]);
+                            System.out.println(value[0] + "=" + value[1]);
+                        }
+                        break;
                 }
             } else {
                 //TODO Handle Searches
@@ -313,7 +317,7 @@ public class RetrieveDataActivity extends AppCompatActivity {
 
     private enum RequestType {
         TEAM,
-        SEARCH;
+        SEARCH
 
     }
 

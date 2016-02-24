@@ -1,4 +1,4 @@
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
     <string name="app_name">4557 Scouting</string>
     <string name="action_settings">Settings</string>
     <string name="log_tag">[SCOUTING]</string>
@@ -29,4 +29,26 @@ After installing and opening the Mac app, make sure Bluetooth is enabled on both
         <item>&gt;=</item>
         <item>&lt;=</item>
     </string-array>
+    <string name="key_team_num" tools:ignore="UnusedResources">team_num</string>
+    <string name="key_match_num" tools:ignore="UnusedResources">match_num</string>
+    <string name="key_team_color" tools:ignore="UnusedResources">team_color</string>
+    <string name="key_num_matches" tools:ignore="UnusedResources">num_matches</string>
+    <string name="key_match_nums" tools:ignore="UnusedResources">match_nums</string>
+    <string name="bluetooth_code_label">Bluetooth Code</string>
+    <string name="bluetooth_code_hint">ex. 333B</string>
+    <string name="connection_label">Connection:</string>
+    <string name="advertising_label">Advertising:</string>
+    <string name="retrieve_description_label">Retrieve a single team or search for teams that meet certain criteria</string>
+    <string name="team_number_label">Team Number</string>
+    <string name="retrieve_or">Or:</string>
+    <string name="retrieve_value_hint">Value</string>
+    <string name="search_button_text">Search</string>
+    <string name="general_scouting_header">General</string>
+    <string name="match_number_label">Match Number</string>
+    <string name="alliance_color_label">Alliance Color</string>
+    <string name="clear_label">Clear Form</string>
+    <string name="clear_button_text">Clear</string>
+    <string name="refresh_button_description">Refresh Button</string>
+    <string name="main_logo_description">Main Logo</string>
+
 </resources>

@@ -241,6 +241,7 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    @SuppressWarnings("UnusedParameters")
     public void startScoutActivity(View view){
         Intent intent = new Intent(this,ScoutingActivity.class);
         startActivity(intent);
@@ -304,6 +305,7 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    @SuppressWarnings("UnusedParameters")
     public void startRetrieveActivity(View view) {
         Intent intent = new Intent(this,RetrieveDataActivity.class);
         startActivity(intent);

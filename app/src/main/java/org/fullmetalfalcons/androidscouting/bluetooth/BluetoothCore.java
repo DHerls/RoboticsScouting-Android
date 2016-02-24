@@ -28,6 +28,7 @@ public class BluetoothCore {
     private static final String RECEIVE_CHARACTERISTIC_UUID = "80A37B7F-0563-409B-B320-8C1768CE6A58";
 
     private static MainActivity activity;
+    @SuppressWarnings({"FieldCanBeLocal", "CanBeFinal"})
     private static int mtu = 75;
     private static BluetoothDevice BleDevice;
     private static boolean connected = false;
@@ -57,7 +58,7 @@ public class BluetoothCore {
 
     }
 
-    private static BluetoothGattServerCallback gattServerCallback = new BluetoothGattServerCallback() {
+    private static final BluetoothGattServerCallback gattServerCallback = new BluetoothGattServerCallback() {
         @Override
         public void onConnectionStateChange(BluetoothDevice device, int status, int newState) {
             super.onConnectionStateChange(device, status, newState);
@@ -143,7 +144,7 @@ public class BluetoothCore {
         }
     };
 
-    private static AdvertiseCallback advertiseCallback = new AdvertiseCallback() {
+    private static final AdvertiseCallback advertiseCallback = new AdvertiseCallback() {
         @Override
         public void onStartSuccess(AdvertiseSettings settingsInEffect) {
             super.onStartSuccess(settingsInEffect);
@@ -206,7 +207,7 @@ public class BluetoothCore {
 
     }
 
-    public static String getServiceUUID() {
+    private static String getServiceUUID() {
         return passphrase + SERVICE_UUID_BASE;
     }
 

@@ -11,6 +11,7 @@ import java.math.BigDecimal;
  */
 public class Equation {
 
+    @SuppressWarnings("FieldCanBeLocal")
     private String equation;
     private String name;
     private String columnValue;

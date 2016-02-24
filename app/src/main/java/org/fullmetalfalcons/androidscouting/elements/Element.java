@@ -408,6 +408,7 @@ public class Element {
         }
     }
 
+    @SuppressWarnings("WeakerAccess")
     public Object getViewData(){
         LinearLayout ll;
         switch(type){
@@ -438,7 +439,7 @@ public class Element {
 
             case STEPPER:
                 ll = (LinearLayout) view;
-                NumberPickerHorizontal np = (NumberPickerHorizontal) ((LinearLayout) view).getChildAt(1);
+                NumberPickerHorizontal np = (NumberPickerHorizontal) ll.getChildAt(1);
                 return np.getValue();
             case LABEL:
                 return "";
@@ -462,6 +463,7 @@ public class Element {
         return null;
     }
 
+    @SuppressWarnings("WeakerAccess")
     public void setViewData(Object viewData) {
         LinearLayout ll;
         switch(type){
@@ -474,11 +476,11 @@ public class Element {
             case TEXTFIELD:
                 ll = (LinearLayout) view;
                 EditText et = (EditText) ll.getChildAt(1);
-                et.setText(""+ viewData);
+                et.setText(String.valueOf(viewData));
                 break;
             case STEPPER:
                 ll = (LinearLayout) view;
-                NumberPickerHorizontal np = (NumberPickerHorizontal) ((LinearLayout) view).getChildAt(1);
+                NumberPickerHorizontal np = (NumberPickerHorizontal) ll.getChildAt(1);
                 np.setValue((int) viewData);
                 break;
             case LABEL:
@@ -521,14 +523,13 @@ public class Element {
             break;
             case STEPPER:
                 ll = (LinearLayout) view;
-                NumberPickerHorizontal np = (NumberPickerHorizontal) ((LinearLayout) view).getChildAt(1);
+                NumberPickerHorizontal np = (NumberPickerHorizontal) ll.getChildAt(1);
                 map.put(keys[0], np.getValue());
             break;
             case LABEL:
                 break;
             case SWITCH:
                 ll = (LinearLayout) view;
-                ArrayList<Boolean> bool = new ArrayList<>();
                 LinearLayout innerLayout;
                 for ( int i = 0; i< ll.getChildCount(); i++){
                     innerLayout = (LinearLayout) ll.getChildAt(i);
@@ -563,7 +564,7 @@ public class Element {
                 break;
             case STEPPER:
                 ll = (LinearLayout) view;
-                NumberPickerHorizontal np = (NumberPickerHorizontal) ((LinearLayout) view).getChildAt(1);
+                NumberPickerHorizontal np = (NumberPickerHorizontal) ll.getChildAt(1);
                 np.setValue(np.getMinValue());
                 break;
             case LABEL:

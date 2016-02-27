@@ -52,4 +52,5 @@ After installing and opening the Mac app, make sure Bluetooth is enabled on both
     <string name="refresh_button_description">Refresh Button</string>
     <string name="main_logo_description">Main Logo</string>
 
+
 </resources>

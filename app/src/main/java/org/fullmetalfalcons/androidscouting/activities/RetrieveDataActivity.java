@@ -4,6 +4,7 @@ import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -65,6 +66,8 @@ public class RetrieveDataActivity extends AppCompatActivity {
         teamOkButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+                imm.hideSoftInputFromWindow(teamNumEditText.getWindowToken(), 0);
                 requestTeamNum(teamNumEditText);
             }
         });
@@ -117,7 +120,6 @@ public class RetrieveDataActivity extends AppCompatActivity {
 
             }
         });
-
     }
 
     private void requestTeamNum(EditText teamNumEditText) {
@@ -192,6 +194,40 @@ public class RetrieveDataActivity extends AppCompatActivity {
         }
     }
 
+    public void displayResults(boolean timeout){
+        if (!timeout){
+            if (requestType==RequestType.TEAM){
+                switch (responseString) {
+                    case "NoReadTable":
+                        sendError("No database has been established yet", false);
+                        break;
+                    case "NoReadTeam":
+                        sendError("The team specified cannot be found", false);
+                        break;
+                    default:
+                        Matcher m = p.matcher(responseString);
+                        HashMap<String, String> teamInfo = new HashMap<>();
+                        while (m.find()) {
+                            String[] value = m.group(1).split("=");
+                            teamInfo.put(value[0], value[1]);
+//                            System.out.println(value[0] + "=" + value[1]);
+                        }
+                        Intent displayIntent = new Intent(this,DisplayDataActivity.class);
+                        displayIntent.putExtra("TEAM_DATA",teamInfo);
+                        displayIntent.putExtra("COLUMN_DATA",prettyColumns);
+                        startActivity(displayIntent);
+                        break;
+                }
+
+
+            } else {
+                //TODO Handle Searches
+            }
+        } else {
+            sendError("Error request timeout", false);
+        }
+    }
+
     private ArrayList<String> getColumnValues(){
         ArrayList<String> valueList = new ArrayList<>();
         String prelabel = "";
@@ -238,21 +274,23 @@ public class RetrieveDataActivity extends AppCompatActivity {
                     }
                     break;
                 case SWITCH:
-                    for (String key:e.getKeys()){
+                    String[] keys1 = e.getKeys();
+                    for (int i = 0; i < keys1.length; i++) {
+                        String key = keys1[i];
                         //Capitalize the first letter of every word
                         String s = makeKeyPretty(key);
                         valueList.add(prelabel + s + "-Yes");
                         valueList.add(prelabel + s + "-No");
-                        prettyColumns.put(prelabel + s + "-Yes", e.getColumnValues()[0]);
-                        prettyColumns.put(prelabel + s + "-No", e.getColumnValues()[1]);
+                        prettyColumns.put(prelabel + s + "-Yes", e.getColumnValues()[i*2]);
+                        prettyColumns.put(prelabel + s + "-No", e.getColumnValues()[i*2+1]);
                     }
                     break;
                 case SPACE:
                     break;
                 case SLIDER:
-                    String[] keys1 = e.getKeys();
-                    for (int i = 0; i < keys1.length; i++) {
-                        String key = keys1[i];
+                    String[] keys2 = e.getKeys();
+                    for (int i = 0; i < keys2.length; i++) {
+                        String key = keys2[i];
                         valueList.add(prelabel + makeKeyPretty(key));
                         prettyColumns.put(prelabel + key, e.getColumnValues()[i]);
                     }
@@ -268,12 +306,11 @@ public class RetrieveDataActivity extends AppCompatActivity {
     }
 
     public static void setResponseString(String s) {
-        System.out.println("HEY DIPSHIT");
         responseString = s;
     }
 
     private void waitForResponse() {
-
+        //responseString = "[team_num=442][team_color=Blue][num_matches=1][match_nums={64}][aut_reaches_defenses_yes=0][aut_reaches_defenses_no=1][aut_portcullis_yes=0][aut_portcullis_no=1][aut_chevaldefrise_yes=0][aut_chevaldefrise_no=1][aut_moat_yes=1][aut_moat_no=0][aut_ramparts_yes=0][aut_ramparts_no=1][aut_drawbridge_yes=0][aut_drawbridge_no=1][aut_sallyport_yes=0][aut_sallyport_no=1][aut_rockwall_yes=1][aut_rockwall_no=0][aut_rough_terrain_yes=0][aut_rough_terrain_no=1][aut_shoots_high_tower=0][aut_shoots_low_tower=1][aut_shoots_try_fail=0][aut_shoots_none=0][aut_underlowbar_yes=0][aut_underlowbar_no=1][aut_underlowbar_try_fail=0][aut_shot_accuracy=4.65748][teleop_starting_position_neutral_zone=0][teleop_starting_position_spy=1][teleop_portcullis_yes=0][teleop_portcullis_no=1][teleop_chevaldefrise_yes=0][teleop_chevaldefrise_no=1][teleop_moat_yes=0][teleop_moat_no=1][teleop_ramparts_yes=1][teleop_ramparts_no=0][teleop_drawbridge_yes=0][teleop_drawbridge_no=1][teleop_sallyport_yes=1][teleop_sallyport_no=0][teleop_rockwall_yes=0][teleop_rockwall_no=1][teleop_rough_terrain_yes=0][teleop_rough_terrain_no=1][teleop_underlowbar_yes=0][teleop_underlowbar_no=1][teleop_underlowbar_try_fail=0][teleop_climbing_yes=0][teleop_climbing_no=0][teleop_climbing_try_fail=1][teleop_defender_bot_yes=1][teleop_defender_bot_no=0][teleop_shots_highgoal=2][teleop_shots_lowgoal=4][teleop_shot_accuracy=9.70342][teleop_technical_fouls=3][teleop_normal_fouls=4][teleop_total_points=88][human_uses_gestures_yes=0][human_uses_gestures_no=1][human_effective=2.78613][autonomous_score=0.222][teleop_score=0.25][human_score=0][grand_total=0.472]";
         WaitTask waiting = new WaitTask();
         waiting.execute();
     }
@@ -315,33 +352,7 @@ public class RetrieveDataActivity extends AppCompatActivity {
                 progress.dismiss();
             }
 
-            if (!timeout) {
-                if (requestType== RetrieveDataActivity.RequestType.TEAM) {
-                    switch (responseString) {
-                        case "NoReadTable":
-                            sendError("No database has been established yet", false);
-                            break;
-                        case "NoReadTeam":
-                            sendError("The team specified cannot be found", false);
-                            break;
-                        default:
-                            Matcher m = p.matcher(responseString);
-                            HashMap<String, String> teamInfo = new HashMap<>();
-                            while (m.find()) {
-                                String[] value = m.group(1).split("=");
-                                teamInfo.put(value[0], value[1]);
-                                System.out.println(value[0] + "=" + value[1]);
-                            }
-                            break;
-                    }
-                    responseString = null;
-
-                } else {
-                    //TODO Handle Searches
-                }
-            } else {
-                sendError("Error request timeout", false);
-            }
+            displayResults(timeout);
 
         }
 

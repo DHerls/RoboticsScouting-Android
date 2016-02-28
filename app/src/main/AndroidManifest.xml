@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="org.fullmetalfalcons.androidscouting">
+    package="org.fullmetalfalcons.androidscouting" >
 
     <uses-permission android:name="android.permission.BLUETOOTH" />
     <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
@@ -10,10 +10,10 @@
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:supportsRtl="true"
-        android:theme="@style/BlueTheme">
+        android:theme="@style/BlueTheme" >
         <activity
             android:name=".activities.MainActivity"
-            android:label="@string/app_name">
+            android:label="@string/app_name" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -24,13 +24,18 @@
             android:name=".activities.ScoutingActivity"
             android:label="@string/app_name"
             android:parentActivityName=".activities.ScoutingActivity"
-            android:theme="@style/BlueTheme"/>
+            android:theme="@style/BlueTheme" />
         <activity
             android:name=".activities.AboutActivity"
-            android:parentActivityName=".activities.ScoutingActivity"/>
-        <activity android:name=".activities.RetrieveDataActivity"
-            android:parentActivityName=".activities.MainActivity"
-            android:label="Retrieve Team Data"/>
+            android:parentActivityName=".activities.ScoutingActivity" />
+        <activity
+            android:name=".activities.RetrieveDataActivity"
+            android:label="Retrieve Team Data"
+            android:parentActivityName=".activities.MainActivity" />
+        <activity
+            android:name=".activities.DisplayDataActivity"
+            android:label="Team Data"
+            android:parentActivityName=".activities.RetrieveDataActivity" />
     </application>
 
 </manifest>

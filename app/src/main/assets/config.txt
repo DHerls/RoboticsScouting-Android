@@ -81,8 +81,8 @@ SWITCH 				;;Drawbridge,Sally Port,Rock wall,Rough Terrain;;teleop_drawbridge,te
 SEGMENTED_CONTROL 	<Yes,No,Try/Fail>;;						Can pass under low bar;;			teleop_underLowBar
 SEGMENTED_CONTROL 	<Yes,No,Try/Fail>;;						Can Climb?;;						teleop_climbing
 SEGMENTED_CONTROL 	<Yes,No>;;								Is a defender bot?;;				teleop_defender_bot
-STEPPER 			<0,99>;;								Shots Made High Goal;;				teleop_high_shots_made
-STEPPER 			<0,99>;;								Shots Made Low Goal;;				teleop_low_shots_made
+STEPPER 			<0,99>;;								Shots Made High Goal;;				teleop_shots_highgoal
+STEPPER 			<0,99>;;								Shots Made Low Goal;;				teleop_shots_lowgoal
 SLIDER 				<0,10>;;								Shot Accuracy;;						teleop_shot_accuracy
 TEXTFIELD 			<number>;;								Total Points;;						teleop_total_points
 TEXTFIELD 			<normal>;;								Final Thoughts?;;					teleop_general_info

@@ -6,8 +6,10 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Path;
+import android.graphics.Region;
 import android.text.TextPaint;
 import android.util.AttributeSet;
+import android.view.MotionEvent;
 import android.view.View;
 
 import org.fullmetalfalcons.androidscouting.R;
@@ -32,6 +34,8 @@ public class MainButtonView extends View {
 
     private Path backgroundPath;
     private Path accentPath;
+
+    private Region touchRegion;
 
     private Paint colorPaint;
     private Paint accentPaint;
@@ -152,15 +156,16 @@ public class MainButtonView extends View {
                 accentPath.lineTo(width, 0f);
                 accentPath.lineTo(0f, .20f * height);
                 accentPath.lineTo(0f,0f);
-
-
             }
+
+            touchRegion = new Region();
+            touchRegion.setPath(backgroundPath,new Region(0, 0, canvas.getWidth(), canvas.getHeight()));
         }
         colorPaint.setColor(mBackgroundColor);
         colorPaint.setStyle(Paint.Style.FILL);
         canvas.drawPath(backgroundPath, colorPaint);
 
-        canvas.drawPath(accentPath,accentPaint);
+        canvas.drawPath(accentPath, accentPaint);
 
         colorPaint.setStyle(Paint.Style.STROKE);
         colorPaint.setStrokeWidth(4);
@@ -169,6 +174,25 @@ public class MainButtonView extends View {
 
         canvas.drawText(text, x, y, mTextPaintOutline);
         canvas.drawText(text, x, y, mTextPaint);
+    }
+
+    @Override
+    public boolean onTouchEvent(MotionEvent event) {
+        switch (event.getAction()) {
+            case MotionEvent.ACTION_DOWN:
+
+                int x = (int) event.getX();
+                int y = (int) event.getY();
+
+                if (touchRegion.contains(x,y)){
+                    performClick();
+                    return true;
+                } else {
+                    return false;
+                }
+        }
+
+        return true;
     }
 
 }

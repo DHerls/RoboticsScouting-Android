@@ -34,6 +34,9 @@ import java.util.regex.Pattern;
 
 import javax.xml.transform.Result;
 
+/**
+ * Allows the user to select criteria to retrieve team data
+ */
 public class RetrieveDataActivity extends AppCompatActivity {
 
     private final HashMap<String, String> prettyColumns = new HashMap<>();
@@ -53,25 +56,29 @@ public class RetrieveDataActivity extends AppCompatActivity {
         //noinspection ConstantConditions
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
+        //Set column values in the column spinner
         Spinner columnSpinner = (Spinner) findViewById(R.id.column_spinner);
         ArrayAdapter<String> spinnerArrayAdapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, getColumnValues());
         spinnerArrayAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         columnSpinner.setAdapter(spinnerArrayAdapter);
 
-
         Button teamOkButton = (Button) findViewById(R.id.retrieve_team_ok);
 
         final EditText teamNumEditText = (EditText) findViewById(R.id.retrieve_team_num);
 
+        //When the user presses the ok button next to the team number box
         teamOkButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                //Close the keyboard
                 InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
                 imm.hideSoftInputFromWindow(teamNumEditText.getWindowToken(), 0);
+                //Request the specified team
                 requestTeamNum(teamNumEditText);
             }
         });
 
+        //When the user hits the uner button in the team number box
         teamNumEditText.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
             public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
@@ -82,6 +89,7 @@ public class RetrieveDataActivity extends AppCompatActivity {
                     InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
                     imm.hideSoftInputFromWindow(teamNumEditText.getWindowToken(), 0);
 
+                    //Request team number
                     requestTeamNum(teamNumEditText);
                     return true;
                 }
@@ -99,6 +107,8 @@ public class RetrieveDataActivity extends AppCompatActivity {
         searchOkButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+                imm.hideSoftInputFromWindow(valueText.getWindowToken(), 0);
                 //TODO handle search button
             }
         });
@@ -194,9 +204,14 @@ public class RetrieveDataActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * Gathers results and displays them
+     * Called by WaitTask after response string is set
+     *
+     * @param timeout Whether or not the request had timed out
+     */
     public void displayResults(boolean timeout){
         if (!timeout){
-            if (requestType==RequestType.TEAM){
                 switch (responseString) {
                     case "NoReadTable":
                         sendError("No database has been established yet", false);
@@ -205,29 +220,34 @@ public class RetrieveDataActivity extends AppCompatActivity {
                         sendError("The team specified cannot be found", false);
                         break;
                     default:
-                        Matcher m = p.matcher(responseString);
-                        HashMap<String, String> teamInfo = new HashMap<>();
-                        while (m.find()) {
-                            String[] value = m.group(1).split("=");
-                            teamInfo.put(value[0], value[1]);
-//                            System.out.println(value[0] + "=" + value[1]);
+                        if (requestType==RequestType.TEAM){
+                            Matcher m = p.matcher(responseString);
+                            HashMap<String, String> teamInfo = new HashMap<>();
+                            while (m.find()) {
+                                String[] value = m.group(1).split("=");
+                                teamInfo.put(value[0], value[1]);
+    //                            System.out.println(value[0] + "=" + value[1]);
+                            }
+                            Intent displayIntent = new Intent(this,DisplayDataActivity.class);
+                            displayIntent.putExtra("TEAM_DATA",teamInfo);
+                            displayIntent.putExtra("COLUMN_DATA",prettyColumns);
+                            startActivity(displayIntent);
+                        } else {
+                            //TODO Handle Searches
                         }
-                        Intent displayIntent = new Intent(this,DisplayDataActivity.class);
-                        displayIntent.putExtra("TEAM_DATA",teamInfo);
-                        displayIntent.putExtra("COLUMN_DATA",prettyColumns);
-                        startActivity(displayIntent);
                         break;
                 }
-
-
-            } else {
-                //TODO Handle Searches
-            }
         } else {
             sendError("Error request timeout", false);
         }
+        responseString = null;
     }
 
+    /**
+     * Returns a list of columns formatted to be readable by the user
+     *
+     * @return List of formatted columns
+     */
     private ArrayList<String> getColumnValues(){
         ArrayList<String> valueList = new ArrayList<>();
         String prelabel = "";
@@ -244,7 +264,6 @@ public class RetrieveDataActivity extends AppCompatActivity {
                             valueList.add(prelabel + s + "-" + args);
                             prettyColumns.put(prelabel + s + "-" + args, e.getColumnValues()[i]);
                         }
-
                     }
                     break;
                 case TEXTFIELD:
@@ -256,9 +275,6 @@ public class RetrieveDataActivity extends AppCompatActivity {
                             prettyColumns.put(prelabel + makeKeyPretty(key), e.getColumnValues()[i]);
                         }
                     }
-
-
-
                     break;
                 case STEPPER:
                     String[] keys = e.getKeys();
@@ -271,6 +287,7 @@ public class RetrieveDataActivity extends AppCompatActivity {
                 case LABEL:
                     if (e.getArguments()[0].trim().equalsIgnoreCase("distinguished")){
                         prelabel = e.getDescriptions()[0] + ": ";
+                        //prelabel is placed before all the columns
                     }
                     break;
                 case SWITCH:
@@ -333,6 +350,9 @@ public class RetrieveDataActivity extends AppCompatActivity {
     }
 
 
+    /**
+     * Displays a waiting icon until data is received by the app
+     */
     class WaitTask extends AsyncTask<Object,Void,Void>{
         @Override
         protected void onPreExecute() {

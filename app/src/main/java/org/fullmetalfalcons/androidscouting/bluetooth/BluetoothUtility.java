@@ -17,7 +17,7 @@ import java.util.ArrayList;
 import java.util.UUID;
 
 /**
- * Bluetooth LE advertising and scanning utilities.
+ * Handles low level BLE
  *
  * Adapted by Dan from the code created by micah on 7/16/14.
  */
@@ -60,26 +60,33 @@ class BluetoothUtility {
             BluetoothGattDescriptor.PERMISSION_WRITE | BluetoothGattDescriptor.PERMISSION_READ);
 
 
+    /**
+     * Checks if bluetooth is turned on, if not, requests to turn it on
+     *
+     * @param a Activity
+     * @return true if everything is setup already, false if user needs to respond
+     */
     static boolean setupBluetooth(Activity a){
         activity = (MainActivity) a;
         bluetoothManager = (BluetoothManager) activity.getApplicationContext().getSystemService(Context.BLUETOOTH_SERVICE);
         bluetoothAdapter = bluetoothManager.getAdapter();
 
+        //If the device does not support bluetooth
         if (bluetoothAdapter == null){
             activity.sendError("Bluetooth is not supported on this device, this app is useless",true);
             return false;
         } else {
             bluetoothAdapter.setName(Utils.getDeviceName() + " " + BLUETOOTH_ADAPTER_NAME);
-            System.out.println();
         }
 
+        //If bluetooth is not turned on
         if(!bluetoothAdapter.isEnabled()) {
             Log.d(a.getString(R.string.log_tag),"Requesting permission to turn on Bluetooth");
             Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
             activity.startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT);
 
             return false;
-
+        //If bluetooth is turned on
         } else {
             bluetoothLeAdvertiser = bluetoothAdapter.getBluetoothLeAdvertiser();
             return true;
@@ -108,9 +115,8 @@ class BluetoothUtility {
     }
 
     /**
-     * BLE Advertising
+     * Public method to begin advertising services
      */
-    //Public method to begin advertising services
     static void startAdvertise() {
         if(getAdvertising()) return;
 
@@ -178,6 +184,7 @@ class BluetoothUtility {
         }
         else if (bluetoothAdapter.getState() == BluetoothAdapter.STATE_TURNING_ON)
         {
+            //Display a loading dialog while the bluetooth adapter is turning on
             ProgressDialog progress = new ProgressDialog(activity);
             progress.setTitle("Bluetooth");
             progress.setMessage("Turning on Bluetooth...");
@@ -208,6 +215,7 @@ class BluetoothUtility {
     }
 
     public static void addCharacteristic(BluetoothGattCharacteristic characteristic) {
+        //Descriptor is required for base to subscribe to services
         characteristic.addDescriptor(STUPID_APPLE_DESCRIPTOR);
         characteristics.add(characteristic);
     }

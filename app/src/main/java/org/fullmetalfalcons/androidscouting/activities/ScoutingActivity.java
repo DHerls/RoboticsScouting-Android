@@ -99,7 +99,7 @@ public class ScoutingActivity extends AppCompatActivity implements CompoundButto
 
 
         //Dynamically generate the UI based on config.txt
-        createTheApp();
+        addViews();
 
         //Get the Team Color Switch
         Switch colorSwitch = (Switch) findViewById(R.id.team_color);
@@ -167,13 +167,6 @@ public class ScoutingActivity extends AppCompatActivity implements CompoundButto
         }
 
         return super.onOptionsItemSelected(item);
-    }
-
-    /**
-     * Calls two methods to create the UI dynamically from config.txt
-     */
-    private void createTheApp(){
-        addViews();
     }
 
     /**

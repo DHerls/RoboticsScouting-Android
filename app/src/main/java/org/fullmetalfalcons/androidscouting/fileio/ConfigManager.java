@@ -14,7 +14,9 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 
 /**
- * Created by djher on 2/20/2016.
+ * Handles the reading of the config file
+ *
+ * Created by Dan on 2/20/2016.
  */
 public class ConfigManager {
 

@@ -24,8 +24,19 @@ public class TeamInfoView extends LinearLayout {
         TextView averageView = (TextView) findViewById(R.id.average_value_view);
 
         columnView.setText(columnValue);
-        rawView.setText(String.valueOf(round(raw,3)));
-        averageView.setText(String.valueOf(round(average,3)));
+        if ((raw%1)==0){
+            rawView.setText(String.valueOf((int) raw));
+        } else {
+            rawView.setText(String.valueOf(round(raw,3)));
+        }
+
+        if ((average%1)==0){
+            averageView.setText(String.valueOf((int) average));
+        } else {
+            averageView.setText(String.valueOf(round(average,3)));
+
+        }
+
     }
 
     public double round(double value, int numberOfDigitsAfterDecimalPoint) {

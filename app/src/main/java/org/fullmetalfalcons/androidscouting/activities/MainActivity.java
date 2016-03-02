@@ -45,27 +45,21 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        //If the elements haven't been loaded from the config file, load them
         if (ConfigManager.getElements().isEmpty()){
             ConfigManager.loadConfig(this);
         }
 
+        //Change the color of the status bar to black, because it looks better
         Window window = this.getWindow();
-
-// clear FLAG_TRANSLUCENT_STATUS flag:
         window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
-
-// add FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS flag to the window
         window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
-
-// finally change the color
         window.setStatusBarColor(Color.BLACK);
 
         final EditText bluetoothCodeView = (EditText) findViewById(R.id.bluetoothCode);
 
         //Refresh button next to the bluetooth code EditText
         final ImageButton refreshBtn = (ImageButton) findViewById(R.id.detail_refresh_btn);
-        //The animation to make the button spin
-        //When the refresh button is pressed
         refreshBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -74,6 +68,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        //When the user presses the enter button in the Bluetooth Code box
         bluetoothCodeView.setOnEditorActionListener(new TextView.OnEditorActionListener() {
 
             @Override
@@ -239,6 +234,11 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * When the Scout button is pressed, the Scout activity is launched
+     *
+     * @param view View that calls this method on click
+     */
     @SuppressWarnings("UnusedParameters")
     public void startScoutActivity(View view){
         Intent intent = new Intent(this,ScoutingActivity.class);
@@ -310,8 +310,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private static boolean isEmulator() {
-        return Build.FINGERPRINT.startsWith("generic")
-                || Build.FINGERPRINT.startsWith("unknown")
+        return Build.FINGERPRINT.startsWith("unknown")
                 || Build.MODEL.contains("google_sdk")
                 || Build.MODEL.contains("Emulator")
                 || Build.MODEL.contains("Android SDK built for x86")

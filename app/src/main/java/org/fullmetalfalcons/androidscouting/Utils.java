@@ -3,9 +3,11 @@ package org.fullmetalfalcons.androidscouting;
 /**
  * Created by Dan on 2/1/2016.
  */
+
 import android.app.Activity;
-import android.content.Intent;
 import android.os.Build;
+
+import org.fullmetalfalcons.androidscouting.elements.Element;
 
 public class Utils
 {
@@ -18,8 +20,14 @@ public class Utils
     public static void changeToTheme(Activity activity, int theme)
     {
         sTheme = theme;
+        Element.setSwitchColors(true);
         activity.recreate();
     }
+
+    public static int getTheme(){
+        return sTheme;
+    }
+
     /** Set the theme of the activity, according to the configuration. */
     public static void onActivityCreateSetTheme(Activity activity)
     {

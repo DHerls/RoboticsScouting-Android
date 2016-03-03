@@ -18,7 +18,8 @@
         android:layout_height="wrap_content"
         android:id="@+id/scrollView"
         android:layout_alignParentEnd="true"
-        android:layout_alignParentStart="true" >
+        android:layout_alignParentStart="true"
+        tools:ignore="UselessParent">
 
         <LinearLayout
             android:orientation="vertical"
@@ -31,77 +32,14 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="0dp"
-                android:text="General"
+                android:text="@string/general_scouting_header"
                 android:id="@+id/titleGeneral"
-                android:layout_below="@+id/scrollView"
-                android:layout_alignParentStart="true"
                 android:layout_gravity="left"
                 android:layout_marginBottom="10dp"
                 android:layout_weight="1"
                 android:textStyle="bold"
-                android:textSize="22dp"
+                android:textSize="22sp"
                 android:textColor="#000000" />
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="25dp"
-                android:orientation="horizontal"
-                android:layout_weight="1">
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:orientation="horizontal"
-                    android:layout_gravity="center"
-                    android:layout_weight="1">
-
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="match_parent"
-                        android:text="Connection:"
-                        android:textSize="18dp"
-                        android:textColor="@android:color/black"
-                        android:layout_marginLeft="20dp"
-                        android:layout_gravity="center" />
-
-                    <View android:layout_width="20dp"
-                        android:layout_height="20dp"
-                        android:background="@drawable/indicator_circle"
-                        android:id="@+id/connection_indicator"
-                        android:layout_marginLeft="10dp"/>
-
-                </LinearLayout>
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:orientation="horizontal"
-                    android:layout_gravity="center"
-                    android:layout_weight="1">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="match_parent"
-                        android:text="Advertising:"
-                        android:textSize="18dp"
-                        android:textColor="@android:color/black"
-                        android:layout_marginLeft="20dp"
-                        />
-
-                    <View android:layout_width="20dp"
-                        android:layout_height="20dp"
-                        android:background="@drawable/indicator_circle"
-                        android:id="@+id/advertising_indicator"
-                        android:layout_marginLeft="10dp"/>
-
-                </LinearLayout>
-
-
-
-
-            </LinearLayout>
-
 
 
             <LinearLayout
@@ -110,7 +48,8 @@
                 android:layout_height="match_parent"
                 android:layout_marginTop="10dp"
                 android:id="@+id/generalLinear1"
-                android:layout_weight="1">
+                android:layout_weight="1"
+                android:baselineAligned="false">
 
                 <LinearLayout
                     android:orientation="vertical"
@@ -122,19 +61,18 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:textAppearance="?android:attr/textAppearanceSmall"
-                        android:text="Team Number"
+                        android:text="@string/team_number_label"
                         android:id="@+id/label_team_num"
                         android:textColor="#000000" />
 
                     <EditText
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:inputType="number"
                         android:ems="10"
                         android:id="@+id/team_num"
-                        android:hint="Team Number"
-                        android:numeric="integer"
-                        android:maxLength="4" />
+                        android:hint="@string/team_number_label"
+                        android:maxLength="4"
+                        android:inputType="number" />
                 </LinearLayout>
 
                 <LinearLayout
@@ -147,7 +85,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:textAppearance="?android:attr/textAppearanceSmall"
-                        android:text="Match Number"
+                        android:text="@string/match_number_label"
                         android:id="@+id/textView2"
                         android:textColor="#000000" />
 
@@ -157,7 +95,7 @@
                         android:inputType="number"
                         android:ems="10"
                         android:id="@+id/match_num"
-                        android:hint="Match Number"
+                        android:hint="@string/match_number_label"
                         android:maxLength="4" />
                 </LinearLayout>
             </LinearLayout>
@@ -168,19 +106,21 @@
                 android:layout_height="match_parent"
                 android:layout_marginTop="10dp"
                 android:id="@+id/general_linear_2"
-                android:layout_weight="1">
+                android:layout_weight="1"
+                android:baselineAligned="false">
 
                 <LinearLayout
                     android:orientation="vertical"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:layout_weight="1" >
+                    android:layout_weight="1"
+                    >
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:textAppearance="?android:attr/textAppearanceSmall"
-                        android:text="Alliance Color"
+                        android:text="@string/alliance_color_label"
                         android:id="@+id/textView3"
                         android:textColor="#000000" />
 
@@ -203,38 +143,25 @@
                     android:orientation="vertical"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:layout_weight="1" >
+                    android:layout_weight="1">
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:textAppearance="?android:attr/textAppearanceSmall"
-                        android:text="Bluetooth Code"
-                        android:id="@+id/textView4"
+                        android:text="@string/clear_label"
+                        android:id="@+id/textView5"
                         android:textColor="#000000" />
 
-                    <LinearLayout
-                        android:orientation="horizontal"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:weightSum="1">
-
-                        <EditText
-                            android:layout_width="51dp"
-                            android:layout_height="wrap_content"
-                            android:inputType="textCapCharacters"
-                            android:ems="10"
-                            android:id="@+id/bluetoothCode"
-                            android:hint="ex. 333B"
-                            android:layout_weight="0.89"
-                            android:maxLength="4" />
-
-                        <ImageButton android:id="@+id/detail_refresh_btn"
-                            android:layout_width="48dp"
-                            android:layout_height="48dp"
-                            android:src="@drawable/ic_action_refresh1" />
-                    </LinearLayout>
+                    <Button
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/clear_button_text"
+                        android:id="@+id/button3"
+                        android:layout_gravity="center_horizontal"
+                        android:onClick="clearAll"/>
                 </LinearLayout>
+
             </LinearLayout>
 
 

@@ -16,6 +16,7 @@ public class ParcelableArrayList extends ArrayList<Object> implements Parcelable
 
     }
 
+    @SuppressWarnings("WeakerAccess")
     protected ParcelableArrayList(Parcel in) {
         ArrayList<Object> obj = new ArrayList<>(Arrays.asList(in.readArray(Object.class.getClassLoader())));
         for (Object o: obj){
@@ -43,6 +44,6 @@ public class ParcelableArrayList extends ArrayList<Object> implements Parcelable
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
-        dest.writeArray(this.toArray(new Object[0]));
+        dest.writeArray(this.toArray(new Object[this.size()]));
     }
 }

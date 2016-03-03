@@ -1,0 +1,11 @@
+<resources>
+    <declare-styleable name="MainButtonView">
+        <attr name="backgroundColor" format="color" />
+        <attr name="accentColor" format="color" />
+        <attr name="buttonText" format="string" />
+        <attr name="orientation" format="enum">
+            <enum name="left" value="0"/>
+            <enum name="right" value="1"/>
+        </attr>
+    </declare-styleable>
+</resources>

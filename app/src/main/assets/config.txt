@@ -81,9 +81,11 @@ SWITCH 				;;Drawbridge,Sally Port,Rock wall,Rough Terrain;;teleop_drawbridge,te
 SEGMENTED_CONTROL 	<Yes,No,Try/Fail>;;						Can pass under low bar;;			teleop_underLowBar
 SEGMENTED_CONTROL 	<Yes,No,Try/Fail>;;						Can Climb?;;						teleop_climbing
 SEGMENTED_CONTROL 	<Yes,No>;;								Is a defender bot?;;				teleop_defender_bot
-STEPPER 			<0,99>;;								Shots Made High Goal;;				teleop_shots_made
-STEPPER 			<0,99>;;								Shots Made Low Goal;;				teleop_shots_made
+STEPPER 			<0,99>;;								Shots Made High Goal;;				teleop_shots_highgoal
+STEPPER 			<0,99>;;								Shots Made Low Goal;;				teleop_shots_lowgoal
 SLIDER 				<0,10>;;								Shot Accuracy;;						teleop_shot_accuracy
+STEPPER 			<0,99>;;								Technical fouls;;					teleop_technical_fouls
+STEPPER 			<0,99>;;								Normal fouls;;						teleop_normal_fouls
 TEXTFIELD 			<number>;;								Total Points;;						teleop_total_points
 TEXTFIELD 			<normal>;;								Final Thoughts?;;					teleop_general_info
 
@@ -112,8 +114,8 @@ SPACE
 ##          - SLIDER - See: STEPPER
 ##      If an Element besides the ones listed above is used, the program will replace its value with 0.
 
-@EQUATION AUTONOMOUS=(2*aut_reaches_defenses+2*aut_crosses_defenses+aut_portcullis+aut_sallyport) / 4
-@EQUATION TELEOP=(teleop_portcullis+teleop_chevalDeFrise+teleop_moat+teleop_ramparts+teleop_drawbridge+teleop_sallyport+teleop_rockwall+teleop_rough_terrain) / 8
+@EQUATION AUTONOMOUS=(aut_reaches_defenses+aut_portcullis+aut_chevalDeFrise+aut_moat+aut_ramparts+aut_drawbridge+aut_sallyport+aut_rockwall+aut_rough_terrain)/9
+@EQUATION TELEOP=(teleop_portcullis+teleop_chevalDeFrise+teleop_moat+teleop_ramparts+teleop_drawbridge+teleop_sallyport+teleop_rockwall+teleop_rough_terrain)/8
 @EQUATION HUMAN=0
 
 ## --------EXTRA HELP--------

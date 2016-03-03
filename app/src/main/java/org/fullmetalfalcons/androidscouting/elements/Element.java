@@ -9,18 +9,16 @@ import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.View;
 import android.widget.EditText;
-import android.widget.HorizontalScrollView;
 import android.widget.LinearLayout;
-import android.widget.NumberPicker;
 import android.widget.Space;
 import android.widget.Switch;
 import android.widget.TextView;
 
 import com.dd.plist.NSDictionary;
 
-import org.fullmetalfalcons.androidscouting.NumberPickerHorizontal;
+import org.fullmetalfalcons.androidscouting.views.NumberPickerHorizontal;
 import org.fullmetalfalcons.androidscouting.R;
-import org.fullmetalfalcons.androidscouting.SeekBarWithValues;
+import org.fullmetalfalcons.androidscouting.views.SeekBarWithValues;
 import org.honorato.multistatetogglebutton.MultiStateToggleButton;
 
 import java.util.ArrayList;
@@ -37,17 +35,22 @@ import java.util.regex.Pattern;
  */
 public class Element {
 
-    private final Activity activity;
     private ElementType type;
     private String[] descriptions;
     private String[] keys;
     private String[] arguments;
-    private View view = null;
+    private volatile View view = null;
 
     //The below elements are used to capture the data between arrows <Like this>
     private final String argumentRegex = "<(.*?)>";
     private final Pattern argumentPattern = Pattern.compile(argumentRegex);
+    private String[] columnValues;
 
+    private static boolean switchColors = false;
+
+    public static void setSwitchColors(boolean switchColors) {
+        Element.switchColors = switchColors;
+    }
 
     /**
      * Constructor for the Element Class, requires a line from the config file
@@ -55,8 +58,7 @@ public class Element {
      * @param line A line read from the config file
      * @throws ElementParseException If there is a problem with the line/ it does not conform to conventions
      */
-    public Element(String line, Activity activity) throws ElementParseException {
-        this.activity = activity;
+    public Element(String line) throws ElementParseException {
         parseString(line);
 
 
@@ -150,15 +152,23 @@ public class Element {
         return keys;
     }
 
-    public View getView(){
-        if (view==null){
-            generateView();
+    public View getView(Activity a){
+
+        if (switchColors){
+            Object o = getViewData();
+            //System.out.println(o.toString());
+            generateView(a);
+            setViewData(o);
         }
+        if (view==null){
+            generateView(a);
+        }
+
 
         return view;
     }
 
-    private void generateView(){
+    private void generateView(Activity activity){
         //LinearLayout main = (LinearLayout) activity.findViewById(R.id.mainLinear);
 
         //LinearLayout ll = new LinearLayout(activity);
@@ -398,6 +408,7 @@ public class Element {
         }
     }
 
+    @SuppressWarnings("WeakerAccess")
     public Object getViewData(){
         LinearLayout ll;
         switch(type){
@@ -428,7 +439,7 @@ public class Element {
 
             case STEPPER:
                 ll = (LinearLayout) view;
-                NumberPickerHorizontal np = (NumberPickerHorizontal) ((LinearLayout) view).getChildAt(1);
+                NumberPickerHorizontal np = (NumberPickerHorizontal) ll.getChildAt(1);
                 return np.getValue();
             case LABEL:
                 return "";
@@ -452,6 +463,7 @@ public class Element {
         return null;
     }
 
+    @SuppressWarnings("WeakerAccess")
     public void setViewData(Object viewData) {
         LinearLayout ll;
         switch(type){
@@ -464,11 +476,11 @@ public class Element {
             case TEXTFIELD:
                 ll = (LinearLayout) view;
                 EditText et = (EditText) ll.getChildAt(1);
-                et.setText((String) viewData);
+                et.setText(String.valueOf(viewData));
                 break;
             case STEPPER:
                 ll = (LinearLayout) view;
-                NumberPickerHorizontal np = (NumberPickerHorizontal) ((LinearLayout) view).getChildAt(1);
+                NumberPickerHorizontal np = (NumberPickerHorizontal) ll.getChildAt(1);
                 np.setValue((int) viewData);
                 break;
             case LABEL:
@@ -507,22 +519,21 @@ public class Element {
             case TEXTFIELD:
                 ll = (LinearLayout) view;
                 EditText et = (EditText) ll.getChildAt(1);
-                map.put(keys[0],et.getText().toString());
+                map.put(keys[0], et.getText().toString());
             break;
             case STEPPER:
                 ll = (LinearLayout) view;
-                NumberPickerHorizontal np = (NumberPickerHorizontal) ((LinearLayout) view).getChildAt(1);
-                map.put(keys[0],np.getValue());
+                NumberPickerHorizontal np = (NumberPickerHorizontal) ll.getChildAt(1);
+                map.put(keys[0], np.getValue());
             break;
             case LABEL:
                 break;
             case SWITCH:
                 ll = (LinearLayout) view;
-                ArrayList<Boolean> bool = new ArrayList<>();
                 LinearLayout innerLayout;
                 for ( int i = 0; i< ll.getChildCount(); i++){
                     innerLayout = (LinearLayout) ll.getChildAt(i);
-                    map.put(keys[i],((Switch) innerLayout.getChildAt(1)).isChecked() ? "Yes" : "No");
+                    map.put(keys[i], ((Switch) innerLayout.getChildAt(1)).isChecked() ? "Yes" : "No");
                 }
                 break;
             case SPACE:
@@ -530,10 +541,101 @@ public class Element {
             case SLIDER:
                 ll = (LinearLayout) view;
                 SeekBarWithValues sbwv = (SeekBarWithValues) ll.getChildAt(1);
-                map.put(keys[0],sbwv.getSeekBar().getProgress());
+                map.put(keys[0], sbwv.getSeekBar().getProgress());
             break;
         }
 
         return map;
+    }
+
+    public void clearViewData() {
+        LinearLayout ll;
+        switch(type){
+
+            case SEGMENTED_CONTROL:
+                ll = (LinearLayout) view;
+                MultiStateToggleButton mstb = (MultiStateToggleButton) ll.getChildAt(1);
+                mstb.setValue(0);
+                break;
+            case TEXTFIELD:
+                ll = (LinearLayout) view;
+                EditText et = (EditText) ll.getChildAt(1);
+                et.getText().clear();
+                break;
+            case STEPPER:
+                ll = (LinearLayout) view;
+                NumberPickerHorizontal np = (NumberPickerHorizontal) ll.getChildAt(1);
+                np.setValue(np.getMinValue());
+                break;
+            case LABEL:
+                break;
+            case SWITCH:
+                ll = (LinearLayout) view;
+                LinearLayout innerLayout;
+                for ( int i = 0; i< ll.getChildCount(); i++){
+                    innerLayout = (LinearLayout) ll.getChildAt(i);
+                    ((Switch) innerLayout.getChildAt(1)).setChecked(false);
+                }
+                break;
+            case SPACE:
+                break;
+            case SLIDER:
+                ll = (LinearLayout) view;
+                SeekBarWithValues sbwv = (SeekBarWithValues) ll.getChildAt(1);
+                sbwv.setProgress(0);
+                break;
+        }
+    }
+
+    public String[] getColumnValues(){
+        if (columnValues!=null){
+            return columnValues;
+        }
+        ArrayList<String> values = new ArrayList<>();
+        switch(type){
+            case SEGMENTED_CONTROL:
+                for (String s: arguments){
+                    values.add(keys[0]+"_"+s.trim());
+                }
+                break;
+            case TEXTFIELD:
+                if (arguments[0].equalsIgnoreCase("number") || arguments[0].equalsIgnoreCase("decimal")){
+                    values.add(keys[0].trim());
+                }
+                break;
+            case STEPPER:
+                values.add(keys[0].trim());
+                break;
+            case LABEL:
+                break;
+            case SWITCH:
+                for (String key: keys){
+                    values.add(key.trim()+"_yes");
+                    values.add(key.trim()+"_no");
+                }
+                break;
+            case SPACE:
+                break;
+            case SLIDER:
+                values.add(keys[0]);
+                break;
+        }
+
+        for (int i = 0; i< values.size();i++){
+            values.set(i, values.get(i)
+                    .replace("\\","_")
+                    .replace("/","_")
+                    .replace(" ","_")
+                    .toLowerCase()
+                    .trim());
+        }
+
+        this.columnValues = values.toArray(new String[values.size()]);
+
+        return this.columnValues;
+    }
+
+    public void destroyView() {
+        view = null;
     }
 }

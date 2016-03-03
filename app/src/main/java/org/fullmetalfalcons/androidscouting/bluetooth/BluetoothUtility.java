@@ -8,25 +8,23 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.ParcelUuid;
 import android.util.Log;
-import android.widget.Toast;
 
+import org.fullmetalfalcons.androidscouting.activities.MainActivity;
 import org.fullmetalfalcons.androidscouting.R;
-import org.fullmetalfalcons.androidscouting.ScoutingActivity;
 import org.fullmetalfalcons.androidscouting.Utils;
 
 import java.util.ArrayList;
-import java.util.List;
 import java.util.UUID;
 
 /**
- * Bluetooth LE advertising and scanning utilities.
+ * Handles low level BLE
  *
- * Created by micah on 7/16/14.
+ * Adapted by Dan from the code created by micah on 7/16/14.
  */
-public class BluetoothUtility {
+class BluetoothUtility {
 
     /**
-     * Contants
+     * Constants
      */
     private static final int REQUEST_ENABLE_BT = 1;
 
@@ -43,38 +41,52 @@ public class BluetoothUtility {
     private static AdvertiseCallback advertiseCallback; //Must implement and set
     private static BluetoothGattServerCallback gattServerCallback; //Must implement and set
     private static BluetoothGattService gattService;
-    private static BluetoothGattCharacteristic gattCharacteristic;
 
     /**
      * Bluetooth Objects
      */
-    private static ScoutingActivity activity;
+    private static MainActivity activity;
     private static BluetoothManager bluetoothManager;
     private static BluetoothAdapter bluetoothAdapter;
     private static BluetoothLeAdvertiser bluetoothLeAdvertiser;
     private static BluetoothGattServer gattServer;
+    private static final ArrayList<BluetoothGattCharacteristic> characteristics = new ArrayList<>();
+
+    /**
+     * All bluetooth characteristics must have this descriptor for Apple iOS and OSX devices to subscribe to the characteristic
+     */
+    private static final BluetoothGattDescriptor STUPID_APPLE_DESCRIPTOR = new BluetoothGattDescriptor(
+            UUID.fromString("00002902-0000-1000-8000-00805F9B34FB"),
+            BluetoothGattDescriptor.PERMISSION_WRITE | BluetoothGattDescriptor.PERMISSION_READ);
 
 
-    protected static boolean setupBluetooth(Activity a){
-        activity = (ScoutingActivity) a;
+    /**
+     * Checks if bluetooth is turned on, if not, requests to turn it on
+     *
+     * @param a Activity
+     * @return true if everything is setup already, false if user needs to respond
+     */
+    static boolean setupBluetooth(Activity a){
+        activity = (MainActivity) a;
         bluetoothManager = (BluetoothManager) activity.getApplicationContext().getSystemService(Context.BLUETOOTH_SERVICE);
         bluetoothAdapter = bluetoothManager.getAdapter();
 
+        //If the device does not support bluetooth
         if (bluetoothAdapter == null){
-            ((ScoutingActivity) activity).sendError("Bluetooth is not supported on this device, this app is useless",true);
+            activity.sendError("Bluetooth is not supported on this device, this app is useless",true);
             return false;
         } else {
             bluetoothAdapter.setName(Utils.getDeviceName() + " " + BLUETOOTH_ADAPTER_NAME);
-            System.out.println();
         }
 
+        //If bluetooth is not turned on
         if(!bluetoothAdapter.isEnabled()) {
             Log.d(a.getString(R.string.log_tag),"Requesting permission to turn on Bluetooth");
             Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
             activity.startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT);
 
             return false;
-
+        //If bluetooth is turned on
         } else {
             bluetoothLeAdvertiser = bluetoothAdapter.getBluetoothLeAdvertiser();
             return true;
@@ -83,7 +95,7 @@ public class BluetoothUtility {
 
     }
 
-    protected static void stopAll() {
+    static void stopAll() {
         if(getAdvertising()) stopAdvertise();
         if(gattServer != null) gattServer.close();
 
@@ -95,18 +107,17 @@ public class BluetoothUtility {
         return advertising;
     }
 
-    protected static void setAdvertiseCallback(AdvertiseCallback callback) {
+    static void setAdvertiseCallback(AdvertiseCallback callback) {
         advertiseCallback = callback;
     }
-    protected static void setGattServerCallback(BluetoothGattServerCallback callback) {
+    static void setGattServerCallback(BluetoothGattServerCallback callback) {
         gattServerCallback = callback;
     }
 
     /**
-     * BLE Advertising
+     * Public method to begin advertising services
      */
-    //Public method to begin advertising services
-    protected static void startAdvertise() {
+    static void startAdvertise() {
         if(getAdvertising()) return;
 
         startGattServer();
@@ -124,14 +135,12 @@ public class BluetoothUtility {
 
         bluetoothLeAdvertiser.startAdvertising(settingsBuilder.build(), dataBuilder.build(), advertiseCallback);
         advertising = true;
-        activity.setAdvertising(true);
-
         Log.d(TAG, "Start Advertising");
 
     }
 
     //Stop ble advertising and clean up
-    protected static void stopAdvertise() {
+    static void stopAdvertise() {
         if(!getAdvertising()) return;
         bluetoothLeAdvertiser.stopAdvertising(advertiseCallback);
         advertising = false;
@@ -140,13 +149,21 @@ public class BluetoothUtility {
 
     }
 
+    public static void setServiceUUID(String serviceUUID) {
+        gattService = new BluetoothGattService(UUID.fromString(serviceUUID),BluetoothGattService.SERVICE_TYPE_PRIMARY);
+        for (BluetoothGattCharacteristic c: characteristics){
+            gattService.addCharacteristic(c);
+        }
+    }
+
     protected void stopGattServer(){
         gattServer.clearServices();
         gattServer.close();
         activity.setConnected(false);
+
     }
 
-    protected static BluetoothGattServer getGattServer() {
+    static BluetoothGattServer getGattServer() {
         return gattServer;
     }
 
@@ -158,14 +175,16 @@ public class BluetoothUtility {
 
     }
 
-    protected static void enable() {
+    static void enable() {
         boolean isEnabling = bluetoothAdapter.enable();
+        //noinspection StatementWithEmptyBody
         if (!isEnabling)
         {
             // an immediate error occurred - perhaps the bluetooth is already on?
         }
         else if (bluetoothAdapter.getState() == BluetoothAdapter.STATE_TURNING_ON)
         {
+            //Display a loading dialog while the bluetooth adapter is turning on
             ProgressDialog progress = new ProgressDialog(activity);
             progress.setTitle("Bluetooth");
             progress.setMessage("Turning on Bluetooth...");
@@ -173,7 +192,7 @@ public class BluetoothUtility {
             progress.show();
             while (bluetoothAdapter.getState() ==BluetoothAdapter.STATE_TURNING_ON){
                 try {
-                    Thread.sleep(1);
+                    Thread.sleep(50);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
@@ -184,30 +203,22 @@ public class BluetoothUtility {
         bluetoothLeAdvertiser = bluetoothAdapter.getBluetoothLeAdvertiser();
     }
 
-    protected static void sendResponse(BluetoothDevice device, int requestId, int gattSuccess, int offset, byte[] value) {
+    static void sendResponse(BluetoothDevice device, int requestId, int gattSuccess, int offset, byte[] value) {
         gattServer.sendResponse(device, requestId, gattSuccess, offset, value);
 
     }
 
-    protected static void sendNotification(BluetoothDevice device, String value){
-        gattCharacteristic.setValue(value);
-        gattServer.notifyCharacteristicChanged(device, gattCharacteristic, false);
+    static void sendNotification(BluetoothGattCharacteristic characteristic, BluetoothDevice device, String value){
+        characteristic.setValue(value);
+        gattServer.notifyCharacteristicChanged(device, characteristic, false);
 
     }
 
-    protected static void createNotificationService(String serviceUUID, String characteristicUUID) {
-        gattService = new BluetoothGattService(UUID.fromString(serviceUUID),BluetoothGattService.SERVICE_TYPE_PRIMARY);
-        gattCharacteristic = new BluetoothGattCharacteristic(
-                UUID.fromString(characteristicUUID),
-                BluetoothGattCharacteristic.PROPERTY_NOTIFY,
-                BluetoothGattCharacteristic.PERMISSION_READ);
-        BluetoothGattDescriptor gD = new BluetoothGattDescriptor(
-                UUID.fromString("00002902-0000-1000-8000-00805F9B34FB"),
-                BluetoothGattDescriptor.PERMISSION_WRITE | BluetoothGattDescriptor.PERMISSION_READ);
-        gattCharacteristic.addDescriptor(gD);
-        gattService.addCharacteristic(gattCharacteristic);
-
-
+    public static void addCharacteristic(BluetoothGattCharacteristic characteristic) {
+        //Descriptor is required for base to subscribe to services
+        characteristic.addDescriptor(STUPID_APPLE_DESCRIPTOR);
+        characteristics.add(characteristic);
     }
+
 
 }

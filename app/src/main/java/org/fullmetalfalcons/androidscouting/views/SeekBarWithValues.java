@@ -1,17 +1,17 @@
-package org.fullmetalfalcons.androidscouting;
+package org.fullmetalfalcons.androidscouting.views;
 
 import android.content.Context;
-import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.widget.RelativeLayout;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
-import java.sql.Struct;
+import org.fullmetalfalcons.androidscouting.R;
 
 /**
  * Created by djher on 1/31/2016.
  */
+@SuppressWarnings("ALL")
 public class SeekBarWithValues extends RelativeLayout implements SeekBar.OnSeekBarChangeListener {
 
     private TextView mMinText;

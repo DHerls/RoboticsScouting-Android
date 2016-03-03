@@ -1,0 +1,33 @@
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <SwitchPreference
+        android:defaultValue="false"
+        android:key="remote_enabled_switch"
+        android:summary="@string/pref_description_enable_remote"
+        android:title="@string/pref_title_enable_remote" />
+
+    <!-- NOTE: Hide buttons to simplify the UI. Users can touch outside the dialog to
+         dismiss it. -->
+    <!-- NOTE: EditTextPreference's summary should be set to its value by the activity code. -->
+
+    <EditTextPreference
+        android:defaultValue="@string/pref_default_team_number"
+        android:inputType="number"
+        android:key="remote_team_num"
+        android:maxLength="4"
+        android:selectAllOnFocus="true"
+        android:singleLine="true"
+        android:title="@string/pref_title_team_number" />
+
+    <EditTextPreference
+        android:defaultValue="@string/pref_default_remote_password"
+        android:inputType="textPassword"
+        android:key="remote_password"
+        android:selectAllOnFocus="true"
+        android:singleLine="true"
+        android:summary="hidden"
+        android:title="@string/pref_title_remote_password" />
+
+
+
+</PreferenceScreen>

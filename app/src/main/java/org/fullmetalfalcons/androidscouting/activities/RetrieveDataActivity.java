@@ -11,6 +11,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.KeyEvent;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
@@ -344,10 +345,21 @@ public class RetrieveDataActivity extends AppCompatActivity {
         {
             case android.R.id.home:
                 this.finish();
-                return (true);
+                break;
+            case R.id.action_retrieve_settings:
+                Intent intent = new Intent(this,RetrieveSettingsActivity.class);
+                startActivity(intent);
+                break;
         }
-        return super.onOptionsItemSelected(item);
+        return (true);
     }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_retrieve, menu);
+        return true;
+    }
+
 
 
     /**

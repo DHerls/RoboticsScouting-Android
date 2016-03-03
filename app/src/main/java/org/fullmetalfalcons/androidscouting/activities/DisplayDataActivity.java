@@ -155,6 +155,7 @@ public class DisplayDataActivity extends AppCompatActivity {
                                 //Absolutely no numbers
                             }
                         }
+                        average = 1.0 * raw / numMatches;
                         teamLayout.addView(new TeamInfoView(this, value, raw, average));
                         value = s + "-No";
                         try {
@@ -167,6 +168,7 @@ public class DisplayDataActivity extends AppCompatActivity {
                                 //See above
                             }
                         }
+                        average = 1.0 * raw / numMatches;
                         teamLayout.addView(new TeamInfoView(this, value, raw, average));
                     }
                     break;

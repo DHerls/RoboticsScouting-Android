@@ -34,7 +34,7 @@ import org.fullmetalfalcons.androidscouting.fileio.ConfigManager;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends DHActivity {
 
     private final Pattern bluetoothCodePattern = Pattern.compile("([a-fA-F]|\\d){4}");
     private BroadcastReceiver mReceiver;
@@ -180,39 +180,6 @@ public class MainActivity extends AppCompatActivity {
         });
 
     }
-
-
-    /**
-     * Sends a popup message to the user with a custom message.
-     * Also closes the app if the error is fatal
-     *
-     * @param message message to send to the user
-     * @param fatalError whether or not the app should close after user acknowledges
-     */
-    public void sendError(String message,final boolean fatalError){
-        new AlertDialog.Builder(this)
-                .setTitle("Something is wrong")
-                        //Can ignore if not fatal
-                .setCancelable(!fatalError)
-                .setMessage(message)
-                .setNeutralButton(android.R.string.ok, new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int which) {
-                        //Close the app
-                        if (fatalError) {
-                            System.exit(0);
-                        }
-                    }
-                })
-                .setIcon(android.R.drawable.ic_dialog_alert)
-                .show();
-        if(fatalError){
-            Log.wtf(getString(R.string.log_tag), message);
-        } else {
-            Log.e(getString(R.string.log_tag),message);
-
-        }
-    }
-
 
     /**
      * Called when request for bluetooth permissions returns

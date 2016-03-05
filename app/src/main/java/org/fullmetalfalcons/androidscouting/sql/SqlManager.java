@@ -3,8 +3,11 @@ package org.fullmetalfalcons.androidscouting.sql;
 import android.app.Activity;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
+import android.os.ParcelUuid;
 import android.preference.PreferenceManager;
 
+import org.fullmetalfalcons.androidscouting.activities.DHActivity;
+import org.fullmetalfalcons.androidscouting.activities.RetrieveDataActivity;
 import org.fullmetalfalcons.androidscouting.activities.RetrieveSettingsActivity;
 
 import java.sql.Connection;
@@ -22,19 +25,19 @@ public class SqlManager {
     private static final String USERNAME_BASE = "ridget35_";
     private static final String URL_BASE = "jdbc:mysql://ridgetopclub.com:3306/";
 
-    public static void requestTeamNumber(Activity a, String teamNum){
+    public static void requestTeamNumber(DHActivity a, String teamNum){
         RequestTask rt = new RequestTask(a);
         try {
             ResultSet rs = rt.execute(teamNum).get();
-            ResultSetMetaData rsmd = rs.getMetaData();
-            int columnsNumber = rsmd.getColumnCount();
-            while (rs.next()) {
-                for (int i = 1; i <= columnsNumber; i++) {
-                    if (i > 1) System.out.print(",  ");
-                    String columnValue = rs.getString(i);
-                    System.out.print(columnValue + " " + rsmd.getColumnName(i));
+            if (rs!=null){
+                if (!rs.next()){
+                    RetrieveDataActivity.setResponseString("NoReadTeam");
+                } else {
+                    rs.beforeFirst();
+                    RetrieveDataActivity.setResultSet(rs);
                 }
-                System.out.println("");
+            } else {
+                RetrieveDataActivity.setResponseString("cancel");
             }
         } catch (InterruptedException e) {
             e.printStackTrace();
@@ -49,15 +52,15 @@ public class SqlManager {
     private static class RequestTask extends AsyncTask<String,Void,ResultSet>{
 
         private Connection c = null;
-        private Activity a;
+        private DHActivity a;
 
-        public RequestTask(Activity a){
+        public RequestTask(DHActivity a){
             this.a = a;
         }
 
+
         @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
+        protected ResultSet doInBackground(String... params) {
             try {
                 SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(a);
                 String driver = "com.mysql.jdbc.Driver";
@@ -67,8 +70,17 @@ public class SqlManager {
                 String password = sharedPref.getString(RetrieveSettingsActivity.PASSWORD_KEY,null);
                 String url = URL_BASE + username;
                 c = DriverManager.getConnection(url, username, password);
+                Statement s = c.createStatement();
+                ResultSet rs = s.executeQuery("SELECT * FROM team_data WHERE team_num=" + params[0]);
+                c.close();
+                return rs;
             } catch (SQLException e) {
+                if (e.getSQLState().equals("28000")){
+                    a.sendError("Invalid Team Number/Password combination",false);
+                }
+                System.out.println(e.getErrorCode() + ":" + e.getSQLState());
                 e.printStackTrace();
+
             } catch (ClassNotFoundException e) {
                 e.printStackTrace();
             } catch (InstantiationException e) {
@@ -76,27 +88,8 @@ public class SqlManager {
             } catch (IllegalAccessException e) {
                 e.printStackTrace();
             }
+            return null;
         }
 
-        @Override
-        protected ResultSet doInBackground(String... params) {
-            try {
-                Statement s = c.createStatement();
-                return s.executeQuery("SELECT * FROM team_data WHERE team_num="+params[0]);
-            } catch (SQLException e) {
-                e.printStackTrace();
-                return null;
-            }
-        }
-
-        @Override
-        protected void onPostExecute(ResultSet resultSet) {
-            super.onPostExecute(resultSet);
-            try {
-                c.close();
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
-        }
     }
 }

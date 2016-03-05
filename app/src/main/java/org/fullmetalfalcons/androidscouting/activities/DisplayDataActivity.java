@@ -23,7 +23,7 @@ import java.util.HashMap;
 /**
  * Activity that displays team data in a grid pattern
  */
-public class DisplayDataActivity extends AppCompatActivity {
+public class DisplayDataActivity extends DHActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

@@ -32,6 +32,9 @@ import org.fullmetalfalcons.androidscouting.equations.Equation;
 import org.fullmetalfalcons.androidscouting.fileio.ConfigManager;
 import org.fullmetalfalcons.androidscouting.sql.SqlManager;
 
+import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.regex.Matcher;
@@ -42,16 +45,18 @@ import javax.xml.transform.Result;
 /**
  * Allows the user to select criteria to retrieve team data
  */
-public class RetrieveDataActivity extends AppCompatActivity {
+public class RetrieveDataActivity extends DHActivity {
 
     private final HashMap<String, String> prettyColumns = new HashMap<>();
+
     private static volatile String responseString= null;
+    private static volatile ResultSet resultSet = null;
+
     private static RequestType requestType;
+
     private final Pattern p = Pattern.compile("\\[(.*?)\\]");
     private ProgressDialog progress;
     private boolean timeout = false;
-
-
 
 
 
@@ -155,6 +160,7 @@ public class RetrieveDataActivity extends AppCompatActivity {
                 }
             } else {
                 SqlManager.requestTeamNumber(this,teamNumEditText.getText().toString());
+                waitForResponse();
             }
 
         }
@@ -185,39 +191,6 @@ public class RetrieveDataActivity extends AppCompatActivity {
         return output.toString().trim();
     }
 
-
-    /**
-     * Sends a popup message to the user with a custom message.
-     * Also closes the app if the error is fatal
-     *
-     * @param message message to send to the user
-     * @param fatalError whether or not the app should close after user acknowledges
-     */
-    @SuppressWarnings("SameParameterValue")
-    public void sendError(String message,final boolean fatalError){
-        new AlertDialog.Builder(this)
-                .setTitle("Something is wrong")
-                        //Can ignore if not fatal
-                .setCancelable(!fatalError)
-                .setMessage(message)
-                .setNeutralButton(android.R.string.ok, new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int which) {
-                        //Close the app
-                        if (fatalError) {
-                            System.exit(0);
-                        }
-                    }
-                })
-                .setIcon(android.R.drawable.ic_dialog_alert)
-                .show();
-        if(fatalError){
-            Log.wtf(getString(R.string.log_tag), message);
-        } else {
-            Log.e(getString(R.string.log_tag),message);
-
-        }
-    }
-
     /**
      * Gathers results and displays them
      * Called by WaitTask after response string is set
@@ -226,6 +199,7 @@ public class RetrieveDataActivity extends AppCompatActivity {
      */
     public void displayResults(boolean timeout){
         if (!timeout){
+            if (responseString!=null) {
                 switch (responseString) {
                     case "NoReadTable":
                         sendError("No database has been established yet", false);
@@ -233,24 +207,45 @@ public class RetrieveDataActivity extends AppCompatActivity {
                     case "NoReadTeam":
                         sendError("The team specified cannot be found", false);
                         break;
+                    case "cancel":
+                        break;
                     default:
-                        if (requestType==RequestType.TEAM){
+                        if (requestType == RequestType.TEAM) {
                             Matcher m = p.matcher(responseString);
                             HashMap<String, String> teamInfo = new HashMap<>();
                             while (m.find()) {
                                 String[] value = m.group(1).split("=");
                                 teamInfo.put(value[0], value[1]);
-    //                            System.out.println(value[0] + "=" + value[1]);
+                                //                            System.out.println(value[0] + "=" + value[1]);
                             }
-                            Intent displayIntent = new Intent(this,DisplayDataActivity.class);
-                            displayIntent.putExtra("TEAM_DATA",teamInfo);
-                            displayIntent.putExtra("COLUMN_DATA",prettyColumns);
+                            Intent displayIntent = new Intent(this, DisplayDataActivity.class);
+                            displayIntent.putExtra("TEAM_DATA", teamInfo);
+                            displayIntent.putExtra("COLUMN_DATA", prettyColumns);
                             startActivity(displayIntent);
                         } else {
                             //TODO Handle Searches
                         }
                         break;
                 }
+            } else {
+                try {
+                    HashMap<String,String> teamInfo = new HashMap<>();
+                    ResultSetMetaData rsmd = resultSet.getMetaData();
+                    int columnCount = rsmd.getColumnCount();
+                    while (resultSet.next()){
+                        for ( int i = 1; i<=columnCount;i++){
+                            teamInfo.put(rsmd.getColumnName(i),resultSet.getString(i));
+                        }
+                    }
+                    Intent displayIntent = new Intent(this, DisplayDataActivity.class);
+                    displayIntent.putExtra("TEAM_DATA", teamInfo);
+                    displayIntent.putExtra("COLUMN_DATA", prettyColumns);
+                    startActivity(displayIntent);
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+                resultSet = null;
+            }
         } else {
             sendError("Error request timeout", false);
         }
@@ -340,6 +335,10 @@ public class RetrieveDataActivity extends AppCompatActivity {
         responseString = s;
     }
 
+    public static void setResultSet(ResultSet resultSet) {
+        RetrieveDataActivity.resultSet = resultSet;
+    }
+
     private void waitForResponse() {
         //responseString = "[team_num=442][team_color=Blue][num_matches=1][match_nums={64}][aut_reaches_defenses_yes=0][aut_reaches_defenses_no=1][aut_portcullis_yes=0][aut_portcullis_no=1][aut_chevaldefrise_yes=0][aut_chevaldefrise_no=1][aut_moat_yes=1][aut_moat_no=0][aut_ramparts_yes=0][aut_ramparts_no=1][aut_drawbridge_yes=0][aut_drawbridge_no=1][aut_sallyport_yes=0][aut_sallyport_no=1][aut_rockwall_yes=1][aut_rockwall_no=0][aut_rough_terrain_yes=0][aut_rough_terrain_no=1][aut_shoots_high_tower=0][aut_shoots_low_tower=1][aut_shoots_try_fail=0][aut_shoots_none=0][aut_underlowbar_yes=0][aut_underlowbar_no=1][aut_underlowbar_try_fail=0][aut_shot_accuracy=4.65748][teleop_starting_position_neutral_zone=0][teleop_starting_position_spy=1][teleop_portcullis_yes=0][teleop_portcullis_no=1][teleop_chevaldefrise_yes=0][teleop_chevaldefrise_no=1][teleop_moat_yes=0][teleop_moat_no=1][teleop_ramparts_yes=1][teleop_ramparts_no=0][teleop_drawbridge_yes=0][teleop_drawbridge_no=1][teleop_sallyport_yes=1][teleop_sallyport_no=0][teleop_rockwall_yes=0][teleop_rockwall_no=1][teleop_rough_terrain_yes=0][teleop_rough_terrain_no=1][teleop_underlowbar_yes=0][teleop_underlowbar_no=1][teleop_underlowbar_try_fail=0][teleop_climbing_yes=0][teleop_climbing_no=0][teleop_climbing_try_fail=1][teleop_defender_bot_yes=1][teleop_defender_bot_no=0][teleop_shots_highgoal=2][teleop_shots_lowgoal=4][teleop_shot_accuracy=9.70342][teleop_technical_fouls=3][teleop_normal_fouls=4][teleop_total_points=88][human_uses_gestures_yes=0][human_uses_gestures_no=1][human_effective=2.78613][autonomous_score=0.222][teleop_score=0.25][human_score=0][grand_total=0.472]";
         WaitTask waiting = new WaitTask();
@@ -349,7 +348,6 @@ public class RetrieveDataActivity extends AppCompatActivity {
     private enum RequestType {
         TEAM,
         SEARCH
-
     }
 
     @Override
@@ -405,7 +403,7 @@ public class RetrieveDataActivity extends AppCompatActivity {
         protected Void doInBackground(Object... params) {
             long millis = System.currentTimeMillis();
             timeout = false;
-            while (responseString == null) {
+            while (responseString == null && resultSet == null) {
                 try {
                     Thread.sleep(50);
                     if (System.currentTimeMillis() - millis > 5000) {

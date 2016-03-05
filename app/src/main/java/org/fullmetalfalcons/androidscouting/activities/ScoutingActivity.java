@@ -36,7 +36,7 @@ import java.util.concurrent.TimeUnit;
  * Collects and sends data about robots to a base
  *
  */
-public class ScoutingActivity extends AppCompatActivity implements CompoundButton.OnCheckedChangeListener {
+public class ScoutingActivity extends DHActivity implements CompoundButton.OnCheckedChangeListener {
     
     private boolean haveBluetoothPermission = true;
     private static boolean isFirstTime = true;
@@ -129,8 +129,8 @@ public class ScoutingActivity extends AppCompatActivity implements CompoundButto
 //        }
 //
         //Restore static values
-        ((EditText) findViewById(R.id.match_num)).setText(bundle.getString("@string/key_match_num"));
-        ((EditText) findViewById(R.id.team_num)).setText(bundle.getString("@string/key_team_num"));
+        ((EditText) findViewById(R.id.match_num)).setText(bundle.getString(getString(R.string.key_match_num)));
+        ((EditText) findViewById(R.id.team_num)).setText(bundle.getString(getString(R.string.key_team_num)));
     }
 
 
@@ -238,8 +238,8 @@ public class ScoutingActivity extends AppCompatActivity implements CompoundButto
 //        bundle.putParcelable("fieldData", values);
 
         //Put all the static fields into the bundle
-        bundle.putString("@string/key_match_num", ((EditText) findViewById(R.id.match_num)).getText().toString());
-        bundle.putString("@string/key_team_num", ((EditText) findViewById(R.id.team_num)).getText().toString());
+        bundle.putString(getString(R.string.key_match_num), ((EditText) findViewById(R.id.match_num)).getText().toString());
+        bundle.putString(getString(R.string.key_team_num), ((EditText) findViewById(R.id.team_num)).getText().toString());
         //bundle.putString("bluetooth_code", ((EditText) findViewById(R.id.bluetoothCode)).getText().toString());
 
     }
@@ -263,8 +263,8 @@ public class ScoutingActivity extends AppCompatActivity implements CompoundButto
 //        }
 
         //Restore static values
-        ((EditText) findViewById(R.id.match_num)).setText(bundle.getString("@string/key_match_num"));
-        ((EditText) findViewById(R.id.team_num)).setText(bundle.getString("@string/key_team_num"));
+        ((EditText) findViewById(R.id.match_num)).setText(bundle.getString(getString(R.string.key_match_num)));
+        ((EditText) findViewById(R.id.team_num)).setText(bundle.getString(getString(R.string.key_team_num)));
         //((EditText) findViewById(R.id.bluetoothCode)).setText(bundle.getString("bluetooth_code"));
 
         //BluetoothCore.startBLE(this);
@@ -320,44 +320,13 @@ public class ScoutingActivity extends AppCompatActivity implements CompoundButto
             values.putAll(e.getHash());
         }
 
-        values.put("@string/key_team_num", Integer.parseInt(((EditText) findViewById(R.id.team_num)).getText().toString()));
-        values.put("@string/key_match_num", Integer.parseInt(((EditText) findViewById(R.id.match_num)).getText().toString()));
-        values.put("@string/key_team_color", ((Switch) findViewById(R.id.team_color)).isChecked() ? "Red" : "Blue");
+        values.put(getString(R.string.key_team_num), Integer.parseInt(((EditText) findViewById(R.id.team_num)).getText().toString()));
+        values.put(getString(R.string.key_match_num), Integer.parseInt(((EditText) findViewById(R.id.match_num)).getText().toString()));
+        values.put(getString(R.string.key_team_color), ((Switch) findViewById(R.id.team_color)).isChecked() ? "Red" : "Blue");
 
         return values.toXMLPropertyList();
     }
 
-    /**
-     * Sends a popup message to the user with a custom message.
-     * Also closes the app if the error is fatal
-     *
-     * @param message message to send to the user
-     * @param fatalError whether or not the app should close after user acknowledges
-     */
-    @SuppressWarnings("SameParameterValue")
-    public void sendError(String message,final boolean fatalError){
-        new AlertDialog.Builder(this)
-                .setTitle("Something is wrong")
-                //Can ignore if not fatal
-                .setCancelable(!fatalError)
-                .setMessage(message)
-                .setNeutralButton(android.R.string.ok, new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int which) {
-                        //Close the app
-                        if (fatalError) {
-                            System.exit(0);
-                        }
-                    }
-                })
-                .setIcon(android.R.drawable.ic_dialog_alert)
-                .show();
-        if(fatalError){
-            Log.wtf(getString(R.string.log_tag),message);
-        } else {
-            Log.e(getString(R.string.log_tag),message);
-
-        }
-    }
 
     @SuppressWarnings({"SameParameterValue", "UnusedParameters"})
     public void clearAll(View v){
@@ -403,8 +372,8 @@ public class ScoutingActivity extends AppCompatActivity implements CompoundButto
 //        bundle.putParcelable("fieldData", values);
 //
 //        //Put all the static fields into the bundle
-        bundle.putString("@string/kay_match_num", ((EditText) findViewById(R.id.match_num)).getText().toString());
-        bundle.putString("@string/key_team_num", ((EditText) findViewById(R.id.team_num)).getText().toString());
+        bundle.putString(getString(R.string.key_match_num), ((EditText) findViewById(R.id.match_num)).getText().toString());
+        bundle.putString(getString(R.string.key_team_num), ((EditText) findViewById(R.id.team_num)).getText().toString());
 //        //bundle.putString("bluetooth_code", ((EditText) findViewById(R.id.bluetoothCode)).getText().toString());
 
         MainActivity.saveData(bundle);

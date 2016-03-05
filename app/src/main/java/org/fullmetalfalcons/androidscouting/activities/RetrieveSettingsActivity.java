@@ -32,6 +32,11 @@ import java.util.List;
  * API Guide</a> for more information on developing a Settings UI.
  */
 public class RetrieveSettingsActivity extends AppCompatPreferenceActivity {
+
+    public static final String TEAM_NUMBER_KEY = "remote_team_num";
+    public static final String PASSWORD_KEY = "remote_password";
+    public static final String REMOTE_RETRIEVE_ENABLED_KEY = "remote_enabled_switch";
+
     /**
      * A preference value change listener that updates the preference's summary
      * to reflect its new value.

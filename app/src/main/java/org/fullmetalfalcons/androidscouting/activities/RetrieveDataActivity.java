@@ -5,8 +5,11 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.ParcelUuid;
+import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
@@ -27,6 +30,7 @@ import org.fullmetalfalcons.androidscouting.bluetooth.BluetoothCore;
 import org.fullmetalfalcons.androidscouting.elements.Element;
 import org.fullmetalfalcons.androidscouting.equations.Equation;
 import org.fullmetalfalcons.androidscouting.fileio.ConfigManager;
+import org.fullmetalfalcons.androidscouting.sql.SqlManager;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -46,6 +50,9 @@ public class RetrieveDataActivity extends AppCompatActivity {
     private final Pattern p = Pattern.compile("\\[(.*?)\\]");
     private ProgressDialog progress;
     private boolean timeout = false;
+
+
+
 
 
     @Override
@@ -134,16 +141,22 @@ public class RetrieveDataActivity extends AppCompatActivity {
     }
 
     private void requestTeamNum(EditText teamNumEditText) {
+        SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
         if (teamNumEditText.getText().toString().isEmpty()){
             sendError("Team number cannot be blank",false);
         } else {
-            if (BluetoothCore.isConnected()){
-                requestType = RequestType.TEAM;
-                BluetoothCore.requestTeamNum(teamNumEditText.getText().toString());
-                waitForResponse();
+            requestType = RequestType.TEAM;
+            if (!sharedPref.getBoolean(RetrieveSettingsActivity.REMOTE_RETRIEVE_ENABLED_KEY,false)) {
+                if (BluetoothCore.isConnected()) {
+                    BluetoothCore.requestTeamNum(teamNumEditText.getText().toString());
+                    waitForResponse();
+                } else {
+                    sendError("Not currently connected to base", false);
+                }
             } else {
-                sendError("Not currently connected to base",false);
+                SqlManager.requestTeamNumber(this,teamNumEditText.getText().toString());
             }
+
         }
     }
 

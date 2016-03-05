@@ -28,6 +28,4 @@
         android:summary="hidden"
         android:title="@string/pref_title_remote_password" />
 
-
-
 </PreferenceScreen>

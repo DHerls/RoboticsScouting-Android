@@ -129,8 +129,8 @@ public class ScoutingActivity extends AppCompatActivity implements CompoundButto
 //        }
 //
         //Restore static values
-        ((EditText) findViewById(R.id.match_num)).setText(bundle.getString("@string/key_match_num"));
-        ((EditText) findViewById(R.id.team_num)).setText(bundle.getString("@string/key_team_num"));
+        ((EditText) findViewById(R.id.match_num)).setText(bundle.getString(getString(R.string.key_match_num)));
+        ((EditText) findViewById(R.id.team_num)).setText(bundle.getString(getString(R.string.key_team_num)));
     }
 
 
@@ -238,8 +238,8 @@ public class ScoutingActivity extends AppCompatActivity implements CompoundButto
 //        bundle.putParcelable("fieldData", values);
 
         //Put all the static fields into the bundle
-        bundle.putString("@string/key_match_num", ((EditText) findViewById(R.id.match_num)).getText().toString());
-        bundle.putString("@string/key_team_num", ((EditText) findViewById(R.id.team_num)).getText().toString());
+        bundle.putString(getString(R.string.key_match_num), ((EditText) findViewById(R.id.match_num)).getText().toString());
+        bundle.putString(getString(R.string.key_team_num), ((EditText) findViewById(R.id.team_num)).getText().toString());
         //bundle.putString("bluetooth_code", ((EditText) findViewById(R.id.bluetoothCode)).getText().toString());
 
     }
@@ -263,8 +263,8 @@ public class ScoutingActivity extends AppCompatActivity implements CompoundButto
 //        }
 
         //Restore static values
-        ((EditText) findViewById(R.id.match_num)).setText(bundle.getString("@string/key_match_num"));
-        ((EditText) findViewById(R.id.team_num)).setText(bundle.getString("@string/key_team_num"));
+        ((EditText) findViewById(R.id.match_num)).setText(bundle.getString(getString(R.string.key_match_num)));
+        ((EditText) findViewById(R.id.team_num)).setText(bundle.getString(getString(R.string.key_team_num)));
         //((EditText) findViewById(R.id.bluetoothCode)).setText(bundle.getString("bluetooth_code"));
 
         //BluetoothCore.startBLE(this);
@@ -320,9 +320,9 @@ public class ScoutingActivity extends AppCompatActivity implements CompoundButto
             values.putAll(e.getHash());
         }
 
-        values.put("@string/key_team_num", Integer.parseInt(((EditText) findViewById(R.id.team_num)).getText().toString()));
-        values.put("@string/key_match_num", Integer.parseInt(((EditText) findViewById(R.id.match_num)).getText().toString()));
-        values.put("@string/key_team_color", ((Switch) findViewById(R.id.team_color)).isChecked() ? "Red" : "Blue");
+        values.put(getString(R.string.key_team_num), Integer.parseInt(((EditText) findViewById(R.id.team_num)).getText().toString()));
+        values.put(getString(R.string.key_match_num), Integer.parseInt(((EditText) findViewById(R.id.match_num)).getText().toString()));
+        values.put(getString(R.string.key_team_color), ((Switch) findViewById(R.id.team_color)).isChecked() ? "Red" : "Blue");
 
         return values.toXMLPropertyList();
     }
@@ -403,8 +403,8 @@ public class ScoutingActivity extends AppCompatActivity implements CompoundButto
 //        bundle.putParcelable("fieldData", values);
 //
 //        //Put all the static fields into the bundle
-        bundle.putString("@string/kay_match_num", ((EditText) findViewById(R.id.match_num)).getText().toString());
-        bundle.putString("@string/key_team_num", ((EditText) findViewById(R.id.team_num)).getText().toString());
+        bundle.putString(getString(R.string.key_match_num), ((EditText) findViewById(R.id.match_num)).getText().toString());
+        bundle.putString(getString(R.string.key_team_num), ((EditText) findViewById(R.id.team_num)).getText().toString());
 //        //bundle.putString("bluetooth_code", ((EditText) findViewById(R.id.bluetoothCode)).getText().toString());
 
         MainActivity.saveData(bundle);

@@ -29,7 +29,7 @@ import android.widget.TextView;
 
 import org.fullmetalfalcons.androidscouting.R;
 import org.fullmetalfalcons.androidscouting.bluetooth.BluetoothCore;
-import org.fullmetalfalcons.androidscouting.fileio.ConfigManager;
+import org.fullmetalfalcons.androidscouting.fileio.FileManager;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -46,8 +46,9 @@ public class MainActivity extends DHActivity {
         setContentView(R.layout.activity_main);
 
         //If the elements haven't been loaded from the config file, load them
-        if (ConfigManager.getElements().isEmpty()){
-            ConfigManager.loadConfig(this);
+        if (FileManager.getElements().isEmpty()){
+            FileManager.loadConfig(this);
+            FileManager.loadTeamNames(this);
         }
 
         //Change the color of the status bar to black, because it looks better

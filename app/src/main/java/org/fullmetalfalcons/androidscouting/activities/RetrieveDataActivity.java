@@ -29,7 +29,7 @@ import org.fullmetalfalcons.androidscouting.R;
 import org.fullmetalfalcons.androidscouting.bluetooth.BluetoothCore;
 import org.fullmetalfalcons.androidscouting.elements.Element;
 import org.fullmetalfalcons.androidscouting.equations.Equation;
-import org.fullmetalfalcons.androidscouting.fileio.ConfigManager;
+import org.fullmetalfalcons.androidscouting.fileio.FileManager;
 import org.fullmetalfalcons.androidscouting.sql.SqlManager;
 
 import java.sql.ResultSet;
@@ -39,8 +39,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import javax.xml.transform.Result;
 
 /**
  * Allows the user to select criteria to retrieve team data
@@ -52,7 +50,7 @@ public class RetrieveDataActivity extends DHActivity {
     private static volatile String responseString= null;
     private static volatile ResultSet resultSet = null;
 
-    private static RequestType requestType;
+    public static RequestType requestType;
 
     private final Pattern p = Pattern.compile("\\[(.*?)\\]");
     private ProgressDialog progress;
@@ -70,7 +68,7 @@ public class RetrieveDataActivity extends DHActivity {
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         //Set column values in the column spinner
-        Spinner columnSpinner = (Spinner) findViewById(R.id.column_spinner);
+        final Spinner columnSpinner = (Spinner) findViewById(R.id.column_spinner);
         ArrayAdapter<String> spinnerArrayAdapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, getColumnValues());
         spinnerArrayAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         columnSpinner.setAdapter(spinnerArrayAdapter);
@@ -113,8 +111,8 @@ public class RetrieveDataActivity extends DHActivity {
 
 
         Button searchOkButton = (Button) findViewById(R.id.retrieve_team_search_button);
-        Spinner typeSpinner = (Spinner) findViewById(R.id.value_spinner);
-        Spinner operatorSpinner = (Spinner) findViewById(R.id.operator_spinner);
+        final Spinner typeSpinner = (Spinner) findViewById(R.id.value_spinner);
+        final Spinner operatorSpinner = (Spinner) findViewById(R.id.operator_spinner);
         final EditText valueText = (EditText) findViewById(R.id.value_edit_text);
 
         searchOkButton.setOnClickListener(new View.OnClickListener() {
@@ -122,7 +120,7 @@ public class RetrieveDataActivity extends DHActivity {
             public void onClick(View v) {
                 InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
                 imm.hideSoftInputFromWindow(valueText.getWindowToken(), 0);
-                //TODO handle search button
+                searchForTeams(typeSpinner,columnSpinner,operatorSpinner,valueText);
             }
         });
 
@@ -136,13 +134,42 @@ public class RetrieveDataActivity extends DHActivity {
                     InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
                     imm.hideSoftInputFromWindow(valueText.getWindowToken(), 0);
 
-                    //TODO handle search enter press
+                    searchForTeams(typeSpinner, columnSpinner, operatorSpinner, valueText);
                     return true;
                 }
                 return false;
 
             }
         });
+    }
+
+    private void searchForTeams(Spinner typeSpinner, Spinner columnSpinner, Spinner operatorSpinner, EditText valueText) {
+        SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
+        String value = valueText.getText().toString();
+
+
+        if (value.isEmpty()){
+            sendError("Value cannot be blank",false);
+        } else {
+            String type = typeSpinner.getSelectedItem().toString();
+            String column = prettyColumns.get(columnSpinner.getSelectedItem().toString());
+            String operator = operatorSpinner.getSelectedItem().toString();
+
+            requestType = RequestType.SEARCH;
+            if (!sharedPref.getBoolean(RetrieveSettingsActivity.REMOTE_RETRIEVE_ENABLED_KEY,false)) {
+                if (BluetoothCore.isConnected()) {
+                    //TODO Bluetooth team search
+                    //BluetoothCore.requestTeamNum(teamNumEditText.getText().toString());
+                    waitForResponse(5);
+                } else {
+                    sendError("Not currently connected to base", false);
+                }
+            } else {
+                SqlManager.searchForTeams(this, type, column, operator, value);
+                waitForResponse(10);
+            }
+
+        }
     }
 
     private void requestTeamNum(EditText teamNumEditText) {
@@ -154,13 +181,13 @@ public class RetrieveDataActivity extends DHActivity {
             if (!sharedPref.getBoolean(RetrieveSettingsActivity.REMOTE_RETRIEVE_ENABLED_KEY,false)) {
                 if (BluetoothCore.isConnected()) {
                     BluetoothCore.requestTeamNum(teamNumEditText.getText().toString());
-                    waitForResponse();
+                    waitForResponse(5);
                 } else {
                     sendError("Not currently connected to base", false);
                 }
             } else {
-                SqlManager.requestTeamNumber(this,teamNumEditText.getText().toString());
-                waitForResponse();
+                SqlManager.requestTeamNumber(this, teamNumEditText.getText().toString());
+                waitForResponse(5);
             }
 
         }
@@ -209,6 +236,9 @@ public class RetrieveDataActivity extends DHActivity {
                         break;
                     case "cancel":
                         break;
+                    case "NoSearchResult":
+                        sendError("Your search returned 0 results",false);
+                        break;
                     default:
                         if (requestType == RequestType.TEAM) {
                             Matcher m = p.matcher(responseString);
@@ -229,18 +259,35 @@ public class RetrieveDataActivity extends DHActivity {
                 }
             } else {
                 try {
-                    HashMap<String,String> teamInfo = new HashMap<>();
-                    ResultSetMetaData rsmd = resultSet.getMetaData();
-                    int columnCount = rsmd.getColumnCount();
-                    while (resultSet.next()){
-                        for ( int i = 1; i<=columnCount;i++){
-                            teamInfo.put(rsmd.getColumnName(i),resultSet.getString(i));
+                    if (requestType==RequestType.TEAM) {
+                        HashMap<String, String> teamInfo = new HashMap<>();
+                        ResultSetMetaData rsmd = resultSet.getMetaData();
+                        int columnCount = rsmd.getColumnCount();
+                        while (resultSet.next()) {
+                            for (int i = 1; i <= columnCount; i++) {
+                                teamInfo.put(rsmd.getColumnName(i), resultSet.getString(i));
+                            }
                         }
+                        Intent displayIntent = new Intent(this, DisplayDataActivity.class);
+                        displayIntent.putExtra("TEAM_DATA", teamInfo);
+                        displayIntent.putExtra("COLUMN_DATA", prettyColumns);
+                        startActivity(displayIntent);
+                    } else {
+                        ArrayList<ArrayList<String>> data = new ArrayList<>();
+                        ResultSetMetaData rsmd = resultSet.getMetaData();
+                        int columnCount = rsmd.getColumnCount();
+                        ArrayList<String> row;
+                        while (resultSet.next()) {
+                            row = new ArrayList<>();
+                            for (int i = 1; i <= columnCount; i++) {
+                                row.add(resultSet.getString(i));
+                            }
+                            data.add(row);
+                        }
+                        Intent displayIntent = new Intent(this, SelectTeamActivity.class);
+                        displayIntent.putExtra("TEAM_DATA", data);
+                        startActivity(displayIntent);
                     }
-                    Intent displayIntent = new Intent(this, DisplayDataActivity.class);
-                    displayIntent.putExtra("TEAM_DATA", teamInfo);
-                    displayIntent.putExtra("COLUMN_DATA", prettyColumns);
-                    startActivity(displayIntent);
                 } catch (SQLException e) {
                     e.printStackTrace();
                 }
@@ -260,7 +307,7 @@ public class RetrieveDataActivity extends DHActivity {
     private ArrayList<String> getColumnValues(){
         ArrayList<String> valueList = new ArrayList<>();
         String prelabel = "";
-        for (Element e: ConfigManager.getElements()){
+        for (Element e: FileManager.getElements()){
             switch(e.getType()){
 
                 case SEGMENTED_CONTROL:
@@ -324,7 +371,7 @@ public class RetrieveDataActivity extends DHActivity {
             }
         }
 
-        for (Equation e: ConfigManager.getEquations()){
+        for (Equation e: FileManager.getEquations()){
             valueList.add("Score: " + makePretty(e.getName()));
         }
         valueList.add("Score: Grand Total");
@@ -339,13 +386,13 @@ public class RetrieveDataActivity extends DHActivity {
         RetrieveDataActivity.resultSet = resultSet;
     }
 
-    private void waitForResponse() {
+    public void waitForResponse(int seconds) {
         //responseString = "[team_num=442][team_color=Blue][num_matches=1][match_nums={64}][aut_reaches_defenses_yes=0][aut_reaches_defenses_no=1][aut_portcullis_yes=0][aut_portcullis_no=1][aut_chevaldefrise_yes=0][aut_chevaldefrise_no=1][aut_moat_yes=1][aut_moat_no=0][aut_ramparts_yes=0][aut_ramparts_no=1][aut_drawbridge_yes=0][aut_drawbridge_no=1][aut_sallyport_yes=0][aut_sallyport_no=1][aut_rockwall_yes=1][aut_rockwall_no=0][aut_rough_terrain_yes=0][aut_rough_terrain_no=1][aut_shoots_high_tower=0][aut_shoots_low_tower=1][aut_shoots_try_fail=0][aut_shoots_none=0][aut_underlowbar_yes=0][aut_underlowbar_no=1][aut_underlowbar_try_fail=0][aut_shot_accuracy=4.65748][teleop_starting_position_neutral_zone=0][teleop_starting_position_spy=1][teleop_portcullis_yes=0][teleop_portcullis_no=1][teleop_chevaldefrise_yes=0][teleop_chevaldefrise_no=1][teleop_moat_yes=0][teleop_moat_no=1][teleop_ramparts_yes=1][teleop_ramparts_no=0][teleop_drawbridge_yes=0][teleop_drawbridge_no=1][teleop_sallyport_yes=1][teleop_sallyport_no=0][teleop_rockwall_yes=0][teleop_rockwall_no=1][teleop_rough_terrain_yes=0][teleop_rough_terrain_no=1][teleop_underlowbar_yes=0][teleop_underlowbar_no=1][teleop_underlowbar_try_fail=0][teleop_climbing_yes=0][teleop_climbing_no=0][teleop_climbing_try_fail=1][teleop_defender_bot_yes=1][teleop_defender_bot_no=0][teleop_shots_highgoal=2][teleop_shots_lowgoal=4][teleop_shot_accuracy=9.70342][teleop_technical_fouls=3][teleop_normal_fouls=4][teleop_total_points=88][human_uses_gestures_yes=0][human_uses_gestures_no=1][human_effective=2.78613][autonomous_score=0.222][teleop_score=0.25][human_score=0][grand_total=0.472]";
         WaitTask waiting = new WaitTask();
-        waiting.execute();
+        waiting.execute(seconds * 1000);
     }
 
-    private enum RequestType {
+    public enum RequestType {
         TEAM,
         SEARCH
     }
@@ -376,7 +423,7 @@ public class RetrieveDataActivity extends DHActivity {
     /**
      * Displays a waiting icon until data is received by the app
      */
-    class WaitTask extends AsyncTask<Object,Void,Void>{
+    class WaitTask extends AsyncTask<Integer,Void,Void>{
         @Override
         protected void onPreExecute() {
             progress = new ProgressDialog(RetrieveDataActivity.this);
@@ -400,13 +447,13 @@ public class RetrieveDataActivity extends DHActivity {
         }
 
         @Override
-        protected Void doInBackground(Object... params) {
+        protected Void doInBackground(Integer... params) {
             long millis = System.currentTimeMillis();
             timeout = false;
             while (responseString == null && resultSet == null) {
                 try {
                     Thread.sleep(50);
-                    if (System.currentTimeMillis() - millis > 5000) {
+                    if (System.currentTimeMillis() - millis > params[0]) {
                         timeout = true;
                         break;
                     }

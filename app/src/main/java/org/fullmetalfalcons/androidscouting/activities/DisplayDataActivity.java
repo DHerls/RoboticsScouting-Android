@@ -5,25 +5,23 @@ import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.ArrayAdapter;
-import android.widget.GridView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import org.fullmetalfalcons.androidscouting.R;
 import org.fullmetalfalcons.androidscouting.elements.Element;
 import org.fullmetalfalcons.androidscouting.equations.Equation;
-import org.fullmetalfalcons.androidscouting.fileio.ConfigManager;
+import org.fullmetalfalcons.androidscouting.fileio.FileManager;
 import org.fullmetalfalcons.androidscouting.views.TeamInfoView;
 
-import java.lang.reflect.Array;
-import java.util.ArrayList;
 import java.util.HashMap;
 
 /**
  * Activity that displays team data in a grid pattern
  */
 public class DisplayDataActivity extends DHActivity {
+
+    private HashMap<String, String> teamData;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,16 +34,18 @@ public class DisplayDataActivity extends DHActivity {
 
         //Get team data passed through the intent
         Bundle bundle = getIntent().getExtras();
-        HashMap<String,String> teamData = (HashMap<String, String>) bundle.get("TEAM_DATA");
-        assert teamData != null;
+        //noinspection unchecked
+        teamData = (HashMap<String, String>) bundle.get("TEAM_DATA");
+
+
+        addGeneralData();
+        addElementData();
+
+
+    }
+
+    private void addElementData() {
         int numMatches = Integer.parseInt(teamData.get("num_matches"));
-
-        TextView teamNum = (TextView) findViewById(R.id.team_number_display);
-        TextView matchNum = (TextView) findViewById(R.id.match_number_display);
-
-        teamNum.setText(teamData.get("team_num"));
-        matchNum.setText(String.valueOf(numMatches));
-
         LinearLayout teamLayout = (LinearLayout) findViewById(R.id.team_display_scroll);
         TextView label;
 
@@ -53,31 +53,31 @@ public class DisplayDataActivity extends DHActivity {
         double raw = 0.0;
         double average = 0.0;
 
-        for (Element e: ConfigManager.getElements()){
-            switch(e.getType()){
+        for (Element e : FileManager.getElements()) {
+            switch (e.getType()) {
 
                 case SEGMENTED_CONTROL:
-                    for (String key:e.getKeys()){
+                    for (String key : e.getKeys()) {
 
                         //Capitalize the first letter of every word
                         String s = makeKeyPretty(key);
                         //For each argument
-                        for (int i = 0; i<e.getArguments().length;i++){
+                        for (int i = 0; i < e.getArguments().length; i++) {
                             String args = e.getArguments()[i];
                             //Splice argument with name
                             value = s + "-" + args;
                             //Calculate raw value and average
-                            try{
+                            try {
                                 raw = Double.parseDouble(teamData.get(e.getColumnValues()[i]));
-                            } catch (NumberFormatException e1){
+                            } catch (NumberFormatException e1) {
                                 try {
                                     int ii = Integer.parseInt(teamData.get(key));
-                                    raw = ii*1.0;
-                                } catch (NumberFormatException e2){
+                                    raw = ii * 1.0;
+                                } catch (NumberFormatException e2) {
                                     //There really shouldn't be any reason for this to happen unless something has gone seriously wrong
                                 }
                             }
-                            average = 1.0*raw/numMatches;
+                            average = 1.0 * raw / numMatches;
                             teamLayout.addView(new TeamInfoView(this, value, raw, average));
                         }
 
@@ -85,7 +85,7 @@ public class DisplayDataActivity extends DHActivity {
                     break;
                 case TEXTFIELD:
                     //If the textfield returns a number
-                    if (e.getArguments()[0].equalsIgnoreCase("number") || e.getArguments()[0].equalsIgnoreCase("decimal")){
+                    if (e.getArguments()[0].equalsIgnoreCase("number") || e.getArguments()[0].equalsIgnoreCase("decimal")) {
                         String[] keys = e.getKeys();
                         for (int i = 0; i < keys.length; i++) {
                             String key = keys[i];
@@ -104,7 +104,6 @@ public class DisplayDataActivity extends DHActivity {
                             teamLayout.addView(new TeamInfoView(this, value, raw, average));
                         }
                     }
-
 
 
                     break;
@@ -129,7 +128,7 @@ public class DisplayDataActivity extends DHActivity {
                     break;
                 case LABEL:
                     //If the label is distinguished, add a label to the layout
-                    if (e.getArguments()[0].trim().equalsIgnoreCase("distinguished")){
+                    if (e.getArguments()[0].trim().equalsIgnoreCase("distinguished")) {
                         label = new TextView(this);
                         label.setText(e.getDescriptions()[0]);
                         label.setTextSize(30);
@@ -149,7 +148,7 @@ public class DisplayDataActivity extends DHActivity {
                             raw = Double.parseDouble(teamData.get(e.getColumnValues()[i * 2]));
                         } catch (NumberFormatException e1) {
                             try {
-                                int ii = Integer.parseInt(teamData.get(e.getColumnValues()[i*2]));
+                                int ii = Integer.parseInt(teamData.get(e.getColumnValues()[i * 2]));
                                 raw = ii * 1.0;
                             } catch (NumberFormatException e2) {
                                 //Absolutely no numbers
@@ -159,10 +158,10 @@ public class DisplayDataActivity extends DHActivity {
                         teamLayout.addView(new TeamInfoView(this, value, raw, average));
                         value = s + "-No";
                         try {
-                            raw = Double.parseDouble(teamData.get(e.getColumnValues()[i * 2+1]));
+                            raw = Double.parseDouble(teamData.get(e.getColumnValues()[i * 2 + 1]));
                         } catch (NumberFormatException e1) {
                             try {
-                                int ii = Integer.parseInt(teamData.get(e.getColumnValues()[i*2+1]));
+                                int ii = Integer.parseInt(teamData.get(e.getColumnValues()[i * 2 + 1]));
                                 raw = ii * 1.0;
                             } catch (NumberFormatException e2) {
                                 //See above
@@ -200,7 +199,7 @@ public class DisplayDataActivity extends DHActivity {
         label.setTextSize(30);
         label.setTextAlignment(View.TEXT_ALIGNMENT_CENTER);
         teamLayout.addView(label);
-        for (Equation e: ConfigManager.getEquations()){
+        for (Equation e : FileManager.getEquations()) {
             value = e.getName();
             try {
                 raw = Double.parseDouble(teamData.get(e.getColumnValue()));
@@ -215,8 +214,19 @@ public class DisplayDataActivity extends DHActivity {
             average = 1.0 * raw / numMatches;
             teamLayout.addView(new TeamInfoView(this, value, raw, average));
         }
+    }
 
+    private void addGeneralData() {
+        assert teamData != null;
+        int numMatches = Integer.parseInt(teamData.get("num_matches"));
 
+        TextView teamNum = (TextView) findViewById(R.id.team_number_display);
+        TextView teamName = (TextView) findViewById(R.id.team_name_display);
+        TextView matchNum = (TextView) findViewById(R.id.match_number_display);
+
+        teamNum.setText(teamData.get("team_num"));
+        teamName.setText(FileManager.getTeamName(Integer.parseInt(teamData.get("team_num"))));
+        matchNum.setText(String.valueOf(numMatches));
     }
 
     /**

@@ -24,7 +24,7 @@ import org.fullmetalfalcons.androidscouting.R;
 import org.fullmetalfalcons.androidscouting.Utils;
 import org.fullmetalfalcons.androidscouting.bluetooth.BluetoothCore;
 import org.fullmetalfalcons.androidscouting.elements.Element;
-import org.fullmetalfalcons.androidscouting.fileio.ConfigManager;
+import org.fullmetalfalcons.androidscouting.fileio.FileManager;
 
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -123,9 +123,9 @@ public class ScoutingActivity extends DHActivity implements CompoundButton.OnChe
         //ParcelableArrayList values = bundle.getParcelable("fieldData");
 //
 //        //Restore all dynamic values
-//        for (int i = 0; i< ConfigManager.getElements().size();i++){
+//        for (int i = 0; i< FileManager.getElements().size();i++){
 //            assert values != null;
-//            ConfigManager.getElements().get(i).setViewData(values.get(i));
+//            FileManager.getElements().get(i).setViewData(values.get(i));
 //        }
 //
         //Restore static values
@@ -170,13 +170,13 @@ public class ScoutingActivity extends DHActivity implements CompoundButton.OnChe
     }
 
     /**
-     * After all the ConfigManager.getElements() are generated from the config file, they are added in order to the screen
+     * After all the FileManager.getElements() are generated from the config file, they are added in order to the screen
      */
     private void addViews() {
         //Get the main layout of the app
         LinearLayout l = (LinearLayout) findViewById(R.id.mainLinear);
         //For each element created
-        for (Element e: ConfigManager.getElements()){
+        for (Element e: FileManager.getElements()){
             //Add the Element's view to the app
             View v = e.getView(this);
             l.addView(v,v.getLayoutParams());
@@ -232,7 +232,7 @@ public class ScoutingActivity extends DHActivity implements CompoundButton.OnChe
 
         //Put all the values from the views into an arraylist then put it into the bundle
 //        ParcelableArrayList values = new ParcelableArrayList();
-//        for (Element e: ConfigManager.getElements()){
+//        for (Element e: FileManager.getElements()){
 //            values.add(e.getViewData());
 //        }
 //        bundle.putParcelable("fieldData", values);
@@ -257,9 +257,9 @@ public class ScoutingActivity extends DHActivity implements CompoundButton.OnChe
         //ParcelableArrayList values = bundle.getParcelable("fieldData");
 
 //        //Restore all dynamic values
-//        for (int i = 0; i< ConfigManager.getElements().size();i++){
+//        for (int i = 0; i< FileManager.getElements().size();i++){
 //            assert values != null;
-//            ConfigManager.getElements().get(i).setViewData(values.get(i));
+//            FileManager.getElements().get(i).setViewData(values.get(i));
 //        }
 
         //Restore static values
@@ -316,7 +316,7 @@ public class ScoutingActivity extends DHActivity implements CompoundButton.OnChe
      */
     private String collectResults(){
         NSDictionary values = new NSDictionary();
-        for (Element e:ConfigManager.getElements()){
+        for (Element e: FileManager.getElements()){
             values.putAll(e.getHash());
         }
 
@@ -335,8 +335,8 @@ public class ScoutingActivity extends DHActivity implements CompoundButton.OnChe
         LinearLayout l = (LinearLayout) findViewById(R.id.mainLinear);
         l.requestFocus();
 
-        for (int i = 0; i< ConfigManager.getElements().size();i++){
-            ConfigManager.getElements().get(i).clearViewData();
+        for (int i = 0; i< FileManager.getElements().size();i++){
+            FileManager.getElements().get(i).clearViewData();
         }
 
         //Restore static values
@@ -366,7 +366,7 @@ public class ScoutingActivity extends DHActivity implements CompoundButton.OnChe
 
 //        //Put all the values from the views into an arraylist then put it into the bundle
 //        ParcelableArrayList values = new ParcelableArrayList();
-//        for (Element e: ConfigManager.getElements()){
+//        for (Element e: FileManager.getElements()){
 //            values.add(e.getViewData());
 //        }
 //        bundle.putParcelable("fieldData", values);
@@ -378,7 +378,7 @@ public class ScoutingActivity extends DHActivity implements CompoundButton.OnChe
 
         MainActivity.saveData(bundle);
         LinearLayout l = (LinearLayout) findViewById(R.id.mainLinear);
-        for (Element e: ConfigManager.getElements()){
+        for (Element e: FileManager.getElements()){
             l.removeView(e.getView(this));
         }
     }

@@ -12,16 +12,18 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 /**
  * Handles the reading of the config file
  *
  * Created by Dan on 2/20/2016.
  */
-public class ConfigManager {
+public class FileManager {
 
     private static final ArrayList<Equation> EQUATIONS = new ArrayList<>();
     private static final ArrayList<Element> ELEMENTS = new ArrayList<>();
+    private static final HashMap<Integer,String> TEAM_NAMES = new HashMap<>();
 
     public static void loadConfig(Activity a){
         //Located in the assets folder
@@ -77,6 +79,24 @@ public class ConfigManager {
         }
     }
 
+    public static void loadTeamNames(Activity a){
+        AssetManager am = a.getAssets();
+        try {
+            BufferedReader config = new BufferedReader(new InputStreamReader(am.open("teams.txt")));
+            String line;
+            //While there are still lines to read
+            int split;
+            while ((line=config.readLine())!=null) {
+                split = line.indexOf(",");
+                TEAM_NAMES.put(Integer.parseInt(line.substring(0,split)),line.substring(split+1));
+            }
+        } catch (IOException e) {
+            //This exception signifies the entire app is useless
+            //sendError("fuck",true);
+            e.printStackTrace();
+        }
+    }
+
 
     public static ArrayList<Equation> getEquations() {
         return EQUATIONS;
@@ -84,5 +104,13 @@ public class ConfigManager {
 
     public static ArrayList<Element> getElements() {
         return ELEMENTS;
+    }
+
+    public static String getTeamName(int teamNum){
+        try{
+            return TEAM_NAMES.get(teamNum);
+        } catch (NullPointerException e){
+            return "MISSING NAME";
+        }
     }
 }

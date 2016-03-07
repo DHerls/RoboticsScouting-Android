@@ -197,7 +197,7 @@ public class MainActivity extends DHActivity {
         }
 
         if ((requestCode == 1) && (resultCode == RESULT_CANCELED)) {
-            sendError("This app will not be useful until bluetooth is enabled", false);
+            //sendError("This app will not be useful until bluetooth is enabled", false);
         }
     }
 

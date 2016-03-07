@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="org.fullmetalfalcons.androidscouting">
+    package="org.fullmetalfalcons.androidscouting" >
 
     <uses-permission android:name="android.permission.BLUETOOTH" />
     <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
@@ -11,11 +11,11 @@
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:supportsRtl="true"
-        android:theme="@style/BlueTheme">
+        android:theme="@style/BlueTheme" >
         <activity
             android:name=".activities.MainActivity"
             android:label="@string/app_name"
-            android:screenOrientation="portrait">
+            android:screenOrientation="portrait" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -45,10 +45,12 @@
         <activity
             android:name=".activities.RetrieveSettingsActivity"
             android:label="@string/title_activity_retrieve_settings"
-            android:parentActivityName=".activities.RetrieveDataActivity">
+            android:parentActivityName=".activities.RetrieveDataActivity" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="org.fullmetalfalcons.androidscouting.activities.RetrieveDataActivity" />
+        </activity>
+        <activity android:name=".activities.SelectTeamActivity" >
         </activity>
     </application>
 

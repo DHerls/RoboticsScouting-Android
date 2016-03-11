@@ -49,7 +49,7 @@ public class ScoutingActivity extends DHActivity implements CompoundButton.OnChe
      * @param savedInstanceState if the app had previously stored data, it would be in this bundle
      */
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
         //This method in the Utils class allows the theme to switch between blue and red
         Utils.onActivityCreateSetTheme(this);
@@ -156,12 +156,12 @@ public class ScoutingActivity extends DHActivity implements CompoundButton.OnChe
 
         Intent intent;
         switch(id){
+            case android.R.id.home:
+                this.finish();
+                break;
             case R.id.action_about:
                 intent = new Intent(this,AboutActivity.class);
                 startActivity(intent);
-                break;
-            case R.id.action_settings:
-
                 break;
             default:
         }
@@ -176,10 +176,15 @@ public class ScoutingActivity extends DHActivity implements CompoundButton.OnChe
         //Get the main layout of the app
         LinearLayout l = (LinearLayout) findViewById(R.id.mainLinear);
         //For each element created
-        for (Element e: FileManager.getElements()){
-            //Add the Element's view to the app
-            View v = e.getView(this);
-            l.addView(v,v.getLayoutParams());
+        try {
+            for (Element e : FileManager.getElements()) {
+                //Add the Element's view to the app
+                View v = e.getView(this);
+                l.addView(v, v.getLayoutParams());
+            }
+        } catch (IllegalStateException e){
+            finish();
+            return;
         }
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
@@ -316,7 +321,7 @@ public class ScoutingActivity extends DHActivity implements CompoundButton.OnChe
      */
     private String collectResults(){
         NSDictionary values = new NSDictionary();
-        for (Element e: FileManager.getElements()){
+        for (Element e: FileManager.getElements()) {
             values.putAll(e.getHash());
         }
 
@@ -359,6 +364,11 @@ public class ScoutingActivity extends DHActivity implements CompoundButton.OnChe
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        LinearLayout l = (LinearLayout) findViewById(R.id.mainLinear);
+        for (Element e: FileManager.getElements()){
+            l.removeView(e.getView(this));
+        }
+
         Bundle bundle = new Bundle();
         //Set whether or not the theme should be red
         Switch s = (Switch) findViewById(R.id.team_color);
@@ -377,10 +387,11 @@ public class ScoutingActivity extends DHActivity implements CompoundButton.OnChe
 //        //bundle.putString("bluetooth_code", ((EditText) findViewById(R.id.bluetoothCode)).getText().toString());
 
         MainActivity.saveData(bundle);
-        LinearLayout l = (LinearLayout) findViewById(R.id.mainLinear);
-        for (Element e: FileManager.getElements()){
-            l.removeView(e.getView(this));
-        }
+
+
     }
+
+
+
 
 }

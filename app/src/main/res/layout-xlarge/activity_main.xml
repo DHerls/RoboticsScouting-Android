@@ -18,7 +18,7 @@
             app:orientation="left"
             app:accentColor="@color/colorRedPrimaryDark"
             android:layout_width="match_parent"
-            android:onClick="startScoutActivity"
+            android:onClick="launchActivity"
             />
 
         <org.fullmetalfalcons.androidscouting.views.MainButtonView
@@ -29,7 +29,7 @@
             app:buttonText="Retrieve"
             app:orientation="right"
             android:layout_width="match_parent"
-            android:onClick="startRetrieveActivity"
+            android:onClick="launchActivity"
             />
 
     </LinearLayout>

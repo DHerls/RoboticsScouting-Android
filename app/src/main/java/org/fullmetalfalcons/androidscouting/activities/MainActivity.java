@@ -30,6 +30,7 @@ import android.widget.TextView;
 import org.fullmetalfalcons.androidscouting.R;
 import org.fullmetalfalcons.androidscouting.bluetooth.BluetoothCore;
 import org.fullmetalfalcons.androidscouting.fileio.FileManager;
+import org.fullmetalfalcons.androidscouting.views.MainButtonView;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -39,6 +40,10 @@ public class MainActivity extends DHActivity {
     private final Pattern bluetoothCodePattern = Pattern.compile("([a-fA-F]|\\d){4}");
     private BroadcastReceiver mReceiver;
     private static Bundle viewData;
+    private boolean doLaunch = true;
+
+    private MainButtonView retrieveButton;
+    private MainButtonView scoutButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -95,6 +100,7 @@ public class MainActivity extends DHActivity {
         } else {
             sendError("Device is running in an emulator, bluetooth will be useless",false);
         }
+
     }
 
     private void setPassphrase(EditText bluetoothCodeView){
@@ -121,6 +127,9 @@ public class MainActivity extends DHActivity {
             //Clear the code box
             bluetoothCodeView.setText("");
         }
+
+        retrieveButton = (MainButtonView) findViewById(R.id.retrieve_button);
+        scoutButton = (MainButtonView) findViewById(R.id.scout_button);
     }
 
     /**
@@ -200,18 +209,11 @@ public class MainActivity extends DHActivity {
         if ((requestCode == 1) && (resultCode == RESULT_CANCELED)) {
             //sendError("This app will not be useful until bluetooth is enabled", false);
         }
+        if (requestCode==2){
+            doLaunch = true;
+        }
     }
 
-    /**
-     * When the Scout button is pressed, the Scout activity is launched
-     *
-     * @param view View that calls this method on click
-     */
-    @SuppressWarnings("UnusedParameters")
-    public void startScoutActivity(View view){
-        Intent intent = new Intent(this,ScoutingActivity.class);
-        startActivity(intent);
-    }
 
     /**
      * Creates and registers a BroadcastReceiver to track changes to BluetoothAdapter
@@ -271,11 +273,26 @@ public class MainActivity extends DHActivity {
         }
     }
 
-    @SuppressWarnings("UnusedParameters")
-    public void startRetrieveActivity(View view) {
-        Intent intent = new Intent(this,RetrieveDataActivity.class);
-        startActivity(intent);
+    public void launchActivity(View v){
+        if (doLaunch){
+            Intent intent = null;
+            switch (v.getId()){
+                case R.id.scout_button:
+                    doLaunch = false;
+                    intent = new Intent(this,ScoutingActivity.class);
+                    break;
+                case R.id.retrieve_button:
+                    doLaunch = false;
+                    intent = new Intent(this,RetrieveDataActivity.class);
+                    break;
+            }
+
+            startActivityForResult(intent,2);
+
+        }
+
     }
+
 
     private static boolean isEmulator() {
         return Build.FINGERPRINT.startsWith("unknown")

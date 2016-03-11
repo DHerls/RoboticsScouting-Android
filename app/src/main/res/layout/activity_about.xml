@@ -37,7 +37,18 @@
                     android:layout_width="wrap_content"
                     android:layout_height="0dp"
                     android:text="@string/about_long_text"
-                    android:id="@+id/textView"
+                    android:id="@+id/about_text_view"
+                    android:layout_marginBottom="0dp"
+                    android:layout_weight="1.07"
+                    android:paddingLeft="10dp"
+                    android:paddingRight="10dp"
+                    android:paddingTop="10dp" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="0dp"
+                    android:text="@string/about_credits_text"
+                    android:id="@+id/credits_text_view"
                     android:layout_marginBottom="0dp"
                     android:layout_weight="1.07"
                     android:paddingLeft="10dp"

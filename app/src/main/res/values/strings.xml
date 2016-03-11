@@ -17,7 +17,7 @@ After installing and opening the Mac app, make sure Bluetooth is enabled on both
 1. Enter the same passkey on both the Mac and Phone apps and press the "refresh" buttons on both
 2. After completing the form, press the "DONE" button at the bottom. On the Mac, when ready to get all the data, just press the "Compile to Excel" button.
 3. And that's it! Scout away!"</string>
-    <string name="about_credits_text"></string>
+    <string name="about_credits_text">"This app was created by Dan Herlihy and Alex DeMeo for FRC Team 4557: The FullMetal Falcons"</string>
     <string-array name="value_array">
         <item>Raw Value</item>
         <item>Average</item>

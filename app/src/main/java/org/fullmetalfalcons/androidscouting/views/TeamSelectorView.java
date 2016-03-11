@@ -26,7 +26,7 @@ public class TeamSelectorView extends LinearLayout {
     private SelectTeamActivity a;
     private String teamNum;
 
-    public TeamSelectorView(SelectTeamActivity context, String teamNum, int numMatches, double raw) {
+    public TeamSelectorView(SelectTeamActivity context, final String teamNum, int numMatches, double raw) {
         super(context);
         a = context;
         this.teamNum = teamNum;
@@ -54,6 +54,13 @@ public class TeamSelectorView extends LinearLayout {
             averageView.setText(String.valueOf(round(average,3)));
         }
 
+        teamNumView.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                a.requestTeamNum(teamNum);
+            }
+        });
+
 
     }
 
@@ -62,17 +69,6 @@ public class TeamSelectorView extends LinearLayout {
         bigDecimal = bigDecimal.setScale(numberOfDigitsAfterDecimalPoint,
                 BigDecimal.ROUND_HALF_UP);
         return bigDecimal.doubleValue();
-    }
-
-    @Override
-    public boolean onTouchEvent(MotionEvent event) {
-        System.out.println(MotionEvent.actionToString(event.getAction()));
-        //a.onTouchEvent(event);
-
-//        if (event.getAction() == MotionEvent.ACTION_DOWN){
-//            a.requestTeamNum(teamNum);
-//        }
-        return super.onTouchEvent(event);
     }
 
 

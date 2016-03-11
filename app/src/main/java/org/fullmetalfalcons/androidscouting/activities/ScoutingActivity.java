@@ -24,7 +24,7 @@ import org.fullmetalfalcons.androidscouting.R;
 import org.fullmetalfalcons.androidscouting.Utils;
 import org.fullmetalfalcons.androidscouting.bluetooth.BluetoothCore;
 import org.fullmetalfalcons.androidscouting.elements.Element;
-import org.fullmetalfalcons.androidscouting.fileio.ConfigManager;
+import org.fullmetalfalcons.androidscouting.fileio.FileManager;
 
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -36,7 +36,7 @@ import java.util.concurrent.TimeUnit;
  * Collects and sends data about robots to a base
  *
  */
-public class ScoutingActivity extends AppCompatActivity implements CompoundButton.OnCheckedChangeListener {
+public class ScoutingActivity extends DHActivity implements CompoundButton.OnCheckedChangeListener {
     
     private boolean haveBluetoothPermission = true;
     private static boolean isFirstTime = true;
@@ -123,9 +123,9 @@ public class ScoutingActivity extends AppCompatActivity implements CompoundButto
         //ParcelableArrayList values = bundle.getParcelable("fieldData");
 //
 //        //Restore all dynamic values
-//        for (int i = 0; i< ConfigManager.getElements().size();i++){
+//        for (int i = 0; i< FileManager.getElements().size();i++){
 //            assert values != null;
-//            ConfigManager.getElements().get(i).setViewData(values.get(i));
+//            FileManager.getElements().get(i).setViewData(values.get(i));
 //        }
 //
         //Restore static values
@@ -170,13 +170,13 @@ public class ScoutingActivity extends AppCompatActivity implements CompoundButto
     }
 
     /**
-     * After all the ConfigManager.getElements() are generated from the config file, they are added in order to the screen
+     * After all the FileManager.getElements() are generated from the config file, they are added in order to the screen
      */
     private void addViews() {
         //Get the main layout of the app
         LinearLayout l = (LinearLayout) findViewById(R.id.mainLinear);
         //For each element created
-        for (Element e: ConfigManager.getElements()){
+        for (Element e: FileManager.getElements()){
             //Add the Element's view to the app
             View v = e.getView(this);
             l.addView(v,v.getLayoutParams());
@@ -232,7 +232,7 @@ public class ScoutingActivity extends AppCompatActivity implements CompoundButto
 
         //Put all the values from the views into an arraylist then put it into the bundle
 //        ParcelableArrayList values = new ParcelableArrayList();
-//        for (Element e: ConfigManager.getElements()){
+//        for (Element e: FileManager.getElements()){
 //            values.add(e.getViewData());
 //        }
 //        bundle.putParcelable("fieldData", values);
@@ -257,9 +257,9 @@ public class ScoutingActivity extends AppCompatActivity implements CompoundButto
         //ParcelableArrayList values = bundle.getParcelable("fieldData");
 
 //        //Restore all dynamic values
-//        for (int i = 0; i< ConfigManager.getElements().size();i++){
+//        for (int i = 0; i< FileManager.getElements().size();i++){
 //            assert values != null;
-//            ConfigManager.getElements().get(i).setViewData(values.get(i));
+//            FileManager.getElements().get(i).setViewData(values.get(i));
 //        }
 
         //Restore static values
@@ -316,7 +316,7 @@ public class ScoutingActivity extends AppCompatActivity implements CompoundButto
      */
     private String collectResults(){
         NSDictionary values = new NSDictionary();
-        for (Element e:ConfigManager.getElements()){
+        for (Element e: FileManager.getElements()){
             values.putAll(e.getHash());
         }
 
@@ -327,37 +327,6 @@ public class ScoutingActivity extends AppCompatActivity implements CompoundButto
         return values.toXMLPropertyList();
     }
 
-    /**
-     * Sends a popup message to the user with a custom message.
-     * Also closes the app if the error is fatal
-     *
-     * @param message message to send to the user
-     * @param fatalError whether or not the app should close after user acknowledges
-     */
-    @SuppressWarnings("SameParameterValue")
-    public void sendError(String message,final boolean fatalError){
-        new AlertDialog.Builder(this)
-                .setTitle("Something is wrong")
-                //Can ignore if not fatal
-                .setCancelable(!fatalError)
-                .setMessage(message)
-                .setNeutralButton(android.R.string.ok, new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int which) {
-                        //Close the app
-                        if (fatalError) {
-                            System.exit(0);
-                        }
-                    }
-                })
-                .setIcon(android.R.drawable.ic_dialog_alert)
-                .show();
-        if(fatalError){
-            Log.wtf(getString(R.string.log_tag),message);
-        } else {
-            Log.e(getString(R.string.log_tag),message);
-
-        }
-    }
 
     @SuppressWarnings({"SameParameterValue", "UnusedParameters"})
     public void clearAll(View v){
@@ -366,8 +335,8 @@ public class ScoutingActivity extends AppCompatActivity implements CompoundButto
         LinearLayout l = (LinearLayout) findViewById(R.id.mainLinear);
         l.requestFocus();
 
-        for (int i = 0; i< ConfigManager.getElements().size();i++){
-            ConfigManager.getElements().get(i).clearViewData();
+        for (int i = 0; i< FileManager.getElements().size();i++){
+            FileManager.getElements().get(i).clearViewData();
         }
 
         //Restore static values
@@ -397,7 +366,7 @@ public class ScoutingActivity extends AppCompatActivity implements CompoundButto
 
 //        //Put all the values from the views into an arraylist then put it into the bundle
 //        ParcelableArrayList values = new ParcelableArrayList();
-//        for (Element e: ConfigManager.getElements()){
+//        for (Element e: FileManager.getElements()){
 //            values.add(e.getViewData());
 //        }
 //        bundle.putParcelable("fieldData", values);
@@ -409,7 +378,7 @@ public class ScoutingActivity extends AppCompatActivity implements CompoundButto
 
         MainActivity.saveData(bundle);
         LinearLayout l = (LinearLayout) findViewById(R.id.mainLinear);
-        for (Element e: ConfigManager.getElements()){
+        for (Element e: FileManager.getElements()){
             l.removeView(e.getView(this));
         }
     }

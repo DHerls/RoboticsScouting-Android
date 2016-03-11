@@ -5,12 +5,16 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.ParcelUuid;
+import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.KeyEvent;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
@@ -25,26 +29,33 @@ import org.fullmetalfalcons.androidscouting.R;
 import org.fullmetalfalcons.androidscouting.bluetooth.BluetoothCore;
 import org.fullmetalfalcons.androidscouting.elements.Element;
 import org.fullmetalfalcons.androidscouting.equations.Equation;
-import org.fullmetalfalcons.androidscouting.fileio.ConfigManager;
+import org.fullmetalfalcons.androidscouting.fileio.FileManager;
+import org.fullmetalfalcons.androidscouting.sql.SqlManager;
 
+import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import javax.xml.transform.Result;
-
 /**
  * Allows the user to select criteria to retrieve team data
  */
-public class RetrieveDataActivity extends AppCompatActivity {
+public class RetrieveDataActivity extends DHActivity {
 
     private final HashMap<String, String> prettyColumns = new HashMap<>();
+
     private static volatile String responseString= null;
-    private static RequestType requestType;
+    private static volatile ResultSet resultSet = null;
+
+    public static RequestType requestType;
+
     private final Pattern p = Pattern.compile("\\[(.*?)\\]");
     private ProgressDialog progress;
     private boolean timeout = false;
+
 
 
     @Override
@@ -57,7 +68,7 @@ public class RetrieveDataActivity extends AppCompatActivity {
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         //Set column values in the column spinner
-        Spinner columnSpinner = (Spinner) findViewById(R.id.column_spinner);
+        final Spinner columnSpinner = (Spinner) findViewById(R.id.column_spinner);
         ArrayAdapter<String> spinnerArrayAdapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, getColumnValues());
         spinnerArrayAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         columnSpinner.setAdapter(spinnerArrayAdapter);
@@ -100,8 +111,8 @@ public class RetrieveDataActivity extends AppCompatActivity {
 
 
         Button searchOkButton = (Button) findViewById(R.id.retrieve_team_search_button);
-        Spinner typeSpinner = (Spinner) findViewById(R.id.value_spinner);
-        Spinner operatorSpinner = (Spinner) findViewById(R.id.operator_spinner);
+        final Spinner typeSpinner = (Spinner) findViewById(R.id.value_spinner);
+        final Spinner operatorSpinner = (Spinner) findViewById(R.id.operator_spinner);
         final EditText valueText = (EditText) findViewById(R.id.value_edit_text);
 
         searchOkButton.setOnClickListener(new View.OnClickListener() {
@@ -109,7 +120,7 @@ public class RetrieveDataActivity extends AppCompatActivity {
             public void onClick(View v) {
                 InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
                 imm.hideSoftInputFromWindow(valueText.getWindowToken(), 0);
-                //TODO handle search button
+                searchForTeams(typeSpinner,columnSpinner,operatorSpinner,valueText);
             }
         });
 
@@ -123,7 +134,7 @@ public class RetrieveDataActivity extends AppCompatActivity {
                     InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
                     imm.hideSoftInputFromWindow(valueText.getWindowToken(), 0);
 
-                    //TODO handle search enter press
+                    searchForTeams(typeSpinner, columnSpinner, operatorSpinner, valueText);
                     return true;
                 }
                 return false;
@@ -132,17 +143,53 @@ public class RetrieveDataActivity extends AppCompatActivity {
         });
     }
 
+    private void searchForTeams(Spinner typeSpinner, Spinner columnSpinner, Spinner operatorSpinner, EditText valueText) {
+        SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
+        String value = valueText.getText().toString();
+
+
+        if (value.isEmpty()){
+            sendError("Value cannot be blank",false);
+        } else {
+            String type = typeSpinner.getSelectedItem().toString();
+            String column = prettyColumns.get(columnSpinner.getSelectedItem().toString());
+            String operator = operatorSpinner.getSelectedItem().toString();
+
+            requestType = RequestType.SEARCH;
+            if (!sharedPref.getBoolean(RetrieveSettingsActivity.REMOTE_RETRIEVE_ENABLED_KEY,false)) {
+                if (BluetoothCore.isConnected()) {
+                    //TODO Bluetooth team search
+                    //BluetoothCore.requestTeamNum(teamNumEditText.getText().toString());
+                    waitForResponse(5);
+                } else {
+                    sendError("Not currently connected to base", false);
+                }
+            } else {
+                SqlManager.searchForTeams(this, type, column, operator, value);
+                waitForResponse(10);
+            }
+
+        }
+    }
+
     private void requestTeamNum(EditText teamNumEditText) {
+        SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
         if (teamNumEditText.getText().toString().isEmpty()){
             sendError("Team number cannot be blank",false);
         } else {
-            if (BluetoothCore.isConnected()){
-                requestType = RequestType.TEAM;
-                BluetoothCore.requestTeamNum(teamNumEditText.getText().toString());
-                waitForResponse();
+            requestType = RequestType.TEAM;
+            if (!sharedPref.getBoolean(RetrieveSettingsActivity.REMOTE_RETRIEVE_ENABLED_KEY,false)) {
+                if (BluetoothCore.isConnected()) {
+                    BluetoothCore.requestTeamNum(teamNumEditText.getText().toString());
+                    waitForResponse(5);
+                } else {
+                    sendError("Not currently connected to base", false);
+                }
             } else {
-                sendError("Not currently connected to base",false);
+                SqlManager.requestTeamNumber(this, teamNumEditText.getText().toString());
+                waitForResponse(5);
             }
+
         }
     }
 
@@ -171,39 +218,6 @@ public class RetrieveDataActivity extends AppCompatActivity {
         return output.toString().trim();
     }
 
-
-    /**
-     * Sends a popup message to the user with a custom message.
-     * Also closes the app if the error is fatal
-     *
-     * @param message message to send to the user
-     * @param fatalError whether or not the app should close after user acknowledges
-     */
-    @SuppressWarnings("SameParameterValue")
-    public void sendError(String message,final boolean fatalError){
-        new AlertDialog.Builder(this)
-                .setTitle("Something is wrong")
-                        //Can ignore if not fatal
-                .setCancelable(!fatalError)
-                .setMessage(message)
-                .setNeutralButton(android.R.string.ok, new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int which) {
-                        //Close the app
-                        if (fatalError) {
-                            System.exit(0);
-                        }
-                    }
-                })
-                .setIcon(android.R.drawable.ic_dialog_alert)
-                .show();
-        if(fatalError){
-            Log.wtf(getString(R.string.log_tag), message);
-        } else {
-            Log.e(getString(R.string.log_tag),message);
-
-        }
-    }
-
     /**
      * Gathers results and displays them
      * Called by WaitTask after response string is set
@@ -212,6 +226,7 @@ public class RetrieveDataActivity extends AppCompatActivity {
      */
     public void displayResults(boolean timeout){
         if (!timeout){
+            if (responseString!=null) {
                 switch (responseString) {
                     case "NoReadTable":
                         sendError("No database has been established yet", false);
@@ -219,24 +234,68 @@ public class RetrieveDataActivity extends AppCompatActivity {
                     case "NoReadTeam":
                         sendError("The team specified cannot be found", false);
                         break;
+                    case "cancel":
+                        break;
+                    case "NoSearchResult":
+                        sendError("Your search returned 0 results",false);
+                        break;
                     default:
-                        if (requestType==RequestType.TEAM){
+                        if (requestType == RequestType.TEAM) {
                             Matcher m = p.matcher(responseString);
                             HashMap<String, String> teamInfo = new HashMap<>();
                             while (m.find()) {
                                 String[] value = m.group(1).split("=");
                                 teamInfo.put(value[0], value[1]);
-    //                            System.out.println(value[0] + "=" + value[1]);
+                                //                            System.out.println(value[0] + "=" + value[1]);
                             }
-                            Intent displayIntent = new Intent(this,DisplayDataActivity.class);
-                            displayIntent.putExtra("TEAM_DATA",teamInfo);
-                            displayIntent.putExtra("COLUMN_DATA",prettyColumns);
+                            Intent displayIntent = new Intent(this, DisplayDataActivity.class);
+                            displayIntent.putExtra("TEAM_DATA", teamInfo);
+                            displayIntent.putExtra("COLUMN_DATA", prettyColumns);
                             startActivity(displayIntent);
                         } else {
                             //TODO Handle Searches
                         }
                         break;
                 }
+            } else {
+                try {
+                    if (requestType==RequestType.TEAM) {
+                        HashMap<String, String> teamInfo = new HashMap<>();
+                        ResultSetMetaData rsmd = resultSet.getMetaData();
+                        int columnCount = rsmd.getColumnCount();
+                        while (resultSet.next()) {
+                            for (int i = 1; i <= columnCount; i++) {
+                                teamInfo.put(rsmd.getColumnName(i), resultSet.getString(i));
+                            }
+                        }
+                        Intent displayIntent = new Intent(this, DisplayDataActivity.class);
+                        displayIntent.putExtra("TEAM_DATA", teamInfo);
+                        displayIntent.putExtra("COLUMN_DATA", prettyColumns);
+                        resultSet.close();
+                        startActivity(displayIntent);
+
+                    } else {
+                        ArrayList<ArrayList<String>> data = new ArrayList<>();
+                        ResultSetMetaData rsmd = resultSet.getMetaData();
+                        int columnCount = rsmd.getColumnCount();
+                        ArrayList<String> row;
+                        while (resultSet.next()) {
+                            row = new ArrayList<>();
+                            for (int i = 1; i <= columnCount; i++) {
+                                row.add(resultSet.getString(i));
+                            }
+                            data.add(row);
+                        }
+                        Intent displayIntent = new Intent(this, SelectTeamActivity.class);
+                        displayIntent.putExtra("TEAM_DATA", data);
+                        resultSet.close();
+                        startActivity(displayIntent);
+                    }
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+                resultSet = null;
+            }
         } else {
             sendError("Error request timeout", false);
         }
@@ -251,7 +310,7 @@ public class RetrieveDataActivity extends AppCompatActivity {
     private ArrayList<String> getColumnValues(){
         ArrayList<String> valueList = new ArrayList<>();
         String prelabel = "";
-        for (Element e: ConfigManager.getElements()){
+        for (Element e: FileManager.getElements()){
             switch(e.getType()){
 
                 case SEGMENTED_CONTROL:
@@ -315,7 +374,7 @@ public class RetrieveDataActivity extends AppCompatActivity {
             }
         }
 
-        for (Equation e: ConfigManager.getEquations()){
+        for (Equation e: FileManager.getEquations()){
             valueList.add("Score: " + makePretty(e.getName()));
         }
         valueList.add("Score: Grand Total");
@@ -326,16 +385,19 @@ public class RetrieveDataActivity extends AppCompatActivity {
         responseString = s;
     }
 
-    private void waitForResponse() {
-        //responseString = "[team_num=442][team_color=Blue][num_matches=1][match_nums={64}][aut_reaches_defenses_yes=0][aut_reaches_defenses_no=1][aut_portcullis_yes=0][aut_portcullis_no=1][aut_chevaldefrise_yes=0][aut_chevaldefrise_no=1][aut_moat_yes=1][aut_moat_no=0][aut_ramparts_yes=0][aut_ramparts_no=1][aut_drawbridge_yes=0][aut_drawbridge_no=1][aut_sallyport_yes=0][aut_sallyport_no=1][aut_rockwall_yes=1][aut_rockwall_no=0][aut_rough_terrain_yes=0][aut_rough_terrain_no=1][aut_shoots_high_tower=0][aut_shoots_low_tower=1][aut_shoots_try_fail=0][aut_shoots_none=0][aut_underlowbar_yes=0][aut_underlowbar_no=1][aut_underlowbar_try_fail=0][aut_shot_accuracy=4.65748][teleop_starting_position_neutral_zone=0][teleop_starting_position_spy=1][teleop_portcullis_yes=0][teleop_portcullis_no=1][teleop_chevaldefrise_yes=0][teleop_chevaldefrise_no=1][teleop_moat_yes=0][teleop_moat_no=1][teleop_ramparts_yes=1][teleop_ramparts_no=0][teleop_drawbridge_yes=0][teleop_drawbridge_no=1][teleop_sallyport_yes=1][teleop_sallyport_no=0][teleop_rockwall_yes=0][teleop_rockwall_no=1][teleop_rough_terrain_yes=0][teleop_rough_terrain_no=1][teleop_underlowbar_yes=0][teleop_underlowbar_no=1][teleop_underlowbar_try_fail=0][teleop_climbing_yes=0][teleop_climbing_no=0][teleop_climbing_try_fail=1][teleop_defender_bot_yes=1][teleop_defender_bot_no=0][teleop_shots_highgoal=2][teleop_shots_lowgoal=4][teleop_shot_accuracy=9.70342][teleop_technical_fouls=3][teleop_normal_fouls=4][teleop_total_points=88][human_uses_gestures_yes=0][human_uses_gestures_no=1][human_effective=2.78613][autonomous_score=0.222][teleop_score=0.25][human_score=0][grand_total=0.472]";
-        WaitTask waiting = new WaitTask();
-        waiting.execute();
+    public static void setResultSet(ResultSet resultSet) {
+        RetrieveDataActivity.resultSet = resultSet;
     }
 
-    private enum RequestType {
+    public void waitForResponse(int seconds) {
+        //responseString = "[team_num=442][team_color=Blue][num_matches=1][match_nums={64}][aut_reaches_defenses_yes=0][aut_reaches_defenses_no=1][aut_portcullis_yes=0][aut_portcullis_no=1][aut_chevaldefrise_yes=0][aut_chevaldefrise_no=1][aut_moat_yes=1][aut_moat_no=0][aut_ramparts_yes=0][aut_ramparts_no=1][aut_drawbridge_yes=0][aut_drawbridge_no=1][aut_sallyport_yes=0][aut_sallyport_no=1][aut_rockwall_yes=1][aut_rockwall_no=0][aut_rough_terrain_yes=0][aut_rough_terrain_no=1][aut_shoots_high_tower=0][aut_shoots_low_tower=1][aut_shoots_try_fail=0][aut_shoots_none=0][aut_underlowbar_yes=0][aut_underlowbar_no=1][aut_underlowbar_try_fail=0][aut_shot_accuracy=4.65748][teleop_starting_position_neutral_zone=0][teleop_starting_position_spy=1][teleop_portcullis_yes=0][teleop_portcullis_no=1][teleop_chevaldefrise_yes=0][teleop_chevaldefrise_no=1][teleop_moat_yes=0][teleop_moat_no=1][teleop_ramparts_yes=1][teleop_ramparts_no=0][teleop_drawbridge_yes=0][teleop_drawbridge_no=1][teleop_sallyport_yes=1][teleop_sallyport_no=0][teleop_rockwall_yes=0][teleop_rockwall_no=1][teleop_rough_terrain_yes=0][teleop_rough_terrain_no=1][teleop_underlowbar_yes=0][teleop_underlowbar_no=1][teleop_underlowbar_try_fail=0][teleop_climbing_yes=0][teleop_climbing_no=0][teleop_climbing_try_fail=1][teleop_defender_bot_yes=1][teleop_defender_bot_no=0][teleop_shots_highgoal=2][teleop_shots_lowgoal=4][teleop_shot_accuracy=9.70342][teleop_technical_fouls=3][teleop_normal_fouls=4][teleop_total_points=88][human_uses_gestures_yes=0][human_uses_gestures_no=1][human_effective=2.78613][autonomous_score=0.222][teleop_score=0.25][human_score=0][grand_total=0.472]";
+        WaitTask waiting = new WaitTask();
+        waiting.execute(seconds * 1000);
+    }
+
+    public enum RequestType {
         TEAM,
         SEARCH
-
     }
 
     @Override
@@ -344,16 +406,27 @@ public class RetrieveDataActivity extends AppCompatActivity {
         {
             case android.R.id.home:
                 this.finish();
-                return (true);
+                break;
+            case R.id.action_retrieve_settings:
+                Intent intent = new Intent(this,RetrieveSettingsActivity.class);
+                startActivity(intent);
+                break;
         }
-        return super.onOptionsItemSelected(item);
+        return (true);
     }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_retrieve, menu);
+        return true;
+    }
+
 
 
     /**
      * Displays a waiting icon until data is received by the app
      */
-    class WaitTask extends AsyncTask<Object,Void,Void>{
+    class WaitTask extends AsyncTask<Integer,Void,Void>{
         @Override
         protected void onPreExecute() {
             progress = new ProgressDialog(RetrieveDataActivity.this);
@@ -377,13 +450,13 @@ public class RetrieveDataActivity extends AppCompatActivity {
         }
 
         @Override
-        protected Void doInBackground(Object... params) {
+        protected Void doInBackground(Integer... params) {
             long millis = System.currentTimeMillis();
             timeout = false;
-            while (responseString == null) {
+            while (responseString == null && resultSet == null) {
                 try {
                     Thread.sleep(50);
-                    if (System.currentTimeMillis() - millis > 5000) {
+                    if (System.currentTimeMillis() - millis > params[0]) {
                         timeout = true;
                         break;
                     }

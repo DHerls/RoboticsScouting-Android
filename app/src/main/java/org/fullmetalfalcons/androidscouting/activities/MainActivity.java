@@ -29,12 +29,12 @@ import android.widget.TextView;
 
 import org.fullmetalfalcons.androidscouting.R;
 import org.fullmetalfalcons.androidscouting.bluetooth.BluetoothCore;
-import org.fullmetalfalcons.androidscouting.fileio.ConfigManager;
+import org.fullmetalfalcons.androidscouting.fileio.FileManager;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends DHActivity {
 
     private final Pattern bluetoothCodePattern = Pattern.compile("([a-fA-F]|\\d){4}");
     private BroadcastReceiver mReceiver;
@@ -46,8 +46,9 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         //If the elements haven't been loaded from the config file, load them
-        if (ConfigManager.getElements().isEmpty()){
-            ConfigManager.loadConfig(this);
+        if (FileManager.getElements().isEmpty()){
+            FileManager.loadConfig(this);
+            FileManager.loadTeamNames(this);
         }
 
         //Change the color of the status bar to black, because it looks better
@@ -181,39 +182,6 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-
-    /**
-     * Sends a popup message to the user with a custom message.
-     * Also closes the app if the error is fatal
-     *
-     * @param message message to send to the user
-     * @param fatalError whether or not the app should close after user acknowledges
-     */
-    public void sendError(String message,final boolean fatalError){
-        new AlertDialog.Builder(this)
-                .setTitle("Something is wrong")
-                        //Can ignore if not fatal
-                .setCancelable(!fatalError)
-                .setMessage(message)
-                .setNeutralButton(android.R.string.ok, new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int which) {
-                        //Close the app
-                        if (fatalError) {
-                            System.exit(0);
-                        }
-                    }
-                })
-                .setIcon(android.R.drawable.ic_dialog_alert)
-                .show();
-        if(fatalError){
-            Log.wtf(getString(R.string.log_tag), message);
-        } else {
-            Log.e(getString(R.string.log_tag),message);
-
-        }
-    }
-
-
     /**
      * Called when request for bluetooth permissions returns
      *
@@ -230,7 +198,7 @@ public class MainActivity extends AppCompatActivity {
         }
 
         if ((requestCode == 1) && (resultCode == RESULT_CANCELED)) {
-            sendError("This app will not be useful until bluetooth is enabled", false);
+            //sendError("This app will not be useful until bluetooth is enabled", false);
         }
     }
 

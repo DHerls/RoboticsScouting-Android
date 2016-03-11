@@ -6,7 +6,7 @@ import android.support.v7.widget.Toolbar;
 
 import org.fullmetalfalcons.androidscouting.R;
 
-public class AboutActivity extends AppCompatActivity {
+public class AboutActivity extends DHActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

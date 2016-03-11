@@ -80,15 +80,6 @@
             android:layout_gravity="center_horizontal"
             android:layout_marginTop="30dp" />
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textAppearance="?android:attr/textAppearanceLarge"
-            android:text="WORK IN PROGRESS"
-            android:id="@+id/textView14"
-            android:layout_gravity="center_horizontal"
-            android:textColor="#ff0000" />
-
         <Spinner
             android:layout_width="150dp"
             android:layout_height="40dp"
@@ -102,7 +93,7 @@
             android:textAlignment="center"
             android:touchscreenBlocksFocus="false"
             style="@android:style/Widget.Holo.Light.Spinner"
-            android:clickable="false"/>
+            />
 
         <Spinner
             android:layout_width="wrap_content"
@@ -113,7 +104,7 @@
             android:layout_marginBottom="10dp"
             android:textAlignment="center"
             style="@android:style/Widget.Holo.Light.Spinner"
-            android:clickable="false"/>
+            />
 
         <Spinner
             android:layout_width="150dp"
@@ -126,7 +117,7 @@
             android:layout_marginBottom="10dp"
             android:textAlignment="center"
             style="@android:style/Widget.Holo.Light.Spinner"
-            android:clickable="false"/>
+            />
 
         <EditText
             android:layout_width="100dp"
@@ -139,7 +130,7 @@
             android:textAlignment="center"
             android:imeOptions="actionDone"
             android:singleLine="true"
-            android:clickable="false"/>
+            />
 
         <Button
             android:layout_width="wrap_content"
@@ -147,7 +138,7 @@
             android:text="@string/search_button_text"
             android:id="@+id/retrieve_team_search_button"
             android:layout_gravity="center_horizontal"
-            android:clickable="false"/>
+            />
 
 
     </LinearLayout>

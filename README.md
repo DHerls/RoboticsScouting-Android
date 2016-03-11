@@ -29,3 +29,6 @@ Welcome to a whole new way to scout robots!  With Falcon Scout, you and your tea
 3. Fill out the "Search" form with the critera you wish to match
 4. Press the "Seach" button
 5. If you want more data on any team, tap its team number
+
+### Export to Excel
+On the Base app, you can press the "Export to Excel" button and it will generate an Excel Workbook that contains all the data you have scouted up to this point

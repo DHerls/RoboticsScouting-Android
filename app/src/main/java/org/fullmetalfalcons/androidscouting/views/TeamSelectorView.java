@@ -9,6 +9,7 @@ import android.graphics.drawable.Drawable;
 import android.text.TextPaint;
 import android.util.AttributeSet;
 import android.util.Log;
+import android.view.GestureDetector;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
@@ -53,6 +54,7 @@ public class TeamSelectorView extends LinearLayout {
             averageView.setText(String.valueOf(round(average,3)));
         }
 
+
     }
 
     public double round(double value, int numberOfDigitsAfterDecimalPoint) {
@@ -64,10 +66,15 @@ public class TeamSelectorView extends LinearLayout {
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
-        if (event.getAction() == MotionEvent.ACTION_DOWN){
-            a.requestTeamNum(teamNum);
-        }
+        System.out.println(MotionEvent.actionToString(event.getAction()));
+        //a.onTouchEvent(event);
+
+//        if (event.getAction() == MotionEvent.ACTION_DOWN){
+//            a.requestTeamNum(teamNum);
+//        }
         return super.onTouchEvent(event);
     }
+
+
 
 }

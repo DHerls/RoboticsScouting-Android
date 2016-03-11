@@ -271,7 +271,9 @@ public class RetrieveDataActivity extends DHActivity {
                         Intent displayIntent = new Intent(this, DisplayDataActivity.class);
                         displayIntent.putExtra("TEAM_DATA", teamInfo);
                         displayIntent.putExtra("COLUMN_DATA", prettyColumns);
+                        resultSet.close();
                         startActivity(displayIntent);
+
                     } else {
                         ArrayList<ArrayList<String>> data = new ArrayList<>();
                         ResultSetMetaData rsmd = resultSet.getMetaData();
@@ -286,6 +288,7 @@ public class RetrieveDataActivity extends DHActivity {
                         }
                         Intent displayIntent = new Intent(this, SelectTeamActivity.class);
                         displayIntent.putExtra("TEAM_DATA", data);
+                        resultSet.close();
                         startActivity(displayIntent);
                     }
                 } catch (SQLException e) {

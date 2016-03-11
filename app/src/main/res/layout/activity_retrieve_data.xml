@@ -80,15 +80,6 @@
             android:layout_gravity="center_horizontal"
             android:layout_marginTop="30dp" />
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textAppearance="?android:attr/textAppearanceLarge"
-            android:text="WORK IN PROGRESS"
-            android:id="@+id/textView14"
-            android:layout_gravity="center_horizontal"
-            android:textColor="#ff0000" />
-
         <Spinner
             android:layout_width="150dp"
             android:layout_height="40dp"

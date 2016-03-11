@@ -66,17 +66,19 @@
                 android:textAlignment="center" />
         </LinearLayout>
 
-        <ScrollView
+        <org.fullmetalfalcons.androidscouting.views.InterceptScrollView
             android:layout_width="fill_parent"
             android:layout_height="fill_parent"
-            android:id="@+id/scrollView4" >
+            android:id="@+id/scrollView4"
+            android:clickable="false"
+            android:focusable="false">
 
             <LinearLayout
                 android:orientation="vertical"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:id="@+id/team_select_layout"></LinearLayout>
-        </ScrollView>
+        </org.fullmetalfalcons.androidscouting.views.InterceptScrollView>
 
 
     </LinearLayout>

@@ -34,8 +34,8 @@ public class SelectTeamActivity extends RetrieveDataActivity {
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         final LinearLayout mainLayout = (LinearLayout) findViewById(R.id.team_select_layout);
-
         Bundle bundle = getIntent().getExtras();
+        getSupportActionBar().setTitle(bundle.getString("TITLE"));
         ArrayList<ArrayList<String>> data = (ArrayList<ArrayList<String>>) bundle.get("TEAM_DATA");
         for (ArrayList<String> a : data){
             mainLayout.addView(new TeamSelectorView(this,

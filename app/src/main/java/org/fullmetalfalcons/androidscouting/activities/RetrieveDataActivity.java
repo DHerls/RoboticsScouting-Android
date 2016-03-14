@@ -55,6 +55,7 @@ public class RetrieveDataActivity extends DHActivity {
     private final Pattern p = Pattern.compile("\\[(.*?)\\]");
     private ProgressDialog progress;
     private boolean timeout = false;
+    private Spinner columnSpinner;
 
 
 
@@ -68,7 +69,7 @@ public class RetrieveDataActivity extends DHActivity {
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         //Set column values in the column spinner
-        final Spinner columnSpinner = (Spinner) findViewById(R.id.column_spinner);
+        columnSpinner = (Spinner) findViewById(R.id.column_spinner);
         ArrayAdapter<String> spinnerArrayAdapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, getColumnValues());
         spinnerArrayAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         columnSpinner.setAdapter(spinnerArrayAdapter);
@@ -288,6 +289,7 @@ public class RetrieveDataActivity extends DHActivity {
                         }
                         Intent displayIntent = new Intent(this, SelectTeamActivity.class);
                         displayIntent.putExtra("TEAM_DATA", data);
+                        displayIntent.putExtra("TITLE", columnSpinner.getSelectedItem().toString());
                         resultSet.close();
                         startActivity(displayIntent);
                     }

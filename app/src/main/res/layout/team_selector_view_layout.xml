@@ -8,7 +8,7 @@
     <TextView
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:text="1"
+        android:text="@string/default_int"
         android:id="@+id/selector_team_num"
         android:layout_weight="1"
         android:textAlignment="center"
@@ -17,7 +17,7 @@
     <TextView
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:text="1"
+        android:text="@string/default_int"
         android:id="@+id/selector_num_matches"
         android:layout_weight="1"
         android:textAlignment="center"
@@ -27,7 +27,7 @@
     <TextView
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:text="1"
+        android:text="@string/default_int"
         android:id="@+id/selector_raw_value"
         android:layout_weight="1"
         android:textAlignment="center"
@@ -36,7 +36,7 @@
     <TextView
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:text="1"
+        android:text="@string/default_int"
         android:id="@+id/selector_average"
         android:layout_weight="1"
         android:textAlignment="center"

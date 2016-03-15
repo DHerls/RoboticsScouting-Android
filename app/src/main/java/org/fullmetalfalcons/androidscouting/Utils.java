@@ -1,6 +1,8 @@
 package org.fullmetalfalcons.androidscouting;
 
 /**
+ * Utility class whose methods are used throughout the app
+ *
  * Created by Dan on 2/1/2016.
  */
 
@@ -8,6 +10,8 @@ import android.app.Activity;
 import android.os.Build;
 
 import org.fullmetalfalcons.androidscouting.elements.Element;
+
+import java.math.BigDecimal;
 
 public class Utils
 {
@@ -22,10 +26,6 @@ public class Utils
         sTheme = theme;
         Element.setSwitchColors(true);
         activity.recreate();
-    }
-
-    public static int getTheme(){
-        return sTheme;
     }
 
     /** Set the theme of the activity, according to the configuration. */
@@ -64,5 +64,13 @@ public class Utils
         } else {
             return Character.toUpperCase(first) + s.substring(1);
         }
+    }
+
+    @SuppressWarnings("SameParameterValue")
+    public static double round(double number, int numPlaces){
+        BigDecimal bigDecimal = new BigDecimal(number);
+        bigDecimal = bigDecimal.setScale(numPlaces,
+                BigDecimal.ROUND_HALF_UP);
+        return bigDecimal.doubleValue();
     }
 }

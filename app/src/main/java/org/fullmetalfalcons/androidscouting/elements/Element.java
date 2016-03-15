@@ -487,6 +487,7 @@ public class Element {
                 break;
             case SWITCH:
                 ll = (LinearLayout) view;
+                @SuppressWarnings("unchecked")
                 ArrayList<Boolean> bool = (ArrayList<Boolean>) viewData;
                 LinearLayout innerLayout;
                 for ( int i = 0; i< ll.getChildCount(); i++){
@@ -635,7 +636,4 @@ public class Element {
         return this.columnValues;
     }
 
-    public void destroyView() {
-        view = null;
-    }
 }

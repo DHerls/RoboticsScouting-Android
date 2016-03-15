@@ -8,8 +8,8 @@ android {
         applicationId "org.fullmetalfalcons.androidscouting"
         minSdkVersion 21
         targetSdkVersion 23
-        versionCode 1
-        versionName "1.0"
+        versionCode 2
+        versionName "2016_stronghold_2"
     }
     buildTypes {
         release {
@@ -26,10 +26,13 @@ android {
 dependencies {
     compile fileTree(include: ['*.jar'], dir: 'libs')
     testCompile 'junit:junit:4.12'
+    //noinspection GradleDependency
     compile 'com.android.support:appcompat-v7:23.1.1'
+    //noinspection GradleDependency
     compile 'com.android.support:design:23.1.1'
     compile 'org.honorato.multistatetogglebutton:multistatetogglebutton:0.2.0'
     compile 'com.googlecode.plist:dd-plist:1.16'
+    //noinspection GradleDependency
     compile 'com.android.support:support-v4:23.1.1'
     compile files('libs/mysql-connector-java-3.0.17-ga-bin.jar')
 }

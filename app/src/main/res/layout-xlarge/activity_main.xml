@@ -1,8 +1,7 @@
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<merge xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#d6d7d7"
     android:focusable="true">
 
     <LinearLayout android:layout_width="fill_parent"
@@ -19,6 +18,7 @@
             app:accentColor="@color/colorRedPrimaryDark"
             android:layout_width="match_parent"
             android:onClick="launchActivity"
+            android:id="@+id/scout_button"
             />
 
         <org.fullmetalfalcons.androidscouting.views.MainButtonView
@@ -30,6 +30,7 @@
             app:orientation="right"
             android:layout_width="match_parent"
             android:onClick="launchActivity"
+            android:id="@+id/retrieve_button"
             />
 
     </LinearLayout>
@@ -71,7 +72,7 @@
             <ImageButton android:id="@+id/detail_refresh_btn"
                 android:layout_width="48dp"
                 android:layout_height="48dp"
-                android:src="@drawable/ic_action_refresh1"
+                android:src="@drawable/ic_sync_24dp"
                 android:contentDescription="@string/refresh_button_description"/>
         </LinearLayout>
     </LinearLayout>
@@ -146,4 +147,4 @@
         android:contentDescription="@string/main_logo_description"/>
 
 
-</FrameLayout>
+</merge>

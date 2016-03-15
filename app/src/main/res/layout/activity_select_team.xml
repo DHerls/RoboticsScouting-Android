@@ -33,7 +33,7 @@
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
                 android:textAppearance="?android:attr/textAppearanceMedium"
-                android:text="Team Number"
+                android:text="@string/team_number_label"
                 android:id="@+id/textView16"
                 android:layout_weight="1"
                 android:textAlignment="center" />
@@ -42,7 +42,7 @@
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
                 android:textAppearance="?android:attr/textAppearanceMedium"
-                android:text="Number Matches"
+                android:text="@string/num_matches_label"
                 android:id="@+id/textView17"
                 android:layout_weight="1"
                 android:textAlignment="center" />
@@ -51,7 +51,7 @@
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
                 android:textAppearance="?android:attr/textAppearanceMedium"
-                android:text="Raw Value"
+                android:text="@string/raw_value_title"
                 android:id="@+id/textView18"
                 android:layout_weight="1"
                 android:textAlignment="center" />
@@ -60,7 +60,7 @@
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
                 android:textAppearance="?android:attr/textAppearanceMedium"
-                android:text="Average"
+                android:text="@string/average_value_title"
                 android:id="@+id/textView19"
                 android:layout_weight="1"
                 android:textAlignment="center" />
@@ -76,7 +76,7 @@
             <LinearLayout
                 android:orientation="vertical"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
+                android:layout_height="wrap_content"
                 android:id="@+id/team_select_layout"/>
         </ScrollView>
 

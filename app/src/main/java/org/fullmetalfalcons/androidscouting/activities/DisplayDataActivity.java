@@ -1,6 +1,5 @@
 package org.fullmetalfalcons.androidscouting.activities;
 
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
@@ -44,14 +43,18 @@ public class DisplayDataActivity extends DHActivity {
 
     }
 
+    /**
+     * Populates LinearLayout with views
+     */
+    @SuppressWarnings("ConstantConditions")
     private void addElementData() {
         int numMatches = Integer.parseInt(teamData.get("num_matches"));
         LinearLayout teamLayout = (LinearLayout) findViewById(R.id.team_display_scroll);
         TextView label;
 
-        String value = "";
+        String value;
         double raw = 0.0;
-        double average = 0.0;
+        double average;
         try {
             for (Element e : FileManager.getElements()) {
                 switch (e.getType()) {
@@ -195,7 +198,7 @@ public class DisplayDataActivity extends DHActivity {
                 }
             }
             label = new TextView(this);
-            label.setText("Equations");
+            label.setText(getString(R.string.equations_title));
             label.setTextSize(30);
             label.setTextAlignment(View.TEXT_ALIGNMENT_CENTER);
             teamLayout.addView(label);
@@ -220,6 +223,9 @@ public class DisplayDataActivity extends DHActivity {
         }
     }
 
+    /**
+     * Fill in general info at top of activity
+     */
     private void addGeneralData() {
         assert teamData != null;
         int numMatches = Integer.parseInt(teamData.get("num_matches"));
@@ -251,16 +257,12 @@ public class DisplayDataActivity extends DHActivity {
     }
 
 
-    private static String makePretty(String input){
-        String[] split = input.split("(\\s)|(_)");
-        StringBuilder output = new StringBuilder();
-        for (String s : split) {
-            output.append(s.substring(0, 1).toUpperCase()).append(s.substring(1)).append(" ");
-        }
-
-        return output.toString().trim();
-    }
-
+    /**
+     * Breaks strings by space or underscore and capitalizes each word
+     *
+     * @param input String to be broken apart
+     * @return Pretty String
+     */
     private static String makeKeyPretty(String input){
         String[] split = input.split("(\\s)|(_)");
         StringBuilder output = new StringBuilder();

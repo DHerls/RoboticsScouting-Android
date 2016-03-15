@@ -1,18 +1,11 @@
 package org.fullmetalfalcons.androidscouting.activities;
 
 import android.content.SharedPreferences;
-import android.os.ParcelUuid;
-import android.preference.PreferenceManager;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v7.widget.Toolbar;
-import android.view.GestureDetector;
 import android.view.MenuItem;
-import android.view.MotionEvent;
-import android.view.View;
-import android.widget.EditText;
 import android.widget.LinearLayout;
-import android.widget.ScrollView;
 
 import org.fullmetalfalcons.androidscouting.R;
 import org.fullmetalfalcons.androidscouting.bluetooth.BluetoothCore;
@@ -21,7 +14,11 @@ import org.fullmetalfalcons.androidscouting.views.TeamSelectorView;
 
 import java.util.ArrayList;
 
-
+/**
+ * Lists the results of a seach
+ *
+ * If the team number is pressed, the full data from that team is retrieved
+ */
 public class SelectTeamActivity extends RetrieveDataActivity {
 
     @Override
@@ -36,7 +33,9 @@ public class SelectTeamActivity extends RetrieveDataActivity {
         final LinearLayout mainLayout = (LinearLayout) findViewById(R.id.team_select_layout);
         Bundle bundle = getIntent().getExtras();
         getSupportActionBar().setTitle(bundle.getString("TITLE"));
+        @SuppressWarnings("unchecked")
         ArrayList<ArrayList<String>> data = (ArrayList<ArrayList<String>>) bundle.get("TEAM_DATA");
+        assert data !=null;
         for (ArrayList<String> a : data){
             mainLayout.addView(new TeamSelectorView(this,
                     a.get(0),

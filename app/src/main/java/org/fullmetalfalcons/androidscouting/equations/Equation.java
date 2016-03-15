@@ -1,8 +1,6 @@
 package org.fullmetalfalcons.androidscouting.equations;
 
 
-import java.math.BigDecimal;
-
 /**
  * Used to evaluate equations as written in the config file
  * Replaces keys with their associated value
@@ -12,7 +10,7 @@ import java.math.BigDecimal;
 public class Equation {
 
     @SuppressWarnings("FieldCanBeLocal")
-    private String equation;
+//    private String equation;
     private String name;
     private String columnValue;
 
@@ -26,7 +24,7 @@ public class Equation {
             //Line should come in the form EQUATION_NAME=Equation
             String[] splitLine = line.split("=");
             name = splitLine[0].substring(splitLine[0].indexOf(" ")).trim();
-            equation = splitLine[1].trim();
+//            equation = splitLine[1].trim();
         } catch(ArrayIndexOutOfBoundsException e){
             throw new EquationParseException("Config error, equation missing \"=\"");
         }
@@ -63,12 +61,5 @@ public class Equation {
 
         return this.columnValue;
 
-    }
-
-    public double round(double value, int numberOfDigitsAfterDecimalPoint) {
-        BigDecimal bigDecimal = new BigDecimal(value);
-        bigDecimal = bigDecimal.setScale(numberOfDigitsAfterDecimalPoint,
-                BigDecimal.ROUND_HALF_UP);
-        return bigDecimal.doubleValue();
     }
 }

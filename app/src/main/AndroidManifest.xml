@@ -8,10 +8,13 @@
 
     <application
         android:allowBackup="true"
+        android:backupAgent=".PreferenceBackupHelper"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/BlueTheme" >
+        <meta-data android:name="com.google.android.backup.api_key"
+            android:value="AEdPqrEAAAAIfMeEu-gf0o-UpxM25KJuf8hnZqr5jIUrZYhYPA" />
         <activity
             android:name=".activities.MainActivity"
             android:label="@string/app_name"

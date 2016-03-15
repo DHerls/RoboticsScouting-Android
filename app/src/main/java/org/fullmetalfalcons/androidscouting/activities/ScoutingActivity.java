@@ -1,14 +1,10 @@
 package org.fullmetalfalcons.androidscouting.activities;
 
-import android.app.AlertDialog;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -31,16 +27,14 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 /**
- * Main Activity for the app
  *
  * Collects and sends data about robots to a base
+ *
+ * Activity is dynamically generated from Elements read from config.txt
  *
  */
 public class ScoutingActivity extends DHActivity implements CompoundButton.OnCheckedChangeListener {
     
-    private boolean haveBluetoothPermission = true;
-    private static boolean isFirstTime = true;
-
     /**
      * Called when the activity is created
      *
@@ -120,14 +114,7 @@ public class ScoutingActivity extends DHActivity implements CompoundButton.OnChe
 
     private void restoreData() {
         Bundle bundle = MainActivity.getData();
-        //ParcelableArrayList values = bundle.getParcelable("fieldData");
-//
-//        //Restore all dynamic values
-//        for (int i = 0; i< FileManager.getElements().size();i++){
-//            assert values != null;
-//            FileManager.getElements().get(i).setViewData(values.get(i));
-//        }
-//
+
         //Restore static values
         ((EditText) findViewById(R.id.match_num)).setText(bundle.getString(getString(R.string.key_match_num)));
         ((EditText) findViewById(R.id.team_num)).setText(bundle.getString(getString(R.string.key_team_num)));
@@ -195,10 +182,6 @@ public class ScoutingActivity extends DHActivity implements CompoundButton.OnChe
         l.addView(s);
     }
 
-    /**
-     * Load Element data from the Config file
-     */
-    //private void loadConfig(){
         
 
     
@@ -235,17 +218,9 @@ public class ScoutingActivity extends DHActivity implements CompoundButton.OnChe
         Switch s = (Switch) findViewById(R.id.team_color);
         bundle.putBoolean("isRed",s.isChecked());
 
-        //Put all the values from the views into an arraylist then put it into the bundle
-//        ParcelableArrayList values = new ParcelableArrayList();
-//        for (Element e: FileManager.getElements()){
-//            values.add(e.getViewData());
-//        }
-//        bundle.putParcelable("fieldData", values);
-
         //Put all the static fields into the bundle
         bundle.putString(getString(R.string.key_match_num), ((EditText) findViewById(R.id.match_num)).getText().toString());
         bundle.putString(getString(R.string.key_team_num), ((EditText) findViewById(R.id.team_num)).getText().toString());
-        //bundle.putString("bluetooth_code", ((EditText) findViewById(R.id.bluetoothCode)).getText().toString());
 
     }
 
@@ -258,35 +233,9 @@ public class ScoutingActivity extends DHActivity implements CompoundButton.OnChe
     @Override
     protected void onRestoreInstanceState(Bundle bundle){
 
-        //Get stored values
-        //ParcelableArrayList values = bundle.getParcelable("fieldData");
-
-//        //Restore all dynamic values
-//        for (int i = 0; i< FileManager.getElements().size();i++){
-//            assert values != null;
-//            FileManager.getElements().get(i).setViewData(values.get(i));
-//        }
-
-        //Restore static values
         ((EditText) findViewById(R.id.match_num)).setText(bundle.getString(getString(R.string.key_match_num)));
         ((EditText) findViewById(R.id.team_num)).setText(bundle.getString(getString(R.string.key_team_num)));
-        //((EditText) findViewById(R.id.bluetoothCode)).setText(bundle.getString("bluetooth_code"));
 
-        //BluetoothCore.startBLE(this);
-        //BluetoothCore.setPassphrase(bundle.getString("bluetooth_code"));
-
-    }
-
-    /**
-     * Called when the activity is resumed, only used when Bluetooth permission is requested
-     */
-    @Override
-    protected void onResume() {
-        super.onResume();
-//        if(haveBluetoothPermission &&!isFirstTime){
-//            BluetoothCore.startBLE(this);
-//        }
-//        isFirstTime = false;
     }
 
 
@@ -374,14 +323,6 @@ public class ScoutingActivity extends DHActivity implements CompoundButton.OnChe
         Switch s = (Switch) findViewById(R.id.team_color);
         bundle.putBoolean("isRed",s.isChecked());
 
-//        //Put all the values from the views into an arraylist then put it into the bundle
-//        ParcelableArrayList values = new ParcelableArrayList();
-//        for (Element e: FileManager.getElements()){
-//            values.add(e.getViewData());
-//        }
-//        bundle.putParcelable("fieldData", values);
-//
-//        //Put all the static fields into the bundle
         bundle.putString(getString(R.string.key_match_num), ((EditText) findViewById(R.id.match_num)).getText().toString());
         bundle.putString(getString(R.string.key_team_num), ((EditText) findViewById(R.id.team_num)).getText().toString());
 //        //bundle.putString("bluetooth_code", ((EditText) findViewById(R.id.bluetoothCode)).getText().toString());

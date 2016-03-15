@@ -9,7 +9,7 @@ import android.widget.TextView;
 import org.fullmetalfalcons.androidscouting.R;
 
 /**
- * Created by djher on 1/31/2016.
+ * Generates a seekbar which displays the value under the thumb
  */
 @SuppressWarnings("ALL")
 public class SeekBarWithValues extends RelativeLayout implements SeekBar.OnSeekBarChangeListener {

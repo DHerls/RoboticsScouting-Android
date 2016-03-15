@@ -7,7 +7,7 @@
     <TextView
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:text="AutonomousL High Bar Value"
+        android:text="@string/default_column"
         android:id="@+id/column_value_view"
         android:textColor="@android:color/black"
         android:layout_weight="1"
@@ -16,14 +16,14 @@
     <TextView
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:text="1"
+        android:text="@string/default_int"
         android:id="@+id/raw_value_view"
         android:layout_weight="3" />
 
     <TextView
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:text="1"
+        android:text="@string/default_int"
         android:id="@+id/average_value_view"
         android:layout_weight="3" />
 </LinearLayout>

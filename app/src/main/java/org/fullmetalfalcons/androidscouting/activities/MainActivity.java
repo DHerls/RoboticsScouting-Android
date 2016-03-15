@@ -1,19 +1,16 @@
 package org.fullmetalfalcons.androidscouting.activities;
 
-import android.app.AlertDialog;
 import android.bluetooth.BluetoothAdapter;
 import android.content.BroadcastReceiver;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.graphics.Color;
 import android.graphics.drawable.GradientDrawable;
 import android.graphics.drawable.LayerDrawable;
 import android.os.Build;
-import android.support.v4.content.ContextCompat;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v4.content.ContextCompat;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
@@ -30,7 +27,6 @@ import android.widget.TextView;
 import org.fullmetalfalcons.androidscouting.R;
 import org.fullmetalfalcons.androidscouting.bluetooth.BluetoothCore;
 import org.fullmetalfalcons.androidscouting.fileio.FileManager;
-import org.fullmetalfalcons.androidscouting.views.MainButtonView;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -41,9 +37,6 @@ public class MainActivity extends DHActivity {
     private BroadcastReceiver mReceiver;
     private static Bundle viewData;
     private boolean doLaunch = true;
-
-    private MainButtonView retrieveButton;
-    private MainButtonView scoutButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -128,8 +121,6 @@ public class MainActivity extends DHActivity {
             bluetoothCodeView.setText("");
         }
 
-        retrieveButton = (MainButtonView) findViewById(R.id.retrieve_button);
-        scoutButton = (MainButtonView) findViewById(R.id.scout_button);
     }
 
     /**
@@ -206,9 +197,6 @@ public class MainActivity extends DHActivity {
             BluetoothCore.enable();
         }
 
-        if ((requestCode == 1) && (resultCode == RESULT_CANCELED)) {
-            //sendError("This app will not be useful until bluetooth is enabled", false);
-        }
         if (requestCode==2){
             doLaunch = true;
         }
@@ -294,6 +282,7 @@ public class MainActivity extends DHActivity {
     }
 
 
+    @SuppressWarnings("BooleanMethodIsAlwaysInverted")
     private static boolean isEmulator() {
         return Build.FINGERPRINT.startsWith("unknown")
                 || Build.MODEL.contains("google_sdk")

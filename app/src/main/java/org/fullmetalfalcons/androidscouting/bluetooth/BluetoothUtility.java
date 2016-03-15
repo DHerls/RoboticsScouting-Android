@@ -97,19 +97,22 @@ class BluetoothUtility {
 
     static void stopAll() {
         if(getAdvertising()) stopAdvertise();
-        if(gattServer != null) gattServer.close();
+        if(gattServer != null) stopGattServer();
 
     }
 
     /*-------------------------------------------------------------------------------*/
 
+    @SuppressWarnings("WeakerAccess")
     protected static boolean getAdvertising() {
         return advertising;
     }
 
+    @SuppressWarnings("SameParameterValue")
     static void setAdvertiseCallback(AdvertiseCallback callback) {
         advertiseCallback = callback;
     }
+    @SuppressWarnings("SameParameterValue")
     static void setGattServerCallback(BluetoothGattServerCallback callback) {
         gattServerCallback = callback;
     }
@@ -156,7 +159,7 @@ class BluetoothUtility {
         }
     }
 
-    protected void stopGattServer(){
+    private static void stopGattServer(){
         gattServer.clearServices();
         gattServer.close();
         activity.setConnected(false);

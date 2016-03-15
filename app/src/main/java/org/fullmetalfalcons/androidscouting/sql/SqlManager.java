@@ -1,9 +1,7 @@
 package org.fullmetalfalcons.androidscouting.sql;
 
-import android.app.Activity;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
-import android.os.ParcelUuid;
 import android.preference.PreferenceManager;
 
 import org.fullmetalfalcons.androidscouting.activities.DHActivity;
@@ -13,12 +11,13 @@ import org.fullmetalfalcons.androidscouting.activities.RetrieveSettingsActivity;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
-import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.concurrent.ExecutionException;
 
 /**
+ * Handles accessing remote SQL Data
+ *
  * Created by djher on 3/3/2016.
  */
 public class SqlManager {
@@ -40,11 +39,11 @@ public class SqlManager {
                 RetrieveDataActivity.setResponseString("cancel");
             }
         } catch (InterruptedException e) {
-            e.printStackTrace();
+            a.sendError("Interrupted while requesting team", false, e);
         } catch (ExecutionException e) {
-            e.printStackTrace();
+            a.sendError("Erorr while requesting team",false, e);
         } catch (SQLException e) {
-            e.printStackTrace();
+            a.sendError("SQL Error while requesting team",false,e);
         }
 
     }
@@ -64,18 +63,18 @@ public class SqlManager {
                 RetrieveDataActivity.setResponseString("cancel");
             }
         } catch (InterruptedException e) {
-            e.printStackTrace();
+            a.sendError("Interrupted while searching for teams", false, e);
         } catch (ExecutionException e) {
-            e.printStackTrace();
+            a.sendError("Erorr while searching for teams", false, e);
         } catch (SQLException e) {
-            e.printStackTrace();
+            a.sendError("SQL Error while searching for teams", false, e);
         }
     }
 
     private static class RequestTask extends AsyncTask<String,Void,ResultSet>{
 
         private Connection c = null;
-        private DHActivity a;
+        private final DHActivity a;
 
         public RequestTask(DHActivity a){
             this.a = a;
@@ -105,11 +104,11 @@ public class SqlManager {
                 e.printStackTrace();
 
             } catch (ClassNotFoundException e) {
-                e.printStackTrace();
+                a.sendError("SQLite drive not found",false,e);
             } catch (InstantiationException e) {
-                e.printStackTrace();
+                a.sendError("Could not instantiate SQLite driver", false, e);
             } catch (IllegalAccessException e) {
-                e.printStackTrace();
+                a.sendError("Illegal Access while requesting team", false, e);
             }
             return null;
         }
@@ -119,7 +118,7 @@ public class SqlManager {
     private static class SearchTask extends AsyncTask<String,Void,ResultSet>{
 
         private Connection c = null;
-        private DHActivity a;
+        private final DHActivity a;
 
         public SearchTask(DHActivity a){
             this.a = a;
@@ -167,15 +166,14 @@ public class SqlManager {
                 if (e.getSQLState().equals("28000")){
                     a.sendError("Invalid Team Number/Password combination",false);
                 }
-                //System.out.println(e.getErrorCode() + ":" + e.getSQLState());
                 e.printStackTrace();
 
-            } catch (ClassNotFoundException e) {
-                e.printStackTrace();
+            }  catch (ClassNotFoundException e) {
+                a.sendError("SQLite drive not found", false, e);
             } catch (InstantiationException e) {
-                e.printStackTrace();
+                a.sendError("Could not instantiate SQLite driver", false, e);
             } catch (IllegalAccessException e) {
-                e.printStackTrace();
+                a.sendError("Illegal Access while searching for teams", false, e);
             }
             return null;
         }

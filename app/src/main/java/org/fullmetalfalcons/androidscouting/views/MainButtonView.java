@@ -15,7 +15,7 @@ import android.view.View;
 import org.fullmetalfalcons.androidscouting.R;
 
 /**
- * TODO: document your custom view class.
+ * Large angular button used in primary activity
  */
 public class MainButtonView extends View {
     private int mBackgroundColor = Color.RED;

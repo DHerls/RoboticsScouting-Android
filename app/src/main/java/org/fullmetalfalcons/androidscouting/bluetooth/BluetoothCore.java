@@ -30,7 +30,7 @@ public class BluetoothCore {
     private static String passphrase = "333B";
     //Characteristic UUID for sending data to computer
     private static final String SEND_CHARACTERISTIC_UUID = "20D0C428-B763-4016-8AC6-4B4B3A6865D9";
-    //Characteristic UUID for recieving data from computer
+    //Characteristic UUID for receiving data from computer
     private static final String RECEIVE_CHARACTERISTIC_UUID = "80A37B7F-0563-409B-B320-8C1768CE6A58";
 
     private static MainActivity activity;
@@ -117,7 +117,7 @@ public class BluetoothCore {
                 if (write.equals("EOM")){
                     RetrieveDataActivity.setResponseString(responseBuilder.toString());
                     responseBuilder = new StringBuilder();
-                } else if (write.equalsIgnoreCase("NoReadTable")||write.equalsIgnoreCase("NoReadTeam")){
+                } else if (write.equalsIgnoreCase("NoReadTable")||write.equalsIgnoreCase("NoReadTeam")||write.equals("NoSearchResult")){
                     RetrieveDataActivity.setResponseString(write);
                 }else {
                     responseBuilder.append(write);
@@ -126,18 +126,6 @@ public class BluetoothCore {
                 BluetoothUtility.sendResponse(device, requestId, BluetoothGatt.GATT_REQUEST_NOT_SUPPORTED, offset, value);
             }
 
-
-        }
-
-        @Override
-        public void onNotificationSent(BluetoothDevice device, int status) {
-            super.onNotificationSent(device, status);
-        }
-
-        @Override
-        public void onMtuChanged(BluetoothDevice device, int mtu) {
-            super.onMtuChanged(device, mtu);
-            //BluetoothCore.mtu = mtu;
 
         }
 
@@ -256,11 +244,19 @@ public class BluetoothCore {
         return connected;
     }
 
+    @SuppressWarnings("unused")
     public  static boolean isAdvertising() {
         return advertising;
     }
 
     public static void requestTeamNum(String s) {
         BluetoothUtility.sendNotification(receiveDataCharacteristic, BleDevice, s);
+    }
+
+    public static void searchForTeams(String type, String column, String operator, String value) {
+        String toSend = type.equals("Average") ? "avg":"raw" + ";;" + column + ";;" + operator + ";;" + value;
+        if (toSend.length()<mtu){
+            BluetoothUtility.sendNotification(receiveDataCharacteristic, BleDevice, toSend);
+        }
     }
 }

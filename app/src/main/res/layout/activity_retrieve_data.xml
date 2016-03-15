@@ -61,7 +61,8 @@
                 android:id="@+id/retrieve_team_num"
                 android:maxLength="4"
                 android:imeOptions="actionDone"
-                android:singleLine="true"/>
+                android:singleLine="true"
+                tools:ignore="LabelFor" />
 
             <Button
                 android:layout_width="0dp"

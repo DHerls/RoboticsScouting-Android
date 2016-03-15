@@ -1,11 +1,13 @@
 package org.fullmetalfalcons.androidscouting.activities;
 
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 
 import org.fullmetalfalcons.androidscouting.R;
 
+/**
+ * Activity designed only to display about info and credits
+ */
 public class AboutActivity extends DHActivity {
 
     @Override

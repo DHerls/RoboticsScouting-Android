@@ -1,18 +1,13 @@
 package org.fullmetalfalcons.androidscouting.activities;
 
-import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.ParcelUuid;
 import android.preference.PreferenceManager;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -50,7 +45,7 @@ public class RetrieveDataActivity extends DHActivity {
     private static volatile String responseString= null;
     private static volatile ResultSet resultSet = null;
 
-    public static RequestType requestType;
+    static RequestType requestType;
 
     private final Pattern p = Pattern.compile("\\[(.*?)\\]");
     private ProgressDialog progress;
@@ -159,8 +154,7 @@ public class RetrieveDataActivity extends DHActivity {
             requestType = RequestType.SEARCH;
             if (!sharedPref.getBoolean(RetrieveSettingsActivity.REMOTE_RETRIEVE_ENABLED_KEY,false)) {
                 if (BluetoothCore.isConnected()) {
-                    //TODO Bluetooth team search
-                    //BluetoothCore.requestTeamNum(teamNumEditText.getText().toString());
+                    BluetoothCore.searchForTeams(type, column, operator, value);
                     waitForResponse(5);
                 } else {
                     sendError("Not currently connected to base", false);
@@ -194,10 +188,12 @@ public class RetrieveDataActivity extends DHActivity {
         }
     }
 
-    private static String capitalize(String input){
-        return input.substring(0, 1).toUpperCase() + input.substring(1);
-    }
-
+    /**
+     * Breaks strings by space or underscore and capitalizes each word
+     *
+     * @param input String to be broken apart
+     * @return Pretty String
+     */
     private static String makePretty(String input){
         String[] split = input.split("(\\s)|(_)");
         StringBuilder output = new StringBuilder();
@@ -225,7 +221,7 @@ public class RetrieveDataActivity extends DHActivity {
      *
      * @param timeout Whether or not the request had timed out
      */
-    public void displayResults(boolean timeout){
+    private void displayResults(boolean timeout){
         if (!timeout){
             if (responseString!=null) {
                 switch (responseString) {
@@ -254,7 +250,24 @@ public class RetrieveDataActivity extends DHActivity {
                             displayIntent.putExtra("COLUMN_DATA", prettyColumns);
                             startActivity(displayIntent);
                         } else {
-                            //TODO Handle Searches
+                            ArrayList<ArrayList<String>> data = new ArrayList<>();
+                            String[] teams = responseString.split(";;");
+                            Matcher m;
+                            String[] value;
+                            ArrayList<String> subData;
+                            for (String t: teams){
+                                m = p.matcher(t);
+                                subData = new ArrayList<>();
+                                while (m.find()){
+                                    value = m.group(1).split("=");
+                                    subData.add(value[1]);
+                                }
+                                data.add(subData);
+                            }
+                            Intent displayIntent = new Intent(this, SelectTeamActivity.class);
+                            displayIntent.putExtra("TEAM_DATA", data);
+                            displayIntent.putExtra("TITLE", columnSpinner.getSelectedItem().toString());
+                            startActivity(displayIntent);
                         }
                         break;
                 }
@@ -391,7 +404,8 @@ public class RetrieveDataActivity extends DHActivity {
         RetrieveDataActivity.resultSet = resultSet;
     }
 
-    public void waitForResponse(int seconds) {
+    void waitForResponse(int seconds) {
+        //Test string for Bluetooth Retrieve
         //responseString = "[team_num=442][team_color=Blue][num_matches=1][match_nums={64}][aut_reaches_defenses_yes=0][aut_reaches_defenses_no=1][aut_portcullis_yes=0][aut_portcullis_no=1][aut_chevaldefrise_yes=0][aut_chevaldefrise_no=1][aut_moat_yes=1][aut_moat_no=0][aut_ramparts_yes=0][aut_ramparts_no=1][aut_drawbridge_yes=0][aut_drawbridge_no=1][aut_sallyport_yes=0][aut_sallyport_no=1][aut_rockwall_yes=1][aut_rockwall_no=0][aut_rough_terrain_yes=0][aut_rough_terrain_no=1][aut_shoots_high_tower=0][aut_shoots_low_tower=1][aut_shoots_try_fail=0][aut_shoots_none=0][aut_underlowbar_yes=0][aut_underlowbar_no=1][aut_underlowbar_try_fail=0][aut_shot_accuracy=4.65748][teleop_starting_position_neutral_zone=0][teleop_starting_position_spy=1][teleop_portcullis_yes=0][teleop_portcullis_no=1][teleop_chevaldefrise_yes=0][teleop_chevaldefrise_no=1][teleop_moat_yes=0][teleop_moat_no=1][teleop_ramparts_yes=1][teleop_ramparts_no=0][teleop_drawbridge_yes=0][teleop_drawbridge_no=1][teleop_sallyport_yes=1][teleop_sallyport_no=0][teleop_rockwall_yes=0][teleop_rockwall_no=1][teleop_rough_terrain_yes=0][teleop_rough_terrain_no=1][teleop_underlowbar_yes=0][teleop_underlowbar_no=1][teleop_underlowbar_try_fail=0][teleop_climbing_yes=0][teleop_climbing_no=0][teleop_climbing_try_fail=1][teleop_defender_bot_yes=1][teleop_defender_bot_no=0][teleop_shots_highgoal=2][teleop_shots_lowgoal=4][teleop_shot_accuracy=9.70342][teleop_technical_fouls=3][teleop_normal_fouls=4][teleop_total_points=88][human_uses_gestures_yes=0][human_uses_gestures_no=1][human_effective=2.78613][autonomous_score=0.222][teleop_score=0.25][human_score=0][grand_total=0.472]";
         WaitTask waiting = new WaitTask();
         waiting.execute(seconds * 1000);
@@ -425,10 +439,10 @@ public class RetrieveDataActivity extends DHActivity {
 
 
 
-    /**
+    /*
      * Displays a waiting icon until data is received by the app
      */
-    class WaitTask extends AsyncTask<Integer,Void,Void>{
+    private class WaitTask extends AsyncTask<Integer,Void,Void>{
         @Override
         protected void onPreExecute() {
             progress = new ProgressDialog(RetrieveDataActivity.this);

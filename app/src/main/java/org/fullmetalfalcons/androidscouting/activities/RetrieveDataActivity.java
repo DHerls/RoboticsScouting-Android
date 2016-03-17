@@ -427,6 +427,10 @@ public class RetrieveDataActivity extends DHActivity {
                 Intent intent = new Intent(this,RetrieveSettingsActivity.class);
                 startActivity(intent);
                 break;
+            case R.id.action_about:
+                intent = new Intent(this,AboutActivity.class);
+                startActivity(intent);
+                break;
         }
         return (true);
     }

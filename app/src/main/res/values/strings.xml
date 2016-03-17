@@ -3,19 +3,23 @@
     <string name="action_settings">Settings</string>
     <string name="log_tag">[SCOUTING]</string>
     <string name="action_about">About</string>
-    <string name="about_long_text">"Welcome to a whole new way to scout robots! With this app, in addition to the Mac app located on team 4557's website, scouting robots is as easy as clicking a few buttons.
-
-Please visit http://www.fullmetalfalcons.org to download the Mac application, and get started.
-
-Email us at robotics@xavierhighschool.org with any questions. Below is more information on how to use this
-
-Prior to downloading the Mac application, make sure your Mac is equipped with Bluetooth Low Energy (BLE). You can check this in System Information.
-
-After installing and opening the Mac app, make sure Bluetooth is enabled on both this device and the computer. Then…
-
-1. Enter the same passkey on both the Mac and Phone apps and press the "refresh" buttons on both
-2. After completing the form, press the "DONE" button at the bottom. On the Mac, when ready to get all the data, just press the "Compile to Excel" button.
-3. And that's it! Scout away!"</string>
+    <string name="about_long_text">
+        <![CDATA[
+<pre>Welcome to a whole new way to scout robots! With this app, in addition to the Mac app located on team 4557&#39;s website, scouting robots is as easy as clicking a few buttons.<br />
+<br />
+Please visit <a href="http://www.fullmetalfalcons.org">http://www.fullmetalfalcons.org</a> to download the Mac application, and get started.<br />
+<br />
+Email us at <a href="mailto:robotics@xavierhighschool.org">robotics&#64;xavierhighschool.org</a> with any questions. Below is more information on how to use this<br />
+<br />
+Prior to downloading the Mac application, make sure your Mac is equipped with Bluetooth Low Energy (BLE). You can check this in System Information.<br />
+<br />
+After installing and opening the Mac app, make sure Bluetooth is enabled on both this device and the computer. Then…<br />
+<br />
+1. Enter the same passkey on both the Mac and Phone apps and press the "refresh" buttons on both<br />
+2. After completing the form, press the "DONE" button at the bottom. On the Mac, when ready to get all the data, just press the "Compile to Excel" button.<br />
+3. And that&#39;s it! Scout away!</pre>
+]]>
+    </string>
     <string name="about_credits_text">"This app was created by Dan Herlihy and Alex DeMeo for FRC Team 4557: The FullMetal Falcons"</string>
     <string-array name="value_array">
         <item>Raw Value</item>
@@ -70,4 +74,6 @@ After installing and opening the Mac app, make sure Bluetooth is enabled on both
 
     <string name="pref_default_team_number">4557</string>
     <string name="pref_title_team_number">Team Number:</string>
+    <string name="activity_retrieve_label">Retrieve Team Data</string>
+    <string name="activity_display_label">Team Data</string>
 </resources>

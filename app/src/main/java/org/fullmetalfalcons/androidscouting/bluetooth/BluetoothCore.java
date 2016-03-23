@@ -221,6 +221,7 @@ public class BluetoothCore {
 
     public static void stopBLE() {
         Log.d(activity.getString(R.string.log_tag),"Stopping BLE");
+
         BluetoothUtility.stopAll();
     }
 

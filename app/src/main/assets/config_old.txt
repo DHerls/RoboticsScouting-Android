@@ -25,7 +25,7 @@
 ##          args=[<Selection 1, Selection 2,Selection n>]
 ##			Format= SEGMENTED_CONTROL<args>;;[Title];;[Key]
 ##			For example, for a segmented control with options "Yes No Try/Fail" titled "Scored Goals" would look like:
-##			SEGMENTED_CONTROL <No,Yes,Try/Fail>;;Scored Goals;;teleop_scored_goals
+##			SEGMENTED_CONTROL <Yes,No,Try/Fail>;;Scored Goals;;teleop_scored_goals
 ##		TEXTFIELD 
 ##          Allows the user to type in their own value, can be limited to just numbers through arguments
 ##          args=[<keyboard type>] where type is any of the following... {decimal, number, normal}
@@ -64,36 +64,34 @@
 
 ## --------PUT INTERFACE STUFF HERE--------
 
-
 LABEL 				<distinguished, center>;;				Autonomous
-SEGMENTED_CONTROL	<No,Yes>;;								Reaches defenses?;;								aut_reaches_defenses
-SEGMENTED_CONTROL 	<None,A,B,C,D,Low bar>;;				Which type of defense does the robot cross?;;	aut_crossesDefense
-SEGMENTED_CONTROL 	<No, Missed shot, Yes>;;				Does is shoot and score? (low or high goal);;	aut_shooting
-SLIDER 				<0,10>;;								Shot Accuracy;;									aut_shot_accuracy
+SEGMENTED_CONTROL	<Yes,No>;;								Reaches defenses?;;					aut_reaches_defenses
+LABEL 				<normal, `center>;;						Can overcome defense (check all that apply)
+SWITCH 				;;Portcullis,Cheval Frise,Moat,Ramparts;;aut_portcullis,aut_chevalDeFrise,aut_moat,aut_ramparts
+SWITCH 				;;Drawbridge,Sally Port,Rock wall,Rough Terrain;;aut_drawbridge,aut_sallyport,aut_rockwall,aut_rough_terrain
+SEGMENTED_CONTROL 	<High tower,Low Tower,Try/Fail, None>;;	Scores tower?;;						aut_shoots
+SEGMENTED_CONTROL 	<Yes,No,Try/Fail>;;						Can pass under low bar;;			aut_underLowBar
+SLIDER 				<0,10>;;								Shot Accuracy;;						aut_shot_accuracy
 
 LABEL 				<distinguished, center>;;				TeleOp
-SEGMENTED_CONTROL 	<Neutral Zone, Spy>;;					Starting Positions;;							teleop_starting_position
-SEGMENTED_CONTROL 	<Portcullis,Cheval De Frise>;;			Which Category A Defense is on the Field?;;		teleop_catA_defense
-STEPPER 			<0,99>;;								Times crossed;;									teleop_catA_timesCrossed
-SEGMENTED_CONTROL 	<Moat,Ramparts>;;						Which Category B Defense is on the Field?;;		teleop_catB_defense
-STEPPER 			<0,99>;;								Times crossed;;									teleop_catB_timesCrossed
-SEGMENTED_CONTROL 	<Sallyport,Drawbridge>;;				Which Category C Defense is on the Field?;;		teleop_catC_defense
-STEPPER 			<0,99>;;								Times crossed;;									teleop_catC_timesCrossed
-SEGMENTED_CONTROL 	<Rockwall,Rough Terrain>;;				Which Category D Defense is on the Field?;;		teleop_catD_defense
-STEPPER 			<0,99>;;								Times crossed;;									teleop_catD_timesCrossed
-STEPPER 		 	<0,99>;;								Times through lowbar;;							teleop_lowbarCrossed
-SEGMENTED_CONTROL 	<No,Yes,Try/Fail>;;						Can Climb?;;									teleop_climbing
-SEGMENTED_CONTROL 	<No,Yes>;;								Is a defender bot?;;							teleop_defender_bot
-STEPPER 			<0,99>;;								Scored High Goal;;								teleop_shots_highgoal
-STEPPER 			<0,99>;;								Scored Low Goal;;								teleop_shots_lowgoal
-SLIDER 				<0,10>;;								Shot Accuracy;;									teleop_shot_accuracy
-STEPPER 			<0,99>;;								Fouls;;											teleop_fouls
-TEXTFIELD 			<number>;;								Total Points;;									teleop_total_points
-TEXTFIELD 			<normal>;;								Final Thoughts?;;								teleop_general_info
+SEGMENTED_CONTROL 	<Neutral Zone, Spy>;;					Starting Positions;;				teleop_starting_position
+LABEL 				<normal, center>;;Can overcome defense (check all that apply)
+SWITCH 				;;Portcullis,Cheval Frise,Moat,Ramparts;;teleop_portcullis,teleop_chevalDeFrise,teleop_moat,teleop_ramparts
+SWITCH 				;;Drawbridge,Sally Port,Rock wall,Rough Terrain;;teleop_drawbridge,teleop_sallyport,teleop_rockwall,teleop_rough_terrain
+SEGMENTED_CONTROL 	<Yes,No,Try/Fail>;;						Can pass under low bar;;			teleop_underLowBar
+SEGMENTED_CONTROL 	<Yes,No,Try/Fail>;;						Can Climb?;;						teleop_climbing
+SEGMENTED_CONTROL 	<Yes,No>;;								Is a defender bot?;;				teleop_defender_bot
+STEPPER 			<0,99>;;								Shots Made High Goal;;				teleop_shots_highgoal
+STEPPER 			<0,99>;;								Shots Made Low Goal;;				teleop_shots_lowgoal
+SLIDER 				<0,10>;;								Shot Accuracy;;						teleop_shot_accuracy
+STEPPER 			<0,99>;;								Technical fouls;;					teleop_technical_fouls
+STEPPER 			<0,99>;;								Normal fouls;;						teleop_normal_fouls
+TEXTFIELD 			<number>;;								Total Points;;						teleop_total_points
+TEXTFIELD 			<normal>;;								Final Thoughts?;;					teleop_general_info
 
 LABEL 				<distinguished, center>;;				Human Players
-SEGMENTED_CONTROL 	<No, Yes>;;								Can team utilize gestures?;;					human_uses_gestures
-SLIDER 				<0,10>;;								Is the human player effective?;;				human_effective
+SEGMENTED_CONTROL 	<Yes, No>;;								Can team utilize gestures?;;		human_uses_gestures
+SLIDER 				<0,10>;;								Is the human player effective?;;	human_effective
 SPACE
 
 ## --------END INTERFACE STUFF--------
@@ -109,14 +107,16 @@ SPACE
 ##			@EQUATION TELEOP=(teleop_boxes_scored+teleop_goals_score+(teleop_shots_attempted / 4)) / 3
 ##
 ##      IMPORTANT: ONLY THE FOLLOWING ELEMENTS MAY BE USED IN EQUATIONS
-##          - SEGMENTED_CONTROL - ONLY with arguments of <No,Yes,Try/Fail> Yes=1, No=0, Try/Fail=.5
+##          - SEGMENTED_CONTROL - ONLY with arguments of <Yes,No,Try/Fail> Yes=1, No=0, Try/Fail=.5
 ##          - TEXTFIELD - ONLY with arguments of <decimal> or <number>
 ##          - STEPPER - Go crazy
 ##          - SWITCH - Yes=1, No=0
 ##          - SLIDER - See: STEPPER
 ##      If an Element besides the ones listed above is used, the program will replace its value with 0.
 
-@EQUATION OVERALL_SCORE=(teleop_catA_timesCrossed+teleop_catB_timesCrossed+teleop_catC_timesCrossed+teleop_catD_timesCrossed+teleop_lowbarCrossed+2*teleop_shots_highgoal+teleop_shots_lowgoal)/8
+@EQUATION AUTONOMOUS=(aut_reaches_defenses+aut_portcullis+aut_chevalDeFrise+aut_moat+aut_ramparts+aut_drawbridge+aut_sallyport+aut_rockwall+aut_rough_terrain)/9
+@EQUATION TELEOP=(teleop_portcullis+teleop_chevalDeFrise+teleop_moat+teleop_ramparts+teleop_drawbridge+teleop_sallyport+teleop_rockwall+teleop_rough_terrain)/8
+@EQUATION HUMAN=0
 
 ## --------EXTRA HELP--------
 ## If you find yourself still confused as to how you should edit this file, you can find an instructional video below

@@ -63,7 +63,7 @@ public class ScoutingActivity extends DHActivity implements CompoundButton.OnChe
                 if (BluetoothCore.isConnected()) {
                     if (ScoutingActivity.this.checkFields()) {
                         fab.setEnabled(false);
-                        Snackbar.make(view, "Sending...", Snackbar.LENGTH_LONG).setAction("Action", null).show();
+                        Snackbar.make(view, "Sending...", Snackbar.LENGTH_SHORT).setAction("Action", null).show();
                         String results = ScoutingActivity.this.collectResults();
                         BluetoothCore.sendScoutingData(results);
                         final ScheduledExecutorService exec = Executors.newScheduledThreadPool(1);

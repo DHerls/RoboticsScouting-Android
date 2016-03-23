@@ -244,6 +244,7 @@ public class MainActivity extends DHActivity {
     protected void onDestroy() {
         super.onDestroy();
         unregisterReceiver(mReceiver);
+        BluetoothCore.stopBLE();
     }
 
 
@@ -292,5 +293,6 @@ public class MainActivity extends DHActivity {
                 || (Build.BRAND.startsWith("generic") && Build.DEVICE.startsWith("generic"))
                 || "google_sdk".equals(Build.PRODUCT);
     }
+
 
 }

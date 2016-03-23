@@ -248,6 +248,8 @@ public class RetrieveDataActivity extends DHActivity {
                             Intent displayIntent = new Intent(this, DisplayDataActivity.class);
                             displayIntent.putExtra("TEAM_DATA", teamInfo);
                             displayIntent.putExtra("COLUMN_DATA", prettyColumns);
+                            System.out.println("Here");
+                            System.out.println(responseString);
                             startActivity(displayIntent);
                         } else {
                             ArrayList<ArrayList<String>> data = new ArrayList<>();

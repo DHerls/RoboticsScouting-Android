@@ -55,7 +55,7 @@ public class DisplayDataActivity extends DHActivity {
         String value;
         double raw = 0.0;
         double average;
-        try {
+//        try {
             for (Element e : FileManager.getElements()) {
                 switch (e.getType()) {
 
@@ -71,6 +71,7 @@ public class DisplayDataActivity extends DHActivity {
                                 value = s + "-" + args;
                                 //Calculate raw value and average
                                 try {
+                                    System.out.println(e.getColumnValues()[i]);
                                     raw = Double.parseDouble(teamData.get(e.getColumnValues()[i]));
                                 } catch (NumberFormatException e1) {
                                     try {
@@ -217,10 +218,11 @@ public class DisplayDataActivity extends DHActivity {
                 average = 1.0 * raw / numMatches;
                 teamLayout.addView(new TeamInfoView(this, value, raw, average));
             }
-        } catch (NullPointerException e){
-            sendError("Remote database does not match config",false);
-            this.finish();
-        }
+//        } catch (NullPointerException e){
+//            sendError("Remote database does not match config",false);
+//
+//            this.finish();
+//        }
     }
 
     /**

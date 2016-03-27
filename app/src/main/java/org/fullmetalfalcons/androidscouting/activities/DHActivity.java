@@ -74,7 +74,7 @@ public abstract class DHActivity extends AppCompatActivity {
                             public void onClick(DialogInterface dialog, int which) {
                                 //Close the app
                                 if (fatalError) {
-                                    System.exit(0);
+                                    System.exit(-1);
                                 }
                             }
                         })

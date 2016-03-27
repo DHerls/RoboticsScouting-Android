@@ -73,26 +73,28 @@ class BluetoothUtility {
 
         //If the device does not support bluetooth
         if (bluetoothAdapter == null){
-            activity.sendError("Bluetooth is not supported on this device, this app is useless",true);
+            activity.sendError("Bluetooth is not supported on this device, this app is useless", true);
             return false;
         } else {
-            bluetoothAdapter.setName(Utils.getDeviceName() + " " + BLUETOOTH_ADAPTER_NAME);
+            if (!bluetoothAdapter.isMultipleAdvertisementSupported()){
+                ((MainActivity) a).sendError("BLE is not supported on this device",true);
+                return false;
+            } else {
+                bluetoothAdapter.setName(Utils.getDeviceName() + " " + BLUETOOTH_ADAPTER_NAME);
+                //If bluetooth is not turned on
+                if(!bluetoothAdapter.isEnabled()) {
+                    Log.d(a.getString(R.string.log_tag),"Requesting permission to turn on Bluetooth");
+                    Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
+                    activity.startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT);
+
+                    return false;
+                    //If bluetooth is turned on
+                } else {
+                    bluetoothLeAdvertiser = bluetoothAdapter.getBluetoothLeAdvertiser();
+                    return true;
+                }
+            }
         }
-
-        //If bluetooth is not turned on
-        if(!bluetoothAdapter.isEnabled()) {
-            Log.d(a.getString(R.string.log_tag),"Requesting permission to turn on Bluetooth");
-            Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
-            activity.startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT);
-
-            return false;
-        //If bluetooth is turned on
-        } else {
-            bluetoothLeAdvertiser = bluetoothAdapter.getBluetoothLeAdvertiser();
-            return true;
-        }
-
-
     }
 
     static void stopAll() {
@@ -122,6 +124,10 @@ class BluetoothUtility {
      */
     static void startAdvertise() {
         if(getAdvertising()) return;
+
+        if (bluetoothLeAdvertiser==null){
+            activity.sendError("BLE is not supported on this device", true);
+        }
 
         startGattServer();
 

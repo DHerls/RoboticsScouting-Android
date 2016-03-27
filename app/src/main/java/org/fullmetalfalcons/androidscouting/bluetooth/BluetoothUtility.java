@@ -76,10 +76,6 @@ class BluetoothUtility {
             activity.sendError("Bluetooth is not supported on this device, this app is useless", true);
             return false;
         } else {
-            if (!bluetoothAdapter.isMultipleAdvertisementSupported()){
-                ((MainActivity) a).sendError("BLE is not supported on this device",true);
-                return false;
-            } else {
                 bluetoothAdapter.setName(Utils.getDeviceName() + " " + BLUETOOTH_ADAPTER_NAME);
                 //If bluetooth is not turned on
                 if(!bluetoothAdapter.isEnabled()) {
@@ -91,9 +87,12 @@ class BluetoothUtility {
                     //If bluetooth is turned on
                 } else {
                     bluetoothLeAdvertiser = bluetoothAdapter.getBluetoothLeAdvertiser();
+                    if (bluetoothLeAdvertiser==null){
+                        activity.sendError("BLE not supported",true);
+                        return false;
+                    }
                     return true;
                 }
-            }
         }
     }
 

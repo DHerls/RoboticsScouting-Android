@@ -15,8 +15,8 @@ android {
         applicationId "org.fullmetalfalcons.androidscouting"
         minSdkVersion 21
         targetSdkVersion 23
-        versionCode 5
-        versionName "2016_3_1"
+        versionCode 6
+        versionName "2016_3_2"
     }
     buildTypes {
         release {

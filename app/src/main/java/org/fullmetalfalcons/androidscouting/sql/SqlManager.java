@@ -21,8 +21,10 @@ import java.util.concurrent.ExecutionException;
  * Created by djher on 3/3/2016.
  */
 public class SqlManager {
-    private static final String USERNAME_BASE = "ridget35_";
-    private static final String URL_BASE = "jdbc:mysql://ridgetopclub.com:3306/";
+    //The below string will be prepended to team numbers i.e. username_4557
+    private static final String USERNAME_BASE = "";
+    //The below string should be set to the URL of the SQL server
+    private static final String URL_BASE = "jdbc:mysql://fullmetalfalcons.com:3306/";
 
     public static void requestTeamNumber(DHActivity a, String teamNum){
         RequestTask rt = new RequestTask(a);

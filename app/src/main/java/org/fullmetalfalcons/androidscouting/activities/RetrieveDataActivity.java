@@ -31,6 +31,7 @@ import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -254,17 +255,8 @@ public class RetrieveDataActivity extends DHActivity {
                         } else {
                             ArrayList<ArrayList<String>> data = new ArrayList<>();
                             String[] teams = responseString.split(";;");
-                            Matcher m;
-                            String[] value;
-                            ArrayList<String> subData;
                             for (String t: teams){
-                                m = p.matcher(t);
-                                subData = new ArrayList<>();
-                                while (m.find()){
-                                    value = m.group(1).split("=");
-                                    subData.add(value[1]);
-                                }
-                                data.add(subData);
+                                data.add(new ArrayList<>(Arrays.asList(t.split(","))));
                             }
                             Intent displayIntent = new Intent(this, SelectTeamActivity.class);
                             displayIntent.putExtra("TEAM_DATA", data);

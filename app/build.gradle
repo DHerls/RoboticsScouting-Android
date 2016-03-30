@@ -5,7 +5,7 @@ android {
         release1 {
             keyAlias 'androidkey01'
             keyPassword 'AeUN5O&Ub@EZtFqT'
-            storeFile file('E:/OneDrive/Documents/Android Keys/releasekey.jks')
+            storeFile file('C:/Users/djher/OneDrive/Documents/Android Keys/releasekey.jks')
             storePassword 'Xsp#%RLaBh%mH!@$'
         }
     }
@@ -15,8 +15,8 @@ android {
         applicationId "org.fullmetalfalcons.androidscouting"
         minSdkVersion 21
         targetSdkVersion 23
-        versionCode 6
-        versionName "2016_3_2"
+        versionCode 7
+        versionName "2016_3_3"
     }
     buildTypes {
         release {

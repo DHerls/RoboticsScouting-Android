@@ -412,15 +412,17 @@ public class RetrieveDataActivity extends DHActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
+        Intent intent;
         switch (item.getItemId())
         {
             case android.R.id.home:
                 this.finish();
                 break;
-            case R.id.action_retrieve_settings:
-                Intent intent = new Intent(this,RetrieveSettingsActivity.class);
-                startActivity(intent);
-                break;
+            //Uncomment if developing remote retrieve
+//            case R.id.action_retrieve_settings:
+//                intent = new Intent(this,RetrieveSettingsActivity.class);
+//                startActivity(intent);
+//                break;
             case R.id.action_about:
                 intent = new Intent(this,AboutActivity.class);
                 startActivity(intent);

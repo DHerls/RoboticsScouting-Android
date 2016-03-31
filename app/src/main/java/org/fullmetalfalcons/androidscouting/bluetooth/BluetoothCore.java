@@ -255,7 +255,7 @@ public class BluetoothCore {
     }
 
     public static void searchForTeams(String type, String column, String operator, String value) {
-        String toSend = type.equals("Average") ? "avg":"raw" + ";;" + column + ";;" + operator + ";;" + value;
+        String toSend = (type.equals("Average") ? "avg":"raw") + ";;" + column + ";;" + operator + ";;" + value;
         if (toSend.length()<mtu){
             BluetoothUtility.sendNotification(receiveDataCharacteristic, BleDevice, toSend);
         }

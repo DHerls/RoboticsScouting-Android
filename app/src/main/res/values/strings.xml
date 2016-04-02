@@ -31,7 +31,6 @@ After installing and opening the Mac app, make sure Bluetooth is enabled on both
         <item>&lt;</item>
         <item>≥</item>
         <item>≤</item>
-        <item>≠</item>
     </string-array>
     <string name="key_team_num" tools:ignore="UnusedResources">team_num</string>
     <string name="key_match_num" tools:ignore="UnusedResources">match_num</string>

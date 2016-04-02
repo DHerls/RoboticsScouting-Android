@@ -5,7 +5,7 @@ android {
         release1 {
             keyAlias 'androidkey01'
             keyPassword 'AeUN5O&Ub@EZtFqT'
-            storeFile file('E:/OneDrive/Documents/Android Keys/releasekey.jks')
+            storeFile file('C:/Users/djher/OneDrive/Documents/Android Keys/releasekey.jks')
             storePassword 'Xsp#%RLaBh%mH!@$'
         }
     }

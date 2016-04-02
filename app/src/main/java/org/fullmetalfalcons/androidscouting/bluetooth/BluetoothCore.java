@@ -250,12 +250,12 @@ public class BluetoothCore {
         return advertising;
     }
 
-    public static void requestTeamNum(String s) {
-        BluetoothUtility.sendNotification(receiveDataCharacteristic, BleDevice, s);
+    public static void requestTeamNum(String teamNum) {
+        BluetoothUtility.sendNotification(receiveDataCharacteristic, BleDevice, "n::"+teamNum);
     }
 
     public static void searchForTeams(String type, String column, String operator, String value) {
-        String toSend = (type.equals("Average") ? "avg":"raw") + ";;" + column + ";;" + operator + ";;" + value;
+        String toSend = "i::" + (type.equals("Average") ? "avg":"raw") + ";;" + column + ";;" + operator + ";;" + value;
         if (toSend.length()<mtu){
             BluetoothUtility.sendNotification(receiveDataCharacteristic, BleDevice, toSend);
         }

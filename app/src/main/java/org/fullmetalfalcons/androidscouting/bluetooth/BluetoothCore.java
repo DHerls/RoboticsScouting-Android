@@ -69,9 +69,10 @@ public class BluetoothCore {
             if (status ==0 && newState==0){
                 BluetoothUtility.startAdvertise();
                 activity.setConnected(false);
-                connected = false;
+                connected  = false;
                 activity.setAdvertising(true);
                 advertising = true;
+                BleDevice = null;
             //If the device is connected
             } else if (status == 0 && newState==2){
                 BluetoothUtility.stopAdvertise();
@@ -79,6 +80,7 @@ public class BluetoothCore {
                 advertising = false;
                 activity.setConnected(true);
                 connected = true;
+                BleDevice = device;
             }
 
         }
@@ -136,7 +138,7 @@ public class BluetoothCore {
             // now tell the connected device that this was all successful
             BluetoothUtility.sendResponse(device, requestId, BluetoothGatt.GATT_SUCCESS, offset, value);
             BleDevice = device;
-
+            System.out.println("Here");
         }
     };
 
@@ -207,6 +209,7 @@ public class BluetoothCore {
 
     public static void setPassphrase(String passphrase1){
         if (BluetoothUtility.setupBluetooth(activity) && !passphrase1.equalsIgnoreCase(passphrase)){
+
             passphrase = passphrase1;
             BluetoothUtility.stopAll();
             BluetoothUtility.setServiceUUID(getServiceUUID());
@@ -221,7 +224,7 @@ public class BluetoothCore {
 
     public static void stopBLE() {
         Log.d(activity.getString(R.string.log_tag),"Stopping BLE");
-
+        BleDevice = null;
         BluetoothUtility.stopAll();
     }
 

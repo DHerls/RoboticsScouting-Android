@@ -416,8 +416,8 @@ public class RetrieveDataActivity extends DHActivity {
         switch (item.getItemId())
         {
             case android.R.id.home:
-                this.finish();
-                break;
+                onBackPressed();
+                return true;
             //Uncomment if developing remote retrieve
 //            case R.id.action_retrieve_settings:
 //                intent = new Intent(this,RetrieveSettingsActivity.class);

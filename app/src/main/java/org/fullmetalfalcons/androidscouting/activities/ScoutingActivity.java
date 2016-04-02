@@ -144,8 +144,8 @@ public class ScoutingActivity extends DHActivity implements CompoundButton.OnChe
         Intent intent;
         switch(id){
             case android.R.id.home:
-                this.finish();
-                break;
+                onBackPressed();
+                return true;
             case R.id.action_about:
                 intent = new Intent(this,AboutActivity.class);
                 startActivity(intent);

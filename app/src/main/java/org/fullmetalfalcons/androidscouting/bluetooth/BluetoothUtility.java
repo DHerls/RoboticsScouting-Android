@@ -97,6 +97,7 @@ class BluetoothUtility {
     }
 
     static void stopAll() {
+
         if(getAdvertising()) stopAdvertise();
         if(gattServer != null) stopGattServer();
 
@@ -165,6 +166,7 @@ class BluetoothUtility {
     }
 
     private static void stopGattServer(){
+
         gattServer.clearServices();
         gattServer.close();
         activity.setConnected(false);

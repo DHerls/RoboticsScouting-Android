@@ -520,7 +520,23 @@ public class Element {
             case TEXTFIELD:
                 ll = (LinearLayout) view;
                 EditText et = (EditText) ll.getChildAt(1);
-                map.put(keys[0], et.getText().toString());
+                switch (et.getInputType()){
+                    case InputType.TYPE_CLASS_NUMBER:
+                        if (et.getText().toString().isEmpty()||et.getText().toString().equals("")){
+                            map.put(keys[0],0);
+
+                        }
+                        break;
+                    case InputType.TYPE_NUMBER_FLAG_DECIMAL:
+                        if (et.getText().toString().isEmpty()||et.getText().toString().equals("")){
+                            map.put(keys[0],0.0);
+
+
+                        }
+                        break;
+                    default:
+                }
+                map.put(keys[0],et.getText().toString());
             break;
             case STEPPER:
                 ll = (LinearLayout) view;

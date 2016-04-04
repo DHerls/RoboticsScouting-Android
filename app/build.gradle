@@ -1,22 +1,14 @@
 apply plugin: 'com.android.application'
 
 android {
-    signingConfigs {
-        release1 {
-            keyAlias 'androidkey01'
-            keyPassword 'AeUN5O&Ub@EZtFqT'
-            storeFile file('C:/Users/djher/OneDrive/Documents/Android Keys/releasekey.jks')
-            storePassword 'Xsp#%RLaBh%mH!@$'
-        }
-    }
     compileSdkVersion 23
     buildToolsVersion "23.0.2"
     defaultConfig {
         applicationId "org.fullmetalfalcons.androidscouting"
         minSdkVersion 21
         targetSdkVersion 23
-        versionCode 10
-        versionName "16.3.6"
+        versionCode 11
+        versionName "16.3.7"
     }
     buildTypes {
         release {

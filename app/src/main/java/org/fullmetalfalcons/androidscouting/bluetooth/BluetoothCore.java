@@ -116,7 +116,8 @@ public class BluetoothCore {
             if (characteristic.getUuid().equals(receiveDataCharacteristic.getUuid())){
                 BluetoothUtility.sendResponse(device, requestId, BluetoothGatt.GATT_SUCCESS, offset, value);
                 String write = new String(value);
-                if (write.equals("EOM")){
+                Log.d("Received",write);
+                if (write.equalsIgnoreCase("EOM+TEAM") || write.equalsIgnoreCase("EOM+INFO")){
                     RetrieveDataActivity.setResponseString(responseBuilder.toString());
                     responseBuilder = new StringBuilder();
                 } else if (write.equalsIgnoreCase("NoReadTable")||write.equalsIgnoreCase("NoReadTeam")||write.equals("NoSearchResult")){

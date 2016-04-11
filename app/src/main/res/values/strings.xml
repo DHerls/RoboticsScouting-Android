@@ -41,7 +41,7 @@ After installing and opening the Mac app, make sure Bluetooth is enabled on both
     <string name="bluetooth_code_hint">ex. 333B</string>
     <string name="connection_label">Connection:</string>
     <string name="advertising_label">Advertising:</string>
-    <string name="retrieve_description_label">Retrieve a single team or search for teams that meet certain criteria</string>
+    <string name="retrieve_description_label">Retrieve a single team by number</string>
     <string name="team_number_label">Team Number:</string>
     <string name="retrieve_or">Or:</string>
     <string name="retrieve_value_hint">Value</string>

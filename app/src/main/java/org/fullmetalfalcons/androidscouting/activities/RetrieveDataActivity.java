@@ -63,12 +63,13 @@ public class RetrieveDataActivity extends DHActivity {
         setSupportActionBar(toolbar);
         //noinspection ConstantConditions
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-
-        //Set column values in the column spinner
-        columnSpinner = (Spinner) findViewById(R.id.column_spinner);
-        ArrayAdapter<String> spinnerArrayAdapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, getColumnValues());
-        spinnerArrayAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        columnSpinner.setAdapter(spinnerArrayAdapter);
+//
+//        SEARCH FUNCTIONALITY
+//        //Set column values in the column spinner
+//        columnSpinner = (Spinner) findViewById(R.id.column_spinner);
+//        ArrayAdapter<String> spinnerArrayAdapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, getColumnValues());
+//        spinnerArrayAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+//        columnSpinner.setAdapter(spinnerArrayAdapter);
 
         Button teamOkButton = (Button) findViewById(R.id.retrieve_team_ok);
 
@@ -107,40 +108,41 @@ public class RetrieveDataActivity extends DHActivity {
         });
 
 
-        Button searchOkButton = (Button) findViewById(R.id.retrieve_team_search_button);
-        final Spinner typeSpinner = (Spinner) findViewById(R.id.value_spinner);
-        final Spinner operatorSpinner = (Spinner) findViewById(R.id.operator_spinner);
-        final EditText valueText = (EditText) findViewById(R.id.value_edit_text);
-
-        searchOkButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-                imm.hideSoftInputFromWindow(valueText.getWindowToken(), 0);
-                searchForTeams(typeSpinner,columnSpinner,operatorSpinner,valueText);
-            }
-        });
-
-        valueText.setOnEditorActionListener(new TextView.OnEditorActionListener() {
-            @Override
-            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
-
-                if ((actionId == EditorInfo.IME_ACTION_DONE)) {
-                    //Toast.makeText(getActivity(), "call",45).show();
-                    // hide virtual keyboard
-                    InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-                    imm.hideSoftInputFromWindow(valueText.getWindowToken(), 0);
-
-                    searchForTeams(typeSpinner, columnSpinner, operatorSpinner, valueText);
-                    return true;
-                }
-                return false;
-
-            }
-        });
+//        SEARCH FUNCTIONALITY
+//        Button searchOkButton = (Button) findViewById(R.id.retrieve_team_search_button);
+//        final Spinner typeSpinner = (Spinner) findViewById(R.id.value_spinner);
+//        final Spinner operatorSpinner = (Spinner) findViewById(R.id.operator_spinner);
+//        final EditText valueText = (EditText) findViewById(R.id.value_edit_text);
+//
+//        searchOkButton.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+//                imm.hideSoftInputFromWindow(valueText.getWindowToken(), 0);
+//                searchForTeams(typeSpinner,columnSpinner,operatorSpinner,valueText);
+//            }
+//        });
+//
+//        valueText.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+//            @Override
+//            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+//
+//                if ((actionId == EditorInfo.IME_ACTION_DONE)) {
+//                    //Toast.makeText(getActivity(), "call",45).show();
+//                    // hide virtual keyboard
+//                    InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+//                    imm.hideSoftInputFromWindow(valueText.getWindowToken(), 0);
+//
+//                    searchForTeams(typeSpinner, columnSpinner, operatorSpinner, valueText);
+//                    return true;
+//                }
+//                return false;
+//
+//            }
+//        });
     }
 
-    private void searchForTeams(Spinner typeSpinner, Spinner columnSpinner, Spinner operatorSpinner, EditText valueText) {
+/*    private void searchForTeams(Spinner typeSpinner, Spinner columnSpinner, Spinner operatorSpinner, EditText valueText) {
         SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
         String value = valueText.getText().toString();
 
@@ -166,7 +168,7 @@ public class RetrieveDataActivity extends DHActivity {
             }
 
         }
-    }
+    }*/
 
     private void requestTeamNum(EditText teamNumEditText) {
         SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
